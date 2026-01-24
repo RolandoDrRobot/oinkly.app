@@ -109,12 +109,20 @@
   gap: 12px;
 }
 
+.debt-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
 .debt-header-main {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 8px 0 0 0;
+  padding-bottom: 0;
   border-radius: 6px;
   transition: background 0.2s;
   width: 100%;
@@ -131,10 +139,8 @@
 .debt-summary {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 8px;
-  margin-left: 16px;
-  min-width: 120px;
 }
 
 .summary-item {
@@ -176,17 +182,33 @@
   color: var(--primary);
 }
 
-.debt-header h3 {
-  margin: 0 0 4px 0;
+.debt-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.debt-header h3,
+.debt-name {
+  margin: 0;
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .debt-bank {
-  margin: 0 0 4px 0;
+  margin: 0;
   font-size: 14px;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .debt-type {
@@ -195,6 +217,17 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.debt-info-icon {
+  font-size: 16px;
+  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .debt-actions {
@@ -408,4 +441,36 @@
 .task-checkbox input[type="checkbox"]:checked + span.completed {
   color: var(--primary-bright);
   opacity: 1;
+}
+
+.editable-field {
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.editable-field:hover {
+  background: rgba(31, 187, 166, 0.1);
+  color: var(--primary);
+}
+
+.inline-edit-input {
+  background: var(--dark-bg);
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--text-primary);
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  width: auto;
+  min-width: 100px;
+  outline: none;
+}
+
+.inline-edit-input:focus {
+  border-color: var(--primary-bright);
+  box-shadow: 0 0 0 3px rgba(31, 187, 166, 0.2);
 }
