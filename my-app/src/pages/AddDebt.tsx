@@ -39,8 +39,8 @@ interface StepData {
   totalLocal?: number;
   totalDollars?: number;
   feeToUpdate?: number;
+  feeToUpdateDollars?: number;
   currentPlan?: string;
-  inOrder?: boolean;
   hasCallTask?: boolean;
 }
 
@@ -158,19 +158,21 @@ const AddDebt: React.FC = () => {
       type: 'number',
     },
     {
+      id: 'feeToUpdateDollars',
+      title: 'Amount to Update',
+      subtitle: 'How much do you need to pay to be up to date in US Dollars?',
+      icon: FaDollarSign,
+      field: 'feeToUpdateDollars' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+    },
+    {
       id: 'currentPlan',
       title: 'Payment Plan',
       subtitle: 'Describe your current payment plan',
       icon: FaClipboardList,
       field: 'currentPlan' as keyof StepData,
       placeholder: 'e.g. 12 monthly installments',
-    },
-    {
-      id: 'inOrder',
-      title: 'Payment Status',
-      subtitle: 'Is this debt up to date?',
-      icon: FaCheckCircle,
-      type: 'boolean',
     },
     {
       id: 'callTask',
@@ -222,9 +224,7 @@ const AddDebt: React.FC = () => {
 
   const handleBooleanSelect = (value: boolean) => {
     const step = steps[currentStep];
-    if (step.id === 'inOrder') {
-      setFormData({ ...formData, inOrder: value });
-    } else if (step.id === 'callTask') {
+    if (step.id === 'callTask') {
       setFormData({ ...formData, hasCallTask: value });
     }
     setTimeout(() => handleNext(), 300);
@@ -233,6 +233,10 @@ const AddDebt: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
+        const feeToUpdate = formData.feeToUpdate || 0;
+        const feeToUpdateDollars = formData.feeToUpdateDollars || 0;
+        const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
+        
         const newDebt: Debt = {
           id: Date.now().toString(),
           name: formData.name || '',
@@ -242,8 +246,9 @@ const AddDebt: React.FC = () => {
           dollarFee: formData.dollarFee || 0,
           totalLocal: formData.totalLocal || 0,
           totalDollars: formData.totalDollars || 0,
-          feeToUpdate: formData.feeToUpdate || 0,
-          inOrder: formData.inOrder || false,
+          feeToUpdate: feeToUpdate,
+          feeToUpdateDollars: feeToUpdateDollars,
+          inOrder: inOrder,
           currentPlan: formData.currentPlan || '',
           bankName: formData.bankName || '',
           bankPhone: formData.bankPhone || '',

@@ -57,17 +57,33 @@ const EditDebt: React.FC = () => {
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev!,
-      [name]: parseFloat(value) || 0,
-    }));
+    const newValue = parseFloat(value) || 0;
+    const updated = {
+      ...formData!,
+      [name]: newValue,
+    };
+    
+    // Calculate inOrder automatically if feeToUpdate or feeToUpdateDollars changed
+    if (name === 'feeToUpdate' || name === 'feeToUpdateDollars') {
+      const feeToUpdate = name === 'feeToUpdate' ? newValue : (updated.feeToUpdate || 0);
+      const feeToUpdateDollars = name === 'feeToUpdateDollars' ? newValue : (updated.feeToUpdateDollars || 0);
+      updated.inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
+    }
+    
+    setFormData(updated);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) {
+      const feeToUpdate = formData.feeToUpdate || 0;
+      const feeToUpdateDollars = formData.feeToUpdateDollars || 0;
+      const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
+      
       storage.saveDebt({
         ...formData,
+        feeToUpdateDollars: feeToUpdateDollars,
+        inOrder: inOrder,
         updatedAt: new Date().toISOString(),
       });
       navigate('/dashboard');
@@ -224,6 +240,18 @@ const EditDebt: React.FC = () => {
 
           <div className="form-group">
             <input
+              name="feeToUpdateDollars"
+              type="number"
+              step="0.01"
+              value={formData.feeToUpdateDollars || 0}
+              onChange={handleNumberChange}
+              placeholder="Amount to update (USD)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
               name="currentPlan"
               type="text"
               value={formData.currentPlan}
@@ -231,18 +259,6 @@ const EditDebt: React.FC = () => {
               placeholder="Current plan"
               required
             />
-          </div>
-
-          <div className="form-group checkbox-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="inOrder"
-                checked={formData.inOrder}
-                onChange={handleChange}
-              />
-              <span>In Order</span>
-            </label>
           </div>
 
           <div className="form-group checkbox-group">
