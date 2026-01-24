@@ -6,6 +6,8 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
+import Profile from './pages/Profile';
+import Preferences from './pages/Preferences';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -38,6 +40,22 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <EditDebt />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/preferences"
+        element={
+          <ProtectedRoute>
+            <Preferences />
           </ProtectedRoute>
         }
       />

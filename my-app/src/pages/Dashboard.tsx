@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -140,14 +140,16 @@ const Dashboard: React.FC = () => {
           <div>
             <h1>Debts</h1>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-logout"
-            onClick={logout}
-          >
-            Logout
-          </motion.button>
+          <div className="header-actions">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
+              onClick={() => navigate('/profile')}
+            >
+              <Icon component={FaUser} />
+            </motion.button>
+          </div>
         </div>
       </motion.header>
 

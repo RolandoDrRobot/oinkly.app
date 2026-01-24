@@ -19,6 +19,32 @@
   max-width: 100%;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-profile {
+  background: transparent;
+  border: 1px solid var(--dark-green);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-profile:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(31, 187, 166, 0.1);
+}
+
 .dashboard-header h1 {
   margin: 0;
   font-size: 32px;
