@@ -6,10 +6,10 @@
 }
 
 .dashboard-header {
-  background: linear-gradient(135deg, var(--dark-section) 0%, var(--dark-green) 100%);
+  background: var(--dark-section);
   color: var(--text-primary);
   padding: 24px 20px;
-  border-bottom: 2px solid rgba(31, 187, 166, 0.2);
+  border-bottom: 2px solid var(--dark-green);
 }
 
 .header-content {
@@ -42,7 +42,7 @@
 .btn-profile:hover {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(31, 187, 166, 0.1);
+  background: var(--primary-overlay);
 }
 
 .dashboard-header h1 {
@@ -88,7 +88,7 @@
 
 .summary-card:hover {
   border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(31, 187, 166, 0.2);
+  box-shadow: 0 4px 12px var(--primary-overlay-medium);
 }
 
 .summary-section {
@@ -174,7 +174,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-medium) 100%);
+  background: var(--primary);
   color: var(--dark-bg);
   border: none;
   font-size: 24px;
@@ -183,14 +183,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(31, 187, 166, 0.4);
+  box-shadow: 0 6px 20px var(--shadow-medium);
   transition: all 0.3s;
   z-index: 1000;
 }
 
 .fab-add-debt:hover {
-  background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 100%);
-  box-shadow: 0 8px 24px rgba(0, 229, 199, 0.5);
+  background: var(--primary-bright);
+  box-shadow: 0 8px 24px var(--shadow-dark);
   transform: translateY(-2px);
 }
 
@@ -231,12 +231,12 @@
   padding: 20px;
   border: 1px solid var(--dark-green);
   transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .debt-card:hover {
   border-color: var(--primary);
-  box-shadow: 0 4px 16px rgba(31, 187, 166, 0.2);
+  box-shadow: 0 4px 16px var(--primary-overlay-medium);
   transform: translateY(-2px);
 }
 
@@ -266,7 +266,7 @@
 }
 
 .debt-header-main:hover {
-  background: linear-gradient(90deg, rgba(31, 187, 166, 0.05) 0%, rgba(31, 187, 166, 0.02) 100%);
+  background: var(--overlay-light);
 }
 
 .debt-header-main > div:first-child {
@@ -315,7 +315,7 @@
 }
 
 .btn-expand:hover {
-  background: rgba(31, 187, 166, 0.1);
+  background: var(--primary-overlay);
   color: var(--primary);
 }
 
@@ -382,8 +382,8 @@
   font-size: 16px;
   padding: 6px;
   border-radius: 4px;
-  background: rgba(31, 187, 166, 0.1);
-  border: 1px solid rgba(31, 187, 166, 0.3);
+  background: var(--primary-overlay);
+  border: 1px solid var(--primary-border);
 }
 
 .call-completed-icon {
@@ -394,8 +394,8 @@
   font-size: 16px;
   padding: 6px;
   border-radius: 4px;
-  background: rgba(0, 229, 199, 0.1);
-  border: 1px solid rgba(0, 229, 199, 0.3);
+  background: var(--primary-bright-overlay);
+  border: 1px solid var(--primary-bright-border);
 }
 
 .debt-expanded-content {
@@ -421,13 +421,13 @@
 }
 
 .btn-edit:hover {
-  background: rgba(31, 187, 166, 0.1);
+  background: var(--primary-overlay);
   color: var(--primary);
 }
 
 .btn-delete:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: var(--error-light);
+  color: var(--error);
 }
 
 .debt-main-info {
@@ -455,8 +455,8 @@
 }
 
 .payment-item.total-debt {
-  background: linear-gradient(135deg, rgba(31, 187, 166, 0.15) 0%, rgba(48, 145, 132, 0.1) 100%);
-  border: 1px solid rgba(31, 187, 166, 0.4);
+  background: var(--overlay);
+  border: 1px solid var(--primary);
 }
 
 .payment-item.total-debt .payment-value {
@@ -466,8 +466,8 @@
 }
 
 .payment-item.update-amount {
-  background: linear-gradient(135deg, rgba(0, 229, 199, 0.1) 0%, rgba(31, 187, 166, 0.05) 100%);
-  border: 1px solid rgba(0, 229, 199, 0.3);
+  background: var(--overlay-light);
+  border: 1px solid var(--primary-bright);
 }
 
 .payment-label {
@@ -516,14 +516,14 @@
 }
 
 .status-badge.in-order {
-  background: linear-gradient(135deg, rgba(0, 229, 199, 0.15) 0%, rgba(31, 187, 166, 0.1) 100%);
+  background: var(--overlay);
   color: var(--primary-bright);
-  border: 1px solid rgba(0, 229, 199, 0.3);
+  border: 1px solid var(--primary-bright);
 }
 
 .status-badge.not-in-order {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: var(--error-light);
+  color: var(--error);
 }
 
 .debt-phone {
@@ -553,7 +553,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-section) 100%);
+  background: var(--dark-bg);
   border-radius: 8px;
   border: 1px solid var(--dark-green);
   margin-top: 16px;
@@ -573,7 +573,7 @@
 }
 
 .task-checkbox:hover {
-  background: linear-gradient(90deg, rgba(31, 187, 166, 0.1) 0%, rgba(31, 187, 166, 0.05) 100%);
+  background: var(--overlay-light);
 }
 
 .task-checkbox input[type="checkbox"] {
@@ -615,7 +615,7 @@
 }
 
 .editable-field:hover {
-  background: linear-gradient(90deg, rgba(31, 187, 166, 0.15) 0%, rgba(31, 187, 166, 0.08) 100%);
+  background: var(--overlay-medium);
   color: var(--primary-bright);
 }
 
@@ -635,6 +635,6 @@
 
 .inline-edit-input:focus {
   border-color: var(--primary-bright);
-  box-shadow: 0 0 0 3px rgba(0, 229, 199, 0.25);
-  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-section) 100%);
+  box-shadow: 0 0 0 3px var(--overlay);
+  background: var(--dark-bg);
 }

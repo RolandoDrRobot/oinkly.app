@@ -4,11 +4,11 @@
 }
 
 .page-header {
-  background: linear-gradient(135deg, var(--dark-section) 0%, var(--dark-green) 100%);
+  background: var(--dark-section);
   color: var(--text-primary);
   padding: 20px 20px 0 20px;
   padding-bottom: 0;
-  border-bottom: 2px solid rgba(31, 187, 166, 0.2);
+  border-bottom: 2px solid var(--dark-green);
 }
 
 .btn-back {
@@ -42,13 +42,13 @@
 }
 
 .debt-form {
-  background: linear-gradient(135deg, var(--dark-section) 0%, var(--dark-bg) 100%);
+  background: var(--dark-section);
   border-radius: 8px;
   padding: 24px;
   border: 1px solid var(--dark-green);
   max-width: 500px;
   margin: 0 auto;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px var(--shadow);
 }
 
 .form-group {
@@ -137,14 +137,14 @@
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-medium) 100%);
+  background: var(--primary);
   color: var(--dark-bg);
-  box-shadow: 0 4px 12px rgba(31, 187, 166, 0.3);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .btn-submit:hover {
-  background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 100%);
-  box-shadow: 0 6px 16px rgba(0, 229, 199, 0.4);
+  background: var(--primary-bright);
+  box-shadow: 0 6px 16px var(--shadow-medium);
   transform: translateY(-2px);
 }
 

@@ -54,4 +54,21 @@ export const storage = {
     const debts = storage.getDebts();
     return debts.find(d => d.id === id) || null;
   },
+
+  // Theme management
+  setThemeMode: (mode: 'light' | 'dark') => {
+    localStorage.setItem('themeMode', mode);
+  },
+
+  getThemeMode: (): 'light' | 'dark' | null => {
+    return localStorage.getItem('themeMode') as 'light' | 'dark' | null;
+  },
+
+  setColorScheme: (scheme: string) => {
+    localStorage.setItem('colorScheme', scheme);
+  },
+
+  getColorScheme: (): string | null => {
+    return localStorage.getItem('colorScheme');
+  },
 };
