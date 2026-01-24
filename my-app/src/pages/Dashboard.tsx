@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser, FaChartLine, FaDollarSign, FaMoneyBill } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -123,6 +123,46 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Calculate totals
+  const calculateTotals = () => {
+    const totals = debts.reduce((acc, debt) => {
+      acc.totalLocal += debt.totalLocal || 0;
+      acc.totalDollars += debt.totalDollars || 0;
+      acc.monthlyLocal += debt.localFee || 0;
+      acc.monthlyDollars += debt.dollarFee || 0;
+      acc.toUpdate += debt.feeToUpdate || 0;
+      
+      // Get the most common currency for local currency display
+      if (debt.localCurrency) {
+        acc.currencies[debt.localCurrency] = (acc.currencies[debt.localCurrency] || 0) + 1;
+      }
+      
+      return acc;
+    }, {
+      totalLocal: 0,
+      totalDollars: 0,
+      monthlyLocal: 0,
+      monthlyDollars: 0,
+      toUpdate: 0,
+      currencies: {} as { [key: string]: number },
+    });
+
+    // Get the most common local currency
+    const currencyKeys = Object.keys(totals.currencies);
+    const mostCommonCurrency = currencyKeys.length > 0
+      ? currencyKeys.reduce((a, b) => 
+          totals.currencies[a] > totals.currencies[b] ? a : b
+        )
+      : 'USD';
+
+    return {
+      ...totals,
+      mostCommonCurrency,
+    };
+  };
+
+  const totals = calculateTotals();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -154,6 +194,64 @@ const Dashboard: React.FC = () => {
       </motion.header>
 
       <div className="dashboard-content">
+        {debts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="dashboard-summary"
+          >
+            <div className="summary-card">
+              <div className="summary-section">
+                <div className="summary-card-header">
+                  <Icon component={FaChartLine} className="summary-icon" />
+                  <span className="summary-label">Total Debt</span>
+                </div>
+                <div className="summary-values">
+                  <div className="summary-value">
+                    <span className="summary-currency">{totals.mostCommonCurrency}</span>
+                    <span className="summary-amount">{formatCurrency(totals.totalLocal, totals.mostCommonCurrency)}</span>
+                  </div>
+                  <div className="summary-value">
+                    <span className="summary-currency">USD</span>
+                    <span className="summary-amount">{formatCurrency(totals.totalDollars, 'USD')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="summary-divider"></div>
+
+              <div className="summary-section">
+                <div className="summary-card-header">
+                  <Icon component={FaMoneyBill} className="summary-icon" />
+                  <span className="summary-label">Monthly Payment</span>
+                </div>
+                <div className="summary-values">
+                  <div className="summary-value">
+                    <span className="summary-currency">{totals.mostCommonCurrency}</span>
+                    <span className="summary-amount">{formatCurrency(totals.monthlyLocal, totals.mostCommonCurrency)}</span>
+                  </div>
+                  <div className="summary-value">
+                    <span className="summary-currency">USD</span>
+                    <span className="summary-amount">{formatCurrency(totals.monthlyDollars, 'USD')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="summary-divider"></div>
+
+              <div className="summary-section">
+                <div className="summary-card-header">
+                  <Icon component={FaDollarSign} className="summary-icon" />
+                  <span className="summary-label">To Update</span>
+                </div>
+                <div className="summary-value-main">
+                  <span className="summary-amount-large">{formatCurrency(totals.toUpdate, totals.mostCommonCurrency)}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         <AnimatePresence mode="wait">
           {debts.length === 0 ? (
@@ -263,6 +361,26 @@ const Dashboard: React.FC = () => {
                           </div>
                         </div>
                         <div className="debt-actions">
+                          {debt.hasCallTask && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="call-task-icon"
+                              title="Call bank task"
+                            >
+                              <Icon component={FaPhone} />
+                            </motion.div>
+                          )}
+                          {debt.callCompleted && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="call-completed-icon"
+                              title="Call completed"
+                            >
+                              <Icon component={FaCheck} />
+                            </motion.div>
+                          )}
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -491,9 +609,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, type: 'spring' }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         className="fab-add-debt"

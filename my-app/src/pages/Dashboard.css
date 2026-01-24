@@ -74,6 +74,99 @@
   max-width: 100%;
 }
 
+.dashboard-summary {
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: var(--dark-section);
+  border: 1px solid var(--dark-green);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.summary-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(31, 187, 166, 0.2);
+}
+
+.summary-section {
+  margin-bottom: 20px;
+}
+
+.summary-section:last-child {
+  margin-bottom: 0;
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--dark-green);
+  margin: 20px 0;
+  opacity: 0.5;
+}
+
+.summary-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary-icon {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.summary-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-values {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+}
+
+.summary-value-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.summary-currency {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summary-amount-large {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-bright);
+  letter-spacing: -1px;
+}
+
 .fab-add-debt {
   position: fixed;
   bottom: 24px;
@@ -116,6 +209,14 @@
 .empty-subtitle {
   font-size: 14px !important;
   color: var(--text-muted) !important;
+}
+
+.debts-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  letter-spacing: -0.5px;
 }
 
 .debts-container {
@@ -269,7 +370,32 @@
 .debt-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
   align-self: flex-end;
+}
+
+.call-task-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 4px;
+  background: rgba(31, 187, 166, 0.1);
+  border: 1px solid rgba(31, 187, 166, 0.3);
+}
+
+.call-completed-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-bright);
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 4px;
+  background: rgba(0, 229, 199, 0.1);
+  border: 1px solid rgba(0, 229, 199, 0.3);
 }
 
 .debt-expanded-content {
