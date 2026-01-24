@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -14,6 +14,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 
 const Dashboard: React.FC = () => {
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -50,6 +51,18 @@ const Dashboard: React.FC = () => {
     };
     storage.saveDebt(updated);
     loadDebts();
+  };
+
+  const toggleExpand = (debtId: string) => {
+    setExpandedDebts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(debtId)) {
+        newSet.delete(debtId);
+      } else {
+        newSet.add(debtId);
+      }
+      return newSet;
+    });
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -136,115 +149,145 @@ const Dashboard: React.FC = () => {
               transition={{ delay: 0.3 }}
               className="debts-container"
             >
-              {debts.map((debt, index) => (
-                <motion.div
-                  key={debt.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * index }}
-                  whileHover={{ y: -2 }}
-                  className="debt-card"
-                >
-                  <div className="debt-header">
-                    <div>
-                      <h3>{debt.name}</h3>
-                      <p className="debt-bank">{debt.bankName}</p>
-                      <p className="debt-type">{debt.type === 'prestamo' ? 'Loan' : 'Credit Card'}</p>
+              {debts.map((debt, index) => {
+                const isExpanded = expandedDebts.has(debt.id);
+                return (
+                  <motion.div
+                    key={debt.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                    whileHover={{ y: -2 }}
+                    className="debt-card"
+                  >
+                    <div className="debt-header">
+                      <div className="debt-header-main" onClick={() => toggleExpand(debt.id)}>
+                        <div>
+                          <h3>{debt.name}</h3>
+                          <p className="debt-bank">{debt.bankName}</p>
+                          <p className="debt-type">{debt.type === 'prestamo' ? 'Loan' : 'Credit Card'}</p>
+                        </div>
+                        <div className="debt-summary">
+                          <div className="debt-status">
+                            {debt.inOrder ? (
+                              <span className="status-badge in-order">
+                                <Icon component={FaCheck} size={12} /> In Order
+                              </span>
+                            ) : (
+                              <span className="status-badge not-in-order">
+                                <Icon component={FaTimes} size={12} /> Not in Order
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <motion.button
+                          className="btn-expand"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(debt.id);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={isExpanded ? FaChevronUp : FaChevronDown} />
+                        </motion.button>
+                      </div>
+                      <div className="debt-actions">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="btn-edit"
+                          onClick={() => navigate(`/edit-debt/${debt.id}`)}
+                        >
+                          <Icon component={FaEdit} />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="btn-delete"
+                          onClick={() => handleDelete(debt.id)}
+                        >
+                          <Icon component={FaTrash} />
+                        </motion.button>
+                      </div>
                     </div>
-                    <div className="debt-actions">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="btn-edit"
-                        onClick={() => navigate(`/edit-debt/${debt.id}`)}
-                      >
-                        <Icon component={FaEdit} />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="btn-delete"
-                        onClick={() => handleDelete(debt.id)}
-                      >
-                        <Icon component={FaTrash} />
-                      </motion.button>
-                    </div>
-                  </div>
 
-                  <div className="debt-main-info">
-                    <div className="debt-payments">
-                      <div className="payment-item">
-                        <span className="payment-label">Monthly ({debt.localCurrency})</span>
-                        <span className="payment-value">{formatCurrency(debt.localFee, debt.localCurrency)}</span>
-                      </div>
-                      <div className="payment-item">
-                        <span className="payment-label">Monthly (USD)</span>
-                        <span className="payment-value">{formatCurrency(debt.dollarFee, 'USD')}</span>
-                      </div>
-                      <div className="payment-item total-debt">
-                        <span className="payment-label">Total ({debt.localCurrency})</span>
-                        <span className="payment-value">{formatCurrency(debt.totalLocal, debt.localCurrency)}</span>
-                      </div>
-                      <div className="payment-item total-debt">
-                        <span className="payment-label">Total (USD)</span>
-                        <span className="payment-value">{formatCurrency(debt.totalDollars, 'USD')}</span>
-                      </div>
-                      <div className="payment-item update-amount">
-                        <span className="payment-label">To Update ({debt.localCurrency})</span>
-                        <span className="payment-value">{formatCurrency(debt.feeToUpdate, debt.localCurrency)}</span>
-                      </div>
-                    </div>
-                    <div className="debt-status">
-                      {debt.inOrder ? (
-                        <span className="status-badge in-order">
-                          <Icon component={FaCheck} size={12} /> In Order
-                        </span>
-                      ) : (
-                        <span className="status-badge not-in-order">
-                          <Icon component={FaTimes} size={12} /> Not in Order
-                        </span>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="debt-expanded-content"
+                        >
+                          <div className="debt-main-info">
+                            <div className="debt-payments">
+                              <div className="payment-item">
+                                <span className="payment-label">Monthly ({debt.localCurrency})</span>
+                                <span className="payment-value">{formatCurrency(debt.localFee, debt.localCurrency)}</span>
+                              </div>
+                              <div className="payment-item">
+                                <span className="payment-label">Monthly (USD)</span>
+                                <span className="payment-value">{formatCurrency(debt.dollarFee, 'USD')}</span>
+                              </div>
+                              <div className="payment-item total-debt">
+                                <span className="payment-label">Total ({debt.localCurrency})</span>
+                                <span className="payment-value">{formatCurrency(debt.totalLocal, debt.localCurrency)}</span>
+                              </div>
+                              <div className="payment-item total-debt">
+                                <span className="payment-label">Total (USD)</span>
+                                <span className="payment-value">{formatCurrency(debt.totalDollars, 'USD')}</span>
+                              </div>
+                              <div className="payment-item update-amount">
+                                <span className="payment-label">To Update ({debt.localCurrency})</span>
+                                <span className="payment-value">{formatCurrency(debt.feeToUpdate, debt.localCurrency)}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {debt.currentPlan && (
+                            <div className="debt-plan">
+                              <span className="plan-label">Plan:</span>
+                              <span className="plan-value">{debt.currentPlan}</span>
+                            </div>
+                          )}
+
+                          {debt.bankPhone && (
+                            <div className="debt-phone">
+                              <Icon component={FaPhone} size={14} />
+                              <a href={`tel:${debt.bankPhone}`} className="phone-link">
+                                {debt.bankPhone}
+                              </a>
+                            </div>
+                          )}
+
+                          <div className="debt-task">
+                            <label className="task-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={debt.hasCallTask}
+                                onChange={() => handleToggleCallTask(debt)}
+                              />
+                              <span>Call bank</span>
+                            </label>
+                            {debt.hasCallTask && (
+                              <label className="task-checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={debt.callCompleted}
+                                  onChange={() => handleToggleCallCompleted(debt)}
+                                />
+                                <span className={debt.callCompleted ? 'completed' : ''}>Completed</span>
+                              </label>
+                            )}
+                          </div>
+                        </motion.div>
                       )}
-                    </div>
-                  </div>
-
-                  {debt.currentPlan && (
-                    <div className="debt-plan">
-                      <span className="plan-label">Plan:</span>
-                      <span className="plan-value">{debt.currentPlan}</span>
-                    </div>
-                  )}
-
-                  {debt.bankPhone && (
-                    <div className="debt-phone">
-                      <Icon component={FaPhone} size={14} />
-                      <a href={`tel:${debt.bankPhone}`} className="phone-link">
-                        {debt.bankPhone}
-                      </a>
-                    </div>
-                  )}
-
-                  <div className="debt-task">
-                    <label className="task-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={debt.hasCallTask}
-                        onChange={() => handleToggleCallTask(debt)}
-                      />
-                      <span>Call bank</span>
-                    </label>
-                    {debt.hasCallTask && (
-                      <label className="task-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={debt.callCompleted}
-                          onChange={() => handleToggleCallCompleted(debt)}
-                        />
-                        <span className={debt.callCompleted ? 'completed' : ''}>Completed</span>
-                      </label>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
