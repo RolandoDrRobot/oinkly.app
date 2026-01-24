@@ -8,7 +8,8 @@
 .page-header {
   background: var(--dark-section);
   color: var(--text-primary);
-  padding: 20px;
+  padding: 20px 20px 0 20px;
+  padding-bottom: 0;
   border-bottom: 1px solid var(--dark-green);
 }
 
@@ -195,16 +196,18 @@
 
 .step-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  justify-content: center;
   margin-top: 40px;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 400px;
 }
 
 .btn-back-step,
 .btn-skip,
 .btn-next {
-  padding: 14px 28px;
+  width: 100%;
+  padding: 16px;
   border: none;
   border-radius: 6px;
   font-size: 16px;

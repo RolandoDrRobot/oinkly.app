@@ -150,6 +150,31 @@ const EditDebt: React.FC = () => {
           </div>
 
           <div className="form-group">
+            <select
+              name="localCurrency"
+              value={formData.localCurrency}
+              onChange={handleChange}
+              required
+            >
+              <option value="CRC">CRC (Colones)</option>
+              <option value="ARS">ARS</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <input
+              name="localFee"
+              type="number"
+              step="0.01"
+              value={formData.localFee}
+              onChange={handleNumberChange}
+              placeholder="Monthly payment (local currency)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
             <input
               name="dollarFee"
               type="number"
@@ -157,6 +182,53 @@ const EditDebt: React.FC = () => {
               value={formData.dollarFee}
               onChange={handleNumberChange}
               placeholder="Monthly payment (USD)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="totalLocal"
+              type="number"
+              step="0.01"
+              value={formData.totalLocal}
+              onChange={handleNumberChange}
+              placeholder="Total debt (local currency)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="totalDollars"
+              type="number"
+              step="0.01"
+              value={formData.totalDollars}
+              onChange={handleNumberChange}
+              placeholder="Total debt (USD)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="feeToUpdate"
+              type="number"
+              step="0.01"
+              value={formData.feeToUpdate}
+              onChange={handleNumberChange}
+              placeholder="Amount to update (local currency)"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="currentPlan"
+              type="text"
+              value={formData.currentPlan}
+              onChange={handleChange}
+              placeholder="Current plan"
               required
             />
           </div>

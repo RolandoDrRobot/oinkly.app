@@ -5,6 +5,8 @@ export interface Debt {
   localCurrency: string;
   localFee: number;
   dollarFee: number;
+  totalLocal: number;
+  totalDollars: number;
   feeToUpdate: number;
   inOrder: boolean;
   currentPlan: string;

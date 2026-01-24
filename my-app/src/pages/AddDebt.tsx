@@ -36,6 +36,8 @@ interface StepData {
   localCurrency?: string;
   localFee?: number;
   dollarFee?: number;
+  totalLocal?: number;
+  totalDollars?: number;
   feeToUpdate?: number;
   currentPlan?: string;
   inOrder?: boolean;
@@ -60,22 +62,22 @@ const AddDebt: React.FC = () => {
   }> = [
     {
       id: 'welcome',
-      title: 'Add Debt',
-      subtitle: 'Let\'s get started',
+      title: 'New Debt',
+      subtitle: 'Let\'s add your debt step by step',
       icon: FaHandPaper,
     },
     {
       id: 'name',
-      title: 'Name',
-      subtitle: 'What do you call this debt?',
+      title: 'Debt Name',
+      subtitle: 'Give this debt a name to identify it',
       icon: FaPen,
       field: 'name' as keyof StepData,
-      placeholder: 'e.g. Personal Loan',
+      placeholder: 'e.g. Personal Loan, Credit Card',
     },
     {
       id: 'type',
-      title: 'Type',
-      subtitle: 'Select one',
+      title: 'Debt Type',
+      subtitle: 'What type of debt is this?',
       icon: FaCreditCard,
       options: [
         { value: 'prestamo', label: 'Loan', icon: FaMoneyBillWave },
@@ -84,16 +86,16 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'bank',
-      title: 'Bank',
-      subtitle: 'Bank name',
+      title: 'Bank Name',
+      subtitle: 'Which bank is this debt with?',
       icon: FaLandmark,
       field: 'bankName' as keyof StepData,
-      placeholder: 'e.g. Bank Name',
+      placeholder: 'e.g. National Bank',
     },
     {
       id: 'phone',
-      title: 'Phone',
-      subtitle: 'Optional',
+      title: 'Bank Phone',
+      subtitle: 'Bank contact number (optional)',
       icon: FaPhone,
       field: 'bankPhone' as keyof StepData,
       placeholder: '+1 234 567 8900',
@@ -101,41 +103,86 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'currency',
-      title: 'Currency',
-      subtitle: 'Select currency',
+      title: 'Local Currency',
+      subtitle: 'What currency do you use locally?',
       icon: FaDollarSign,
       options: [
+        { value: 'CRC', label: 'CRC (Colones)', icon: FaDollarSign },
         { value: 'ARS', label: 'ARS', icon: FaDollarSign },
         { value: 'USD', label: 'USD', icon: FaDollarSign },
       ],
     },
     {
+      id: 'localFee',
+      title: 'Monthly Payment',
+      subtitle: 'How much do you pay monthly in local currency?',
+      icon: FaMoneyBill,
+      field: 'localFee' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+    },
+    {
       id: 'dollarFee',
       title: 'Monthly Payment',
-      subtitle: 'Amount in USD',
+      subtitle: 'How much do you pay monthly in US Dollars?',
       icon: FaDollarSign,
       field: 'dollarFee' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
     },
     {
+      id: 'totalLocal',
+      title: 'Total Debt Amount',
+      subtitle: 'What is the total debt amount in local currency?',
+      icon: FaMoneyBill,
+      field: 'totalLocal' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+    },
+    {
+      id: 'totalDollars',
+      title: 'Total Debt Amount',
+      subtitle: 'What is the total debt amount in US Dollars?',
+      icon: FaDollarSign,
+      field: 'totalDollars' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+    },
+    {
+      id: 'feeToUpdate',
+      title: 'Amount to Update',
+      subtitle: 'How much do you need to pay to be up to date?',
+      icon: FaChartLine,
+      field: 'feeToUpdate' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+    },
+    {
+      id: 'currentPlan',
+      title: 'Payment Plan',
+      subtitle: 'Describe your current payment plan',
+      icon: FaClipboardList,
+      field: 'currentPlan' as keyof StepData,
+      placeholder: 'e.g. 12 monthly installments',
+    },
+    {
       id: 'inOrder',
-      title: 'Status',
-      subtitle: 'Is it up to date?',
+      title: 'Payment Status',
+      subtitle: 'Is this debt up to date?',
       icon: FaCheckCircle,
       type: 'boolean',
     },
     {
       id: 'callTask',
-      title: 'Reminder',
-      subtitle: 'Set call reminder?',
+      title: 'Call Reminder',
+      subtitle: 'Do you want a reminder to call the bank?',
       icon: FaPhoneAlt,
       type: 'boolean',
     },
     {
       id: 'complete',
-      title: 'Done',
-      subtitle: 'Debt added',
+      title: 'All Done!',
+      subtitle: 'Your debt has been added successfully',
       icon: FaGift,
     },
   ];
@@ -191,11 +238,13 @@ const AddDebt: React.FC = () => {
           name: formData.name || '',
           type: formData.type || 'prestamo',
           localCurrency: formData.localCurrency || 'USD',
-          localFee: 0,
+          localFee: formData.localFee || 0,
           dollarFee: formData.dollarFee || 0,
-          feeToUpdate: 0,
+          totalLocal: formData.totalLocal || 0,
+          totalDollars: formData.totalDollars || 0,
+          feeToUpdate: formData.feeToUpdate || 0,
           inOrder: formData.inOrder || false,
-          currentPlan: '',
+          currentPlan: formData.currentPlan || '',
           bankName: formData.bankName || '',
           bankPhone: formData.bankPhone || '',
           hasCallTask: formData.hasCallTask || false,
@@ -211,6 +260,23 @@ const AddDebt: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
+  // Get dynamic subtitle based on current step and form data
+  const getSubtitle = (step: typeof steps[0]) => {
+    if (step.id === 'localFee' && formData.localCurrency) {
+      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+      return `How much do you pay monthly in ${currencyName}?`;
+    }
+    if (step.id === 'totalLocal' && formData.localCurrency) {
+      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+      return `What is the total debt amount in ${currencyName}?`;
+    }
+    if (step.id === 'feeToUpdate' && formData.localCurrency) {
+      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+      return `How much do you need to pay in ${currencyName} to be up to date?`;
+    }
+    return step.subtitle;
+  };
+
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
   const canProceed = () => {
@@ -221,7 +287,8 @@ const AddDebt: React.FC = () => {
     if (currentStepData.field) {
       const value = formData[currentStepData.field];
       if (currentStepData.type === 'number') {
-        return value !== undefined && value !== null && Number(value) >= 0;
+        // Allow 0 as valid value, but require that the field has been touched (not undefined)
+        return value !== undefined && value !== null && !isNaN(Number(value));
       }
       return value !== undefined && value !== '' && value !== null;
     }
@@ -269,14 +336,15 @@ const AddDebt: React.FC = () => {
               {currentStepData.title}
             </motion.h1>
 
-            {currentStepData.subtitle && (
+            {getSubtitle(currentStepData) && (
               <motion.p
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="step-subtitle"
+                key={formData.localCurrency} // Force re-render when currency changes
               >
-                {currentStepData.subtitle}
+                {getSubtitle(currentStepData)}
               </motion.p>
             )}
 

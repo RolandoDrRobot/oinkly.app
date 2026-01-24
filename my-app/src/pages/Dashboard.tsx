@@ -53,10 +53,24 @@ const Dashboard: React.FC = () => {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    // Map currency codes to Intl.NumberFormat compatible codes
+    const currencyMap: { [key: string]: string } = {
+      'CRC': 'CRC',
+      'ARS': 'ARS',
+      'USD': 'USD',
+    };
+    
+    const currencyCode = currencyMap[currency] || 'USD';
+    
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+      }).format(amount);
+    } catch (e) {
+      // Fallback for currencies that might not be supported
+      return `${currencyCode} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
   };
 
   return (
@@ -135,6 +149,7 @@ const Dashboard: React.FC = () => {
                     <div>
                       <h3>{debt.name}</h3>
                       <p className="debt-bank">{debt.bankName}</p>
+                      <p className="debt-type">{debt.type === 'prestamo' ? 'Loan' : 'Credit Card'}</p>
                     </div>
                     <div className="debt-actions">
                       <motion.button
@@ -157,9 +172,27 @@ const Dashboard: React.FC = () => {
                   </div>
 
                   <div className="debt-main-info">
-                    <div className="debt-amount">
-                      <span className="amount-label">Monthly</span>
-                      <span className="amount-value">{formatCurrency(debt.dollarFee, 'USD')}</span>
+                    <div className="debt-payments">
+                      <div className="payment-item">
+                        <span className="payment-label">Monthly ({debt.localCurrency})</span>
+                        <span className="payment-value">{formatCurrency(debt.localFee, debt.localCurrency)}</span>
+                      </div>
+                      <div className="payment-item">
+                        <span className="payment-label">Monthly (USD)</span>
+                        <span className="payment-value">{formatCurrency(debt.dollarFee, 'USD')}</span>
+                      </div>
+                      <div className="payment-item total-debt">
+                        <span className="payment-label">Total ({debt.localCurrency})</span>
+                        <span className="payment-value">{formatCurrency(debt.totalLocal, debt.localCurrency)}</span>
+                      </div>
+                      <div className="payment-item total-debt">
+                        <span className="payment-label">Total (USD)</span>
+                        <span className="payment-value">{formatCurrency(debt.totalDollars, 'USD')}</span>
+                      </div>
+                      <div className="payment-item update-amount">
+                        <span className="payment-label">To Update ({debt.localCurrency})</span>
+                        <span className="payment-value">{formatCurrency(debt.feeToUpdate, debt.localCurrency)}</span>
+                      </div>
                     </div>
                     <div className="debt-status">
                       {debt.inOrder ? (
@@ -173,6 +206,13 @@ const Dashboard: React.FC = () => {
                       )}
                     </div>
                   </div>
+
+                  {debt.currentPlan && (
+                    <div className="debt-plan">
+                      <span className="plan-label">Plan:</span>
+                      <span className="plan-value">{debt.currentPlan}</span>
+                    </div>
+                  )}
 
                   {debt.bankPhone && (
                     <div className="debt-phone">
