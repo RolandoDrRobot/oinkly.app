@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
 import './EditDebt.css';
+
+// Type assertion helper for icons
+const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
+  return Component ? <Component {...props} /> : null;
+};
 
 const EditDebt: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,7 +39,7 @@ const EditDebt: React.FC = () => {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         >
-          Cargando...
+          Loading...
         </motion.div>
       </motion.div>
     );
@@ -86,9 +92,9 @@ const EditDebt: React.FC = () => {
           className="btn-back"
           onClick={() => navigate('/dashboard')}
         >
-          ← Volver
+          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
         </motion.button>
-        <h1>Editar Deuda</h1>
+        <h1>Edit Debt</h1>
       </motion.header>
 
       <div className="form-container">
@@ -99,63 +105,61 @@ const EditDebt: React.FC = () => {
           onSubmit={handleSubmit}
           className="debt-form"
         >
-          {[
-            { id: 'name', label: 'Nombre de la Deuda *', type: 'text', required: true },
-            { id: 'type', label: 'Tipo *', type: 'select', required: true },
-            { id: 'bankName', label: 'Banco *', type: 'text', required: true },
-            { id: 'bankPhone', label: 'Teléfono del Banco', type: 'tel', required: false },
-            { id: 'localCurrency', label: 'Moneda Local *', type: 'select', required: true },
-            { id: 'localFee', label: 'Cuota en Moneda Local *', type: 'number', required: true },
-            { id: 'dollarFee', label: 'Cuota en Dólares *', type: 'number', required: true },
-            { id: 'feeToUpdate', label: 'Cuota para Ponerla al Día *', type: 'number', required: true },
-            { id: 'currentPlan', label: 'Plan Actual *', type: 'text', required: true },
-          ].map((field, index) => (
-            <motion.div
-              key={field.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.05 * index }}
-              className="form-group"
+          <div className="form-group">
+            <input
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Debt name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              required
             >
-              <label htmlFor={field.id}>{field.label}</label>
-              {field.type === 'select' ? (
-                field.id === 'type' ? (
-                  <select
-                    id={field.id}
-                    name={field.id}
-                    value={formData[field.id as keyof Debt] as string}
-                    onChange={handleChange}
-                    required={field.required}
-                  >
-                    <option value="prestamo">Préstamo</option>
-                    <option value="tarjeta">Tarjeta de Crédito</option>
-                  </select>
-                ) : (
-                  <select
-                    id={field.id}
-                    name={field.id}
-                    value={formData[field.id as keyof Debt] as string}
-                    onChange={handleChange}
-                    required={field.required}
-                  >
-                    <option value="ARS">ARS (Pesos Argentinos)</option>
-                    <option value="USD">USD (Dólares)</option>
-                  </select>
-                )
-              ) : (
-                <input
-                  id={field.id}
-                  name={field.id}
-                  type={field.type}
-                  step={field.type === 'number' ? '0.01' : undefined}
-                  value={(formData[field.id as keyof Debt] as string | number) || ''}
-                  onChange={field.type === 'number' ? handleNumberChange : handleChange}
-                  placeholder={field.id === 'bankPhone' ? 'Ej: +54 11 1234-5678' : undefined}
-                  required={field.required}
-                />
-              )}
-            </motion.div>
-          ))}
+              <option value="prestamo">Loan</option>
+              <option value="tarjeta">Credit Card</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <input
+              name="bankName"
+              type="text"
+              value={formData.bankName}
+              onChange={handleChange}
+              placeholder="Bank name"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="bankPhone"
+              type="tel"
+              value={formData.bankPhone || ''}
+              onChange={handleChange}
+              placeholder="Phone (optional)"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="dollarFee"
+              type="number"
+              step="0.01"
+              value={formData.dollarFee}
+              onChange={handleNumberChange}
+              placeholder="Monthly payment (USD)"
+              required
+            />
+          </div>
 
           <div className="form-group checkbox-group">
             <label className="checkbox-label">
@@ -165,7 +169,7 @@ const EditDebt: React.FC = () => {
                 checked={formData.inOrder}
                 onChange={handleChange}
               />
-              <span>En Orden</span>
+              <span>In Order</span>
             </label>
           </div>
 
@@ -177,7 +181,7 @@ const EditDebt: React.FC = () => {
                 checked={formData.hasCallTask}
                 onChange={handleChange}
               />
-              <span>Tarea: Llamar al banco</span>
+              <span>Call reminder</span>
             </label>
           </div>
 
@@ -191,7 +195,7 @@ const EditDebt: React.FC = () => {
                   onChange={handleChange}
                 />
                 <span className={formData.callCompleted ? 'completed' : ''}>
-                  Llamada completada
+                  Completed
                 </span>
               </label>
             </div>
@@ -200,25 +204,25 @@ const EditDebt: React.FC = () => {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.3 }}
             className="form-actions"
           >
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="button"
               className="btn-cancel"
               onClick={() => navigate('/dashboard')}
             >
-              Cancelar
+              Cancel
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               className="btn-submit"
             >
-              Guardar Cambios
+              Save
             </motion.button>
           </motion.div>
         </motion.form>

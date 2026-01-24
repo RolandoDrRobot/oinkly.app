@@ -50,7 +50,7 @@ const AddDebt: React.FC = () => {
   const steps: Array<{
     id: string;
     title: string;
-    subtitle: string;
+    subtitle?: string;
     icon?: IconType;
     field?: keyof StepData;
     placeholder?: string;
@@ -60,108 +60,82 @@ const AddDebt: React.FC = () => {
   }> = [
     {
       id: 'welcome',
-      title: '¡Hola!',
-      subtitle: 'Vamos a agregar una nueva deuda',
+      title: 'Add Debt',
+      subtitle: 'Let\'s get started',
       icon: FaHandPaper,
     },
     {
       id: 'name',
-      title: '¿Cómo se llama esta deuda?',
-      subtitle: 'Dale un nombre que te ayude a identificarla',
+      title: 'Name',
+      subtitle: 'What do you call this debt?',
       icon: FaPen,
       field: 'name' as keyof StepData,
-      placeholder: 'Ej: Préstamo Personal',
+      placeholder: 'e.g. Personal Loan',
     },
     {
       id: 'type',
-      title: '¿Qué tipo de deuda es?',
-      subtitle: 'Selecciona una opción',
+      title: 'Type',
+      subtitle: 'Select one',
       icon: FaCreditCard,
       options: [
-        { value: 'prestamo', label: 'Préstamo', icon: FaMoneyBillWave },
-        { value: 'tarjeta', label: 'Tarjeta de Crédito', icon: FaCreditCard },
+        { value: 'prestamo', label: 'Loan', icon: FaMoneyBillWave },
+        { value: 'tarjeta', label: 'Credit Card', icon: FaCreditCard },
       ],
     },
     {
       id: 'bank',
-      title: '¿De qué banco es?',
-      subtitle: 'Escribe el nombre del banco',
+      title: 'Bank',
+      subtitle: 'Bank name',
       icon: FaLandmark,
       field: 'bankName' as keyof StepData,
-      placeholder: 'Ej: Banco Nación',
+      placeholder: 'e.g. Bank Name',
     },
     {
       id: 'phone',
-      title: '¿Tienes el teléfono del banco?',
-      subtitle: 'Opcional, pero útil para llamar',
+      title: 'Phone',
+      subtitle: 'Optional',
       icon: FaPhone,
       field: 'bankPhone' as keyof StepData,
-      placeholder: 'Ej: +54 11 1234-5678',
+      placeholder: '+1 234 567 8900',
       optional: true,
     },
     {
       id: 'currency',
-      title: '¿En qué moneda está?',
-      subtitle: 'Selecciona la moneda principal',
+      title: 'Currency',
+      subtitle: 'Select currency',
       icon: FaDollarSign,
       options: [
-        { value: 'ARS', label: 'Pesos Argentinos', icon: FaDollarSign },
-        { value: 'USD', label: 'Dólares', icon: FaDollarSign },
+        { value: 'ARS', label: 'ARS', icon: FaDollarSign },
+        { value: 'USD', label: 'USD', icon: FaDollarSign },
       ],
     },
     {
-      id: 'localFee',
-      title: '¿Cuánto pagas en moneda local?',
-      subtitle: 'Ingresa el monto de la cuota',
-      icon: FaMoneyBill,
-      field: 'localFee' as keyof StepData,
-      placeholder: '0.00',
-      type: 'number',
-    },
-    {
       id: 'dollarFee',
-      title: '¿Cuánto pagas en dólares?',
-      subtitle: 'Ingresa el monto de la cuota',
+      title: 'Monthly Payment',
+      subtitle: 'Amount in USD',
       icon: FaDollarSign,
       field: 'dollarFee' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
     },
     {
-      id: 'feeToUpdate',
-      title: '¿Cuánto necesitas para ponerla al día?',
-      subtitle: 'El monto total para actualizar',
-      icon: FaChartLine,
-      field: 'feeToUpdate' as keyof StepData,
-      placeholder: '0.00',
-      type: 'number',
-    },
-    {
-      id: 'plan',
-      title: '¿Cuál es tu plan actual?',
-      subtitle: 'Describe tu plan de pago',
-      icon: FaClipboardList,
-      field: 'currentPlan' as keyof StepData,
-      placeholder: 'Ej: Plan 12 cuotas',
-    },
-    {
       id: 'inOrder',
-      title: '¿Está al día?',
-      subtitle: 'Marca si está en orden',
+      title: 'Status',
+      subtitle: 'Is it up to date?',
       icon: FaCheckCircle,
       type: 'boolean',
     },
     {
       id: 'callTask',
-      title: '¿Quieres recordatorio para llamar?',
-      subtitle: 'Te ayudamos a no olvidar',
+      title: 'Reminder',
+      subtitle: 'Set call reminder?',
       icon: FaPhoneAlt,
       type: 'boolean',
     },
     {
       id: 'complete',
-      title: '¡Listo!',
-      subtitle: 'Tu deuda ha sido agregada',
+      title: 'Done',
+      subtitle: 'Debt added',
       icon: FaGift,
     },
   ];
@@ -209,27 +183,33 @@ const AddDebt: React.FC = () => {
     setTimeout(() => handleNext(), 300);
   };
 
-  const handleSubmit = () => {
-    const newDebt: Debt = {
-      id: Date.now().toString(),
-      name: formData.name || '',
-      type: formData.type || 'prestamo',
-      localCurrency: formData.localCurrency || 'ARS',
-      localFee: formData.localFee || 0,
-      dollarFee: formData.dollarFee || 0,
-      feeToUpdate: formData.feeToUpdate || 0,
-      inOrder: formData.inOrder || false,
-      currentPlan: formData.currentPlan || '',
-      bankName: formData.bankName || '',
-      bankPhone: formData.bankPhone || '',
-      hasCallTask: formData.hasCallTask || false,
-      callCompleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    storage.saveDebt(newDebt);
-    setTimeout(() => navigate('/dashboard'), 1500);
-  };
+  useEffect(() => {
+    if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
+      const timer = setTimeout(() => {
+        const newDebt: Debt = {
+          id: Date.now().toString(),
+          name: formData.name || '',
+          type: formData.type || 'prestamo',
+          localCurrency: formData.localCurrency || 'USD',
+          localFee: 0,
+          dollarFee: formData.dollarFee || 0,
+          feeToUpdate: 0,
+          inOrder: formData.inOrder || false,
+          currentPlan: '',
+          bankName: formData.bankName || '',
+          bankPhone: formData.bankPhone || '',
+          hasCallTask: formData.hasCallTask || false,
+          callCompleted: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(newDebt);
+        navigate('/dashboard');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -248,45 +228,14 @@ const AddDebt: React.FC = () => {
     return false;
   };
 
-  useEffect(() => {
-    if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
-      const timer = setTimeout(() => {
-        const newDebt: Debt = {
-          id: Date.now().toString(),
-          name: formData.name || '',
-          type: formData.type || 'prestamo',
-          localCurrency: formData.localCurrency || 'ARS',
-          localFee: formData.localFee || 0,
-          dollarFee: formData.dollarFee || 0,
-          feeToUpdate: formData.feeToUpdate || 0,
-          inOrder: formData.inOrder || false,
-          currentPlan: formData.currentPlan || '',
-          bankName: formData.bankName || '',
-          bankPhone: formData.bankPhone || '',
-          hasCallTask: formData.hasCallTask || false,
-          callCompleted: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(newDebt);
-        navigate('/dashboard');
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep]);
-
   return (
     <div className="add-debt">
       <header className="page-header">
         <button className="btn-back" onClick={() => navigate('/dashboard')}>
-          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Volver
+          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
         </button>
         <div className="progress-bar-container">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
-        </div>
-        <div className="step-indicator">
-          Paso {currentStep + 1} de {steps.length}
         </div>
       </header>
 
@@ -294,38 +243,42 @@ const AddDebt: React.FC = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
             className="step-content"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.1, type: 'spring' }}
-              className="step-icon"
-            >
-              {currentStepData.icon && <Icon component={currentStepData.icon} size={80} />}
-            </motion.div>
+            {currentStepData.icon && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: 'spring' }}
+                className="step-icon"
+              >
+                <Icon component={currentStepData.icon} size={64} />
+              </motion.div>
+            )}
 
             <motion.h1
-              initial={{ y: 20, opacity: 0 }}
+              initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.15 }}
               className="step-title"
             >
               {currentStepData.title}
             </motion.h1>
 
-            <motion.p
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="step-subtitle"
-            >
-              {currentStepData.subtitle}
-            </motion.p>
+            {currentStepData.subtitle && (
+              <motion.p
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="step-subtitle"
+              >
+                {currentStepData.subtitle}
+              </motion.p>
+            )}
 
             <div className="step-input">
               {currentStepData.options ? (
@@ -333,15 +286,15 @@ const AddDebt: React.FC = () => {
                   {currentStepData.options.map((option, index) => (
                     <motion.button
                       key={option.value}
-                      initial={{ scale: 0, opacity: 0 }}
+                      initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.1 * index }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      transition={{ delay: 0.05 * index }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       className="option-button"
                       onClick={() => handleOptionSelect(option.value)}
                     >
-                      {option.icon && <Icon component={option.icon} className="option-icon" size={48} />}
+                      <Icon component={option.icon} className="option-icon" size={32} />
                       <span className="option-label">{option.label}</span>
                     </motion.button>
                   ))}
@@ -349,33 +302,33 @@ const AddDebt: React.FC = () => {
               ) : currentStepData.type === 'boolean' ? (
                 <div className="boolean-options">
                   <motion.button
-                    initial={{ scale: 0, opacity: 0 }}
+                    initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="boolean-button yes"
                     onClick={() => handleBooleanSelect(true)}
                   >
-                    <Icon component={FaCheckCircle} className="boolean-icon" size={48} />
-                    <span>Sí</span>
+                    <Icon component={FaCheckCircle} className="boolean-icon" size={32} />
+                    <span>Yes</span>
                   </motion.button>
                   <motion.button
-                    initial={{ scale: 0, opacity: 0 }}
+                    initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     className="boolean-button no"
                     onClick={() => handleBooleanSelect(false)}
                   >
-                    <Icon component={FaTimes} className="boolean-icon" size={48} />
+                    <Icon component={FaTimes} className="boolean-icon" size={32} />
                     <span>No</span>
                   </motion.button>
                 </div>
               ) : currentStepData.field ? (
                 <motion.input
-                  initial={{ scale: 0.9, opacity: 0 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   type={currentStepData.type || 'text'}
@@ -403,35 +356,35 @@ const AddDebt: React.FC = () => {
         <div className="step-actions">
           {currentStep > 0 && currentStepData.id !== 'complete' && (
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className="btn-back-step"
               onClick={handleBack}
             >
-              ← Atrás
+              Back
             </motion.button>
           )}
           {currentStepData.optional && (
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className="btn-skip"
               onClick={handleSkip}
             >
-              Omitir
+              Skip
             </motion.button>
           )}
           {currentStepData.id !== 'complete' &&
             !currentStepData.options &&
             currentStepData.type !== 'boolean' && (
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="btn-next"
                 onClick={handleNext}
                 disabled={!canProceed()}
               >
-                Continuar →
+                Next
               </motion.button>
             )}
         </div>

@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('¿Estás seguro de eliminar esta deuda?')) {
+    if (window.confirm('Are you sure you want to delete this debt?')) {
       storage.deleteDebt(id);
       loadDebts();
     }
@@ -53,9 +53,9 @@ const Dashboard: React.FC = () => {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('es-AR', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency === 'ARS' ? 'ARS' : 'USD',
+      currency: 'USD',
     }).format(amount);
   };
 
@@ -73,21 +73,16 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h1>Dashboard</h1>
-            <p className="user-name">Hola, {user?.name}</p>
-          </motion.div>
+          <div>
+            <h1>Debts</h1>
+          </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="btn-logout"
             onClick={logout}
           >
-            Salir
+            Logout
           </motion.button>
         </div>
       </motion.header>
@@ -96,13 +91,13 @@ const Dashboard: React.FC = () => {
         <motion.button
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="btn-add-debt"
           onClick={() => navigate('/add-debt')}
         >
-          <Icon component={FaPlus} style={{ marginRight: '8px' }} /> Agregar Deuda
+          <Icon component={FaPlus} style={{ marginRight: '8px' }} /> Add Debt
         </motion.button>
 
         <AnimatePresence mode="wait">
@@ -112,17 +107,11 @@ const Dashboard: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3 }}
               className="empty-state"
             >
-              <motion.p
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5, type: 'spring' }}
-              >
-                No tienes deudas registradas
-              </motion.p>
-              <p className="empty-subtitle">Agrega tu primera deuda para comenzar</p>
+              <p>No debts yet</p>
+              <p className="empty-subtitle">Add your first debt to get started</p>
             </motion.div>
           ) : (
             <motion.div
@@ -130,20 +119,23 @@ const Dashboard: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3 }}
               className="debts-container"
             >
               {debts.map((debt, index) => (
                 <motion.div
                   key={debt.id}
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.1 * index }}
-                  whileHover={{ y: -5, boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)' }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index }}
+                  whileHover={{ y: -2 }}
                   className="debt-card"
                 >
                   <div className="debt-header">
-                    <h3>{debt.name}</h3>
+                    <div>
+                      <h3>{debt.name}</h3>
+                      <p className="debt-bank">{debt.bankName}</p>
+                    </div>
                     <div className="debt-actions">
                       <motion.button
                         whileHover={{ scale: 1.1 }}
@@ -164,87 +156,52 @@ const Dashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="debt-info">
-                    <div className="info-row">
-                      <span className="label">Tipo:</span>
-                      <span className="value">{debt.type === 'prestamo' ? 'Préstamo' : 'Tarjeta'}</span>
+                  <div className="debt-main-info">
+                    <div className="debt-amount">
+                      <span className="amount-label">Monthly</span>
+                      <span className="amount-value">{formatCurrency(debt.dollarFee, 'USD')}</span>
                     </div>
-                    <div className="info-row">
-                      <span className="label">Moneda Local:</span>
-                      <span className="value">{debt.localCurrency}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">Cuota Local:</span>
-                      <span className="value">{formatCurrency(debt.localFee, debt.localCurrency)}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">Cuota Dólares:</span>
-                      <span className="value">{formatCurrency(debt.dollarFee, 'USD')}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">Cuota para Actualizar:</span>
-                      <span className="value">{formatCurrency(debt.feeToUpdate, debt.localCurrency)}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">En Orden:</span>
-                      <span className={`value ${debt.inOrder ? 'in-order' : 'not-in-order'}`}>
-                        {debt.inOrder ? <><Icon component={FaCheck} /> Sí</> : <><Icon component={FaTimes} /> No</>}
-                      </span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">Plan Actual:</span>
-                      <span className="value">{debt.currentPlan}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="label">Banco:</span>
-                      <span className="value">{debt.bankName}</span>
+                    <div className="debt-status">
+                      {debt.inOrder ? (
+                        <span className="status-badge in-order">
+                          <Icon component={FaCheck} size={12} /> In Order
+                        </span>
+                      ) : (
+                        <span className="status-badge not-in-order">
+                          <Icon component={FaTimes} size={12} /> Not in Order
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="call-task-section">
-                    {debt.bankPhone && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="phone-info"
-                      >
-                        <span><Icon component={FaPhone} style={{ marginRight: '8px' }} /> {debt.bankPhone}</span>
-                        <motion.a
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          href={`tel:${debt.bankPhone}`}
-                          className="btn-call"
-                        >
-                          Llamar
-                        </motion.a>
-                      </motion.div>
-                    )}
-                    <div className="call-task-controls">
-                      <label className="checkbox-label">
+                  {debt.bankPhone && (
+                    <div className="debt-phone">
+                      <Icon component={FaPhone} size={14} />
+                      <a href={`tel:${debt.bankPhone}`} className="phone-link">
+                        {debt.bankPhone}
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="debt-task">
+                    <label className="task-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={debt.hasCallTask}
+                        onChange={() => handleToggleCallTask(debt)}
+                      />
+                      <span>Call bank</span>
+                    </label>
+                    {debt.hasCallTask && (
+                      <label className="task-checkbox">
                         <input
                           type="checkbox"
-                          checked={debt.hasCallTask}
-                          onChange={() => handleToggleCallTask(debt)}
+                          checked={debt.callCompleted}
+                          onChange={() => handleToggleCallCompleted(debt)}
                         />
-                        <span>Tarea: Llamar al banco</span>
+                        <span className={debt.callCompleted ? 'completed' : ''}>Completed</span>
                       </label>
-                      {debt.hasCallTask && (
-                        <motion.label
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          className="checkbox-label"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={debt.callCompleted}
-                            onChange={() => handleToggleCallCompleted(debt)}
-                          />
-                          <span className={debt.callCompleted ? 'completed' : ''}>
-                            Llamada completada
-                          </span>
-                        </motion.label>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
