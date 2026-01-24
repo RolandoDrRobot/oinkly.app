@@ -1,16 +1,57 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import AddDebt from './pages/AddDebt';
+import EditDebt from './pages/EditDebt';
 import './App.css';
+
+const AppRoutes: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />}
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-debt"
+        element={
+          <ProtectedRoute>
+            <AddDebt />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-debt/:id"
+        element={
+          <ProtectedRoute>
+            <EditDebt />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Bienvenido a React con TypeScript</h1>
-        <p>
-          Edita <code>src/App.tsx</code> y guarda para recargar.
-        </p>
-      </header>
-    </div>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 
