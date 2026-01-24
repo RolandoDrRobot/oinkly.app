@@ -1,14 +1,15 @@
 .dashboard {
   min-height: 100vh;
   background: var(--dark-bg);
-  padding-bottom: 40px;
+  padding-bottom: 100px;
+  position: relative;
 }
 
 .dashboard-header {
-  background: var(--dark-section);
+  background: linear-gradient(135deg, var(--dark-section) 0%, var(--dark-green) 100%);
   color: var(--text-primary);
   padding: 24px 20px;
-  border-bottom: 1px solid var(--dark-green);
+  border-bottom: 2px solid rgba(31, 187, 166, 0.2);
 }
 
 .header-content {
@@ -47,25 +48,31 @@
   max-width: 100%;
 }
 
-.btn-add-debt {
-  width: 100%;
-  padding: 16px;
-  background: var(--primary);
+.fab-add-debt {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-medium) 100%);
   color: var(--dark-bg);
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 24px;
-  transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 6px 20px rgba(31, 187, 166, 0.4);
+  transition: all 0.3s;
+  z-index: 1000;
 }
 
-.btn-add-debt:hover {
-  background: var(--primary-bright);
+.fab-add-debt:hover {
+  background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 100%);
+  box-shadow: 0 8px 24px rgba(0, 229, 199, 0.5);
+  transform: translateY(-2px);
 }
 
 .empty-state {
@@ -97,10 +104,13 @@
   padding: 20px;
   border: 1px solid var(--dark-green);
   transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .debt-card:hover {
   border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(31, 187, 166, 0.2);
+  transform: translateY(-2px);
 }
 
 .debt-header {
@@ -129,7 +139,7 @@
 }
 
 .debt-header-main:hover {
-  background: rgba(31, 187, 166, 0.05);
+  background: linear-gradient(90deg, rgba(31, 187, 166, 0.05) 0%, rgba(31, 187, 166, 0.02) 100%);
 }
 
 .debt-header-main > div:first-child {
@@ -293,8 +303,8 @@
 }
 
 .payment-item.total-debt {
-  background: rgba(31, 187, 166, 0.1);
-  border: 1px solid rgba(31, 187, 166, 0.3);
+  background: linear-gradient(135deg, rgba(31, 187, 166, 0.15) 0%, rgba(48, 145, 132, 0.1) 100%);
+  border: 1px solid rgba(31, 187, 166, 0.4);
 }
 
 .payment-item.total-debt .payment-value {
@@ -304,8 +314,8 @@
 }
 
 .payment-item.update-amount {
-  background: rgba(0, 229, 199, 0.05);
-  border: 1px solid rgba(0, 229, 199, 0.2);
+  background: linear-gradient(135deg, rgba(0, 229, 199, 0.1) 0%, rgba(31, 187, 166, 0.05) 100%);
+  border: 1px solid rgba(0, 229, 199, 0.3);
 }
 
 .payment-label {
@@ -354,8 +364,9 @@
 }
 
 .status-badge.in-order {
-  background: rgba(0, 229, 199, 0.1);
+  background: linear-gradient(135deg, rgba(0, 229, 199, 0.15) 0%, rgba(31, 187, 166, 0.1) 100%);
   color: var(--primary-bright);
+  border: 1px solid rgba(0, 229, 199, 0.3);
 }
 
 .status-badge.not-in-order {
@@ -390,7 +401,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  background: var(--dark-bg);
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-section) 100%);
   border-radius: 8px;
   border: 1px solid var(--dark-green);
   margin-top: 16px;
@@ -410,7 +421,7 @@
 }
 
 .task-checkbox:hover {
-  background: rgba(31, 187, 166, 0.05);
+  background: linear-gradient(90deg, rgba(31, 187, 166, 0.1) 0%, rgba(31, 187, 166, 0.05) 100%);
 }
 
 .task-checkbox input[type="checkbox"] {
@@ -452,8 +463,8 @@
 }
 
 .editable-field:hover {
-  background: rgba(31, 187, 166, 0.1);
-  color: var(--primary);
+  background: linear-gradient(90deg, rgba(31, 187, 166, 0.15) 0%, rgba(31, 187, 166, 0.08) 100%);
+  color: var(--primary-bright);
 }
 
 .inline-edit-input {
@@ -472,5 +483,6 @@
 
 .inline-edit-input:focus {
   border-color: var(--primary-bright);
-  box-shadow: 0 0 0 3px rgba(31, 187, 166, 0.2);
+  box-shadow: 0 0 0 3px rgba(0, 229, 199, 0.25);
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-section) 100%);
 }

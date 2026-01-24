@@ -66,7 +66,7 @@
 .btn-primary {
   width: 100%;
   padding: 16px;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-medium) 100%);
   color: var(--dark-bg);
   border: none;
   border-radius: 8px;
@@ -75,10 +75,13 @@
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(31, 187, 166, 0.3);
 }
 
 .btn-primary:hover {
-  background: var(--primary-bright);
+  background: linear-gradient(135deg, var(--primary-bright) 0%, var(--primary) 100%);
+  box-shadow: 0 6px 16px rgba(0, 229, 199, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {

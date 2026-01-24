@@ -152,17 +152,6 @@ const Dashboard: React.FC = () => {
       </motion.header>
 
       <div className="dashboard-content">
-        <motion.button
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="btn-add-debt"
-          onClick={() => navigate('/add-debt')}
-        >
-          <Icon component={FaPlus} style={{ marginRight: '8px' }} /> Add Debt
-        </motion.button>
 
         <AnimatePresence mode="wait">
           {debts.length === 0 ? (
@@ -498,6 +487,18 @@ const Dashboard: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.3, type: 'spring' }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="fab-add-debt"
+        onClick={() => navigate('/add-debt')}
+      >
+        <Icon component={FaPlus} />
+      </motion.button>
     </motion.div>
   );
 };
