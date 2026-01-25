@@ -72,6 +72,14 @@ const EditDebt: React.FC = () => {
       updated.inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
     }
     
+    // If total reaches 0, set corresponding fee to 0
+    if (name === 'totalLocal' && newValue === 0) {
+      updated.localFee = 0;
+    }
+    if (name === 'totalDollars' && newValue === 0) {
+      updated.dollarFee = 0;
+    }
+    
     setFormData(updated);
   };
 
@@ -82,8 +90,17 @@ const EditDebt: React.FC = () => {
       const feeToUpdateDollars = formData.feeToUpdateDollars || 0;
       const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
       
+      // If total reaches 0, set corresponding fee to 0
+      const finalData = { ...formData };
+      if (finalData.totalLocal === 0) {
+        finalData.localFee = 0;
+      }
+      if (finalData.totalDollars === 0) {
+        finalData.dollarFee = 0;
+      }
+      
       storage.saveDebt({
-        ...formData,
+        ...finalData,
         localCurrency: storage.getLocalCurrency(), // Use currency from preferences
         feeToUpdateDollars: feeToUpdateDollars,
         inOrder: inOrder,

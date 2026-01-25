@@ -229,14 +229,30 @@ const AddCommitment: React.FC = () => {
         // Handle total updates based on options
         if (formData.setTotalLocal && formData.amountLocal !== undefined) {
           updatedDebt.totalLocal = formData.amountLocal;
+          // If total reaches 0, set fee to 0
+          if (formData.amountLocal === 0) {
+            updatedDebt.localFee = 0;
+          }
         } else if (formData.subtractFromTotalLocal && formData.amountLocal !== undefined) {
           updatedDebt.totalLocal = Math.max(0, (updatedDebt.totalLocal || 0) - formData.amountLocal);
+          // If total reaches 0, set fee to 0
+          if (updatedDebt.totalLocal === 0) {
+            updatedDebt.localFee = 0;
+          }
         }
 
         if (formData.setTotalDollars && formData.amountDollars !== undefined) {
           updatedDebt.totalDollars = formData.amountDollars;
+          // If total reaches 0, set fee to 0
+          if (formData.amountDollars === 0) {
+            updatedDebt.dollarFee = 0;
+          }
         } else if (formData.subtractFromTotalDollars && formData.amountDollars !== undefined) {
           updatedDebt.totalDollars = Math.max(0, (updatedDebt.totalDollars || 0) - formData.amountDollars);
+          // If total reaches 0, set fee to 0
+          if (updatedDebt.totalDollars === 0) {
+            updatedDebt.dollarFee = 0;
+          }
         }
 
         // Recalculate inOrder

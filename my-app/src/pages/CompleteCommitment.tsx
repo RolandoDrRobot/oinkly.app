@@ -235,17 +235,36 @@ const CompleteCommitment: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
 
+        // If total reaches 0, set corresponding fee to 0
+        if (newTotalLocal === 0) {
+          updatedDebt.localFee = 0;
+        }
+        if (newTotalDollars === 0) {
+          updatedDebt.dollarFee = 0;
+        }
+
         // Update balances if user chose to (overrides automatic subtraction)
         if (formData.updateBalances === true) {
           const inOrder = (formData.feeToUpdate || 0) === 0 && (formData.feeToUpdateDollars || 0) === 0;
+          const finalTotalLocal = formData.totalLocal || 0;
+          const finalTotalDollars = formData.totalDollars || 0;
+          
           updatedDebt = {
             ...updatedDebt,
-            totalLocal: formData.totalLocal || 0,
-            totalDollars: formData.totalDollars || 0,
+            totalLocal: finalTotalLocal,
+            totalDollars: finalTotalDollars,
             feeToUpdate: formData.feeToUpdate || 0,
             feeToUpdateDollars: formData.feeToUpdateDollars || 0,
             inOrder: inOrder,
           };
+
+          // If total reaches 0, set corresponding fee to 0
+          if (finalTotalLocal === 0) {
+            updatedDebt.localFee = 0;
+          }
+          if (finalTotalDollars === 0) {
+            updatedDebt.dollarFee = 0;
+          }
         } else {
           // Recalculate inOrder after automatic subtraction
           updatedDebt.inOrder = (updatedDebt.feeToUpdate || 0) === 0 && (updatedDebt.feeToUpdateDollars || 0) === 0;
