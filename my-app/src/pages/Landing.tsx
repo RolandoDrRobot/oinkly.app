@@ -1,24 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import './Landing.css';
 
+// Type assertion helper for icons
+const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
+  return Component ? <Component {...props} /> : null;
+};
+
 const Landing: React.FC = () => {
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const { login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && name) {
-      login(email, name);
-      navigate('/dashboard');
-    }
-  };
 
   return (
     <motion.div
@@ -28,52 +24,54 @@ const Landing: React.FC = () => {
       className="landing"
     >
       <div className="landing-container">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="landing-header"
-        >
-          <h1 className="landing-title">{t('landing.title')}</h1>
-          <p className="landing-subtitle">{t('landing.subtitle')}</p>
-        </motion.div>
+        {isAuthenticated ? (
+          <>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-back"
+              onClick={() => navigate('/dashboard')}
+              style={{ marginBottom: '24px', alignSelf: 'flex-start' }}
+            >
+              <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} />
+              {t('common.back')}
+            </motion.button>
 
-        <motion.form
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          onSubmit={handleSubmit}
-          className="landing-form"
-        >
-          <div className="form-group">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t('landing.name')}
-              required
-            />
-          </div>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="landing-header"
+            >
+              <h1 className="landing-title">{t('landing.title')}</h1>
+              <p className="landing-subtitle">{t('landing.subtitle')}</p>
+            </motion.div>
+          </>
+        ) : (
+          <>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="landing-header"
+            >
+              <h1 className="landing-title">{t('landing.title')}</h1>
+              <p className="landing-subtitle">{t('landing.subtitle')}</p>
+            </motion.div>
 
-          <div className="form-group">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('landing.email')}
-              required
-            />
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            className="btn-primary"
-          >
-            {t('landing.continue')}
-          </motion.button>
-        </motion.form>
+            <motion.button
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="btn-primary"
+              onClick={() => navigate('/login')}
+            >
+              {t('landing.getStarted')}
+            </motion.button>
+          </>
+        )}
       </div>
     </motion.div>
   );

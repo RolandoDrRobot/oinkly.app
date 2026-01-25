@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
@@ -25,7 +26,11 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />}
+        element={<Landing />}
+      />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
       />
       <Route
         path="/dashboard"

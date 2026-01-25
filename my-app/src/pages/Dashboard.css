@@ -25,7 +25,7 @@
 }
 
 .btn-profile {
-  border: 0;
+  
   background: transparent;
   color: var(--text-secondary);
   padding: 0;
@@ -275,7 +275,7 @@
 }
 
 .btn-close-debt {
-  border: 0;
+  
   background: transparent;
   
   color: var(--text-secondary);
@@ -455,7 +455,7 @@
 
 .btn-edit,
 .btn-delete {
-  border: 0;
+  
   background: transparent;
   
   font-size: 16px;
