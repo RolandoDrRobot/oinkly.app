@@ -319,7 +319,6 @@
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .debt-bank {
@@ -328,7 +327,6 @@
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 8px;
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -341,7 +339,6 @@
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 8px;
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -350,6 +347,8 @@
   font-size: 16px;
   color: var(--primary);
   flex-shrink: 0;
+  margin: 0;
+  margin-right: 8px;
 }
 
 .debt-actions {
