@@ -149,7 +149,7 @@
 }
 
 .step-title {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -218,7 +218,7 @@
 /* CTA Section */
 .about-cta {
   text-align: center;
-  padding: 48px 0;
+  padding: 0 0 48px;
 }
 
 .btn-primary {
