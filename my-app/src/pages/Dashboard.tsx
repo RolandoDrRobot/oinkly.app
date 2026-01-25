@@ -759,18 +759,6 @@ const Dashboard: React.FC = () => {
                                   );
                                 })()}
                               </div>
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="btn-add-commitment"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/add-commitment/${debt.id}`);
-                                }}
-                              >
-                                <Icon component={FaPlus} size={12} />
-                                Add Commitment
-                              </motion.button>
                             </div>
                             
                             {debt.commitments && debt.commitments.length > 0 ? (
@@ -1011,9 +999,21 @@ const Dashboard: React.FC = () => {
                             ) : (
                               <div className="commitments-empty">
                                 <p>{t('dashboard.noCommitments')}</p>
-                                <p className="empty-subtitle">{t('dashboard.noCommitmentsSubtitle')}</p>
                               </div>
                             )}
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="btn-add-commitment"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/add-commitment/${debt.id}`);
+                              }}
+                              style={{ marginTop: '16px', width: '100%' }}
+                            >
+                              <Icon component={FaPlus} size={12} />
+                              {t('dashboard.addCommitment')}
+                            </motion.button>
                           </div>
 
                           {/* Call History Section */}
@@ -1023,18 +1023,6 @@ const Dashboard: React.FC = () => {
                                 <Icon component={FaPhone} size={16} />
                                 {t('dashboard.callHistory')}
                               </h4>
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="btn-add-call"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setAddingCall(debt);
-                                }}
-                              >
-                                <Icon component={FaPlus} size={12} />
-                                {t('dashboard.recordCall')}
-                              </motion.button>
                             </div>
                             
                             {debt.callHistory && debt.callHistory.length > 0 ? (
@@ -1059,9 +1047,21 @@ const Dashboard: React.FC = () => {
                             ) : (
                               <div className="call-history-empty">
                                 <p>{t('dashboard.noCalls')}</p>
-                                <p className="empty-subtitle">{t('dashboard.noCallsSubtitle')}</p>
                               </div>
                             )}
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="btn-add-call"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setAddingCall(debt);
+                              }}
+                              style={{ marginTop: '16px', width: '100%' }}
+                            >
+                              <Icon component={FaPlus} size={12} />
+                              {t('dashboard.recordCall')}
+                            </motion.button>
                           </div>
 
                           {debt.currentPlan && (

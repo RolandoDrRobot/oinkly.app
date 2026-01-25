@@ -864,7 +864,7 @@
 
 .commitments-empty {
   text-align: center;
-  padding: 32px 16px;
+  padding: 32px 0;
   color: var(--text-muted);
 }
 
@@ -1109,7 +1109,7 @@
 
 .call-history-empty {
   text-align: center;
-  padding: 32px 16px;
+  padding: 32px 0;
   color: var(--text-muted);
 }
 
