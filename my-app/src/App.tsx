@@ -10,6 +10,7 @@ import EditDebt from './pages/EditDebt';
 import AddCommitment from './pages/AddCommitment';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
+import TermsAndConditions from './pages/TermsAndConditions';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -66,6 +67,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Preferences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <ProtectedRoute>
+            <TermsAndConditions />
           </ProtectedRoute>
         }
       />
