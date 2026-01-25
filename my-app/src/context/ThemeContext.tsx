@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { storage } from '../utils/storage';
 
 export type ThemeMode = 'light' | 'dark';
 
