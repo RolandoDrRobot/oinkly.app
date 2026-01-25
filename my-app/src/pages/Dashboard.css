@@ -233,6 +233,8 @@
   border: 1px solid var(--dark-green);
   transition: all 0.3s;
   box-shadow: 0 2px 8px var(--shadow);
+  cursor: pointer;
+  user-select: none;
 }
 
 .debt-card:hover {
@@ -301,24 +303,6 @@
   color: var(--text-primary);
 }
 
-.btn-expand {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 12px;
-}
-
-.btn-expand:hover {
-  background: var(--primary-overlay);
-  color: var(--primary);
-}
 
 .debt-header-info {
   display: flex;

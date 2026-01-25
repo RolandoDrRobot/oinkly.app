@@ -405,9 +405,10 @@ const Dashboard: React.FC = () => {
                     transition={{ delay: 0.05 * index }}
                     whileHover={{ y: -2 }}
                     className="debt-card"
+                    onClick={() => toggleExpand(debt.id)}
                   >
                     <div className="debt-header">
-                      <div className="debt-header-main" onClick={() => toggleExpand(debt.id)}>
+                      <div className="debt-header-main">
                         <div className="debt-header-info">
                           {editingField?.debtId === debt.id && editingField?.field === 'name' ? (
                             <input
@@ -424,7 +425,10 @@ const Dashboard: React.FC = () => {
                               autoFocus
                             />
                           ) : (
-                            <h3 onClick={(e) => startEditing(debt.id, 'name', debt.name, e)} className="editable-field debt-name">
+                            <h3 onClick={(e) => {
+                              e.stopPropagation();
+                              startEditing(debt.id, 'name', debt.name, e);
+                            }} className="editable-field debt-name">
                               <Icon component={FaFileInvoiceDollar} className="debt-info-icon" />
                               {debt.name}
                             </h3>
@@ -444,7 +448,10 @@ const Dashboard: React.FC = () => {
                               autoFocus
                             />
                           ) : (
-                            <p className="debt-bank editable-field" onClick={(e) => startEditing(debt.id, 'bankName', debt.bankName, e)}>
+                            <p className="debt-bank editable-field" onClick={(e) => {
+                              e.stopPropagation();
+                              startEditing(debt.id, 'bankName', debt.bankName, e);
+                            }}>
                               <Icon component={FaLandmark} className="debt-info-icon" />
                               {debt.bankName}
                             </p>
@@ -454,19 +461,8 @@ const Dashboard: React.FC = () => {
                             {debt.type === 'prestamo' ? 'Loan' : 'Credit Card'}
                           </p>
                         </div>
-                        <motion.button
-                          className="btn-expand"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand(debt.id);
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={isExpanded ? FaChevronUp : FaChevronDown} />
-                        </motion.button>
                       </div>
-                      <div className="debt-header-actions">
+                      <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
                         <div className="debt-summary">
                           <div className="debt-status">
                             {debt.inOrder ? (
@@ -533,7 +529,10 @@ const Dashboard: React.FC = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             className="btn-delete"
-                            onClick={() => handleDelete(debt.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(debt.id);
+                            }}
                           >
                             <Icon component={FaTrash} />
                           </motion.button>
@@ -570,7 +569,10 @@ const Dashboard: React.FC = () => {
                                     autoFocus
                                   />
                                 ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'localFee', debt.localFee, e)}>
+                                  <span className="payment-value editable-field" onClick={(e) => {
+                                    e.stopPropagation();
+                                    startEditing(debt.id, 'localFee', debt.localFee, e);
+                                  }}>
                                     {formatCurrency(debt.localFee, debt.localCurrency)}
                                   </span>
                                 )}
@@ -593,7 +595,10 @@ const Dashboard: React.FC = () => {
                                     autoFocus
                                   />
                                 ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'dollarFee', debt.dollarFee, e)}>
+                                  <span className="payment-value editable-field" onClick={(e) => {
+                                    e.stopPropagation();
+                                    startEditing(debt.id, 'dollarFee', debt.dollarFee, e);
+                                  }}>
                                     {formatCurrency(debt.dollarFee, 'USD')}
                                   </span>
                                 )}
@@ -616,7 +621,10 @@ const Dashboard: React.FC = () => {
                                     autoFocus
                                   />
                                 ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'totalLocal', debt.totalLocal, e)}>
+                                  <span className="payment-value editable-field" onClick={(e) => {
+                                    e.stopPropagation();
+                                    startEditing(debt.id, 'totalLocal', debt.totalLocal, e);
+                                  }}>
                                     {formatCurrency(debt.totalLocal, debt.localCurrency)}
                                   </span>
                                 )}
@@ -639,7 +647,10 @@ const Dashboard: React.FC = () => {
                                     autoFocus
                                   />
                                 ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'totalDollars', debt.totalDollars, e)}>
+                                  <span className="payment-value editable-field" onClick={(e) => {
+                                    e.stopPropagation();
+                                    startEditing(debt.id, 'totalDollars', debt.totalDollars, e);
+                                  }}>
                                     {formatCurrency(debt.totalDollars, 'USD')}
                                   </span>
                                 )}
@@ -665,7 +676,10 @@ const Dashboard: React.FC = () => {
                                           autoFocus
                                         />
                                       ) : (
-                                        <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'feeToUpdate', debt.feeToUpdate, e)}>
+                                        <span className="payment-value editable-field" onClick={(e) => {
+                                          e.stopPropagation();
+                                          startEditing(debt.id, 'feeToUpdate', debt.feeToUpdate, e);
+                                        }}>
                                           {formatCurrency(debt.feeToUpdate, debt.localCurrency)}
                                         </span>
                                       )}
@@ -690,7 +704,10 @@ const Dashboard: React.FC = () => {
                                           autoFocus
                                         />
                                       ) : (
-                                        <span className="payment-value editable-field" onClick={(e) => startEditing(debt.id, 'feeToUpdateDollars', debt.feeToUpdateDollars || 0, e)}>
+                                        <span className="payment-value editable-field" onClick={(e) => {
+                                          e.stopPropagation();
+                                          startEditing(debt.id, 'feeToUpdateDollars', debt.feeToUpdateDollars || 0, e);
+                                        }}>
                                           {formatCurrency(debt.feeToUpdateDollars || 0, 'USD')}
                                         </span>
                                       )}
@@ -742,7 +759,10 @@ const Dashboard: React.FC = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="btn-add-commitment"
-                                onClick={() => navigate(`/add-commitment/${debt.id}`)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/add-commitment/${debt.id}`);
+                                }}
                               >
                                 <Icon component={FaPlus} size={12} />
                                 Add Commitment
@@ -853,7 +873,10 @@ const Dashboard: React.FC = () => {
                                               whileHover={{ scale: 1.1 }}
                                               whileTap={{ scale: 0.9 }}
                                               className="btn-commitment-action"
-                                              onClick={() => setEditingCommitment({ debt, commitment })}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingCommitment({ debt, commitment });
+                                              }}
                                               title="Edit commitment"
                                             >
                                               <Icon component={FaEdit} size={14} />
@@ -862,7 +885,8 @@ const Dashboard: React.FC = () => {
                                               whileHover={{ scale: 1.1 }}
                                               whileTap={{ scale: 0.9 }}
                                               className="btn-commitment-action"
-                                              onClick={() => {
+                                              onClick={(e) => {
+                                                e.stopPropagation();
                                                 const updated = {
                                                   ...debt,
                                                   commitments: debt.commitments?.map(c => 
@@ -885,7 +909,8 @@ const Dashboard: React.FC = () => {
                                               whileHover={{ scale: 1.1 }}
                                               whileTap={{ scale: 0.9 }}
                                               className="btn-commitment-action btn-delete"
-                                              onClick={() => {
+                                              onClick={(e) => {
+                                                e.stopPropagation();
                                                 if (window.confirm('Are you sure you want to delete this commitment?')) {
                                                   const updated = {
                                                     ...debt,
@@ -998,7 +1023,10 @@ const Dashboard: React.FC = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="btn-add-call"
-                                onClick={() => setAddingCall(debt)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAddingCall(debt);
+                                }}
                               >
                                 <Icon component={FaPlus} size={12} />
                                 Record Call
@@ -1050,7 +1078,10 @@ const Dashboard: React.FC = () => {
                                   autoFocus
                                 />
                               ) : (
-                                <span className="plan-value editable-field" onClick={(e) => startEditing(debt.id, 'currentPlan', debt.currentPlan, e)}>
+                                <span className="plan-value editable-field" onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditing(debt.id, 'currentPlan', debt.currentPlan, e);
+                                }}>
                                   {debt.currentPlan}
                                 </span>
                               )}
@@ -1076,11 +1107,17 @@ const Dashboard: React.FC = () => {
                               />
                             ) : (
                               debt.bankPhone ? (
-                                <a href={`tel:${debt.bankPhone}`} className="phone-link editable-field" onClick={(e) => startEditing(debt.id, 'bankPhone', debt.bankPhone || '', e)}>
+                                <a href={`tel:${debt.bankPhone}`} className="phone-link editable-field" onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditing(debt.id, 'bankPhone', debt.bankPhone || '', e);
+                                }}>
                                   {debt.bankPhone}
                                 </a>
                               ) : (
-                                <span className="phone-link editable-field" onClick={(e) => startEditing(debt.id, 'bankPhone', '', e)} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                                <span className="phone-link editable-field" onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditing(debt.id, 'bankPhone', '', e);
+                                }} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
                                   Add phone
                                 </span>
                               )
@@ -1088,7 +1125,7 @@ const Dashboard: React.FC = () => {
                           </div>
 
                           <div className="debt-task">
-                            <label className="task-checkbox">
+                            <label className="task-checkbox" onClick={(e) => e.stopPropagation()}>
                               <input
                                 type="checkbox"
                                 checked={debt.hasCallTask}
@@ -1097,7 +1134,7 @@ const Dashboard: React.FC = () => {
                               <span>Call bank</span>
                             </label>
                             {debt.hasCallTask && (
-                              <label className="task-checkbox">
+                              <label className="task-checkbox" onClick={(e) => e.stopPropagation()}>
                                 <input
                                   type="checkbox"
                                   checked={debt.callCompleted}
