@@ -193,6 +193,12 @@
     "confirmMessage": "Esta acción no se puede deshacer.",
     "success": "Compromiso eliminado exitosamente"
   },
+  "deleteDebt": {
+    "title": "Eliminar Deuda",
+    "subtitle": "¿Estás seguro de que quieres eliminar esta deuda?",
+    "confirmMessage": "Esto eliminará permanentemente \"{{debtName}}\" y todos sus datos asociados. Esta acción no se puede deshacer.",
+    "success": "Deuda eliminada exitosamente"
+  },
   "completeCommitment": {
     "title": "Completar Compromiso",
     "subtitle": "¡Excelente! Completaste un compromiso de pago.",

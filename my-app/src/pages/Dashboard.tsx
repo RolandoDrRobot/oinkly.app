@@ -117,14 +117,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t('debt.deleteConfirm'))) {
-      storage.deleteDebt(id);
-      // Remove from order
-      const currentOrder = storage.getDebtsOrder() || debts.map(d => d.id);
-      const newOrder = currentOrder.filter(debtId => debtId !== id);
-      storage.setDebtsOrder(newOrder);
-      loadDebts();
-    }
+    navigate(`/delete-debt/${id}`);
   };
 
   const sensors = useSensors(
