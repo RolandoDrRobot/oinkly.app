@@ -92,7 +92,7 @@
 
 .summary-card:hover {
   
-  box-shadow: 0 2px 8px var(--primary-overlay-medium);
+  
 }
 
 .summary-section {
@@ -191,14 +191,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px var(--shadow-medium);
+  
   transition: all 0.3s;
   z-index: 1000;
 }
 
 .fab-add-debt:hover {
   background: var(--primary-bright);
-  box-shadow: 0 8px 24px var(--shadow-dark);
+  
   transform: translateY(-2px);
 }
 
@@ -239,7 +239,7 @@
   padding: 20px;
   
   transition: all 0.3s;
-  box-shadow: 0 2px 8px var(--shadow);
+  
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -252,7 +252,7 @@
 
 .debt-card:hover {
   
-  box-shadow: 0 4px 16px var(--primary-overlay-medium);
+  
   transform: translateY(-2px);
 }
 
@@ -658,7 +658,7 @@
 
 .inline-edit-input:focus {
   
-  box-shadow: 0 0 0 3px var(--overlay);
+  
   background: var(--dark-bg);
 }
 
@@ -728,7 +728,7 @@
 
 .commitment-item:hover {
   transform: translateX(6px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
 }
 
 .commitment-info {
@@ -772,10 +772,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+    
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
+    
   }
 }
 
@@ -939,7 +939,7 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  
 }
 
 .modal-header {
@@ -1012,7 +1012,7 @@
 .modal-form textarea:focus {
   outline: none;
   
-  box-shadow: 0 0 0 3px var(--overlay);
+  
 }
 
 .modal-form textarea {
@@ -1126,7 +1126,7 @@
 .call-item:hover {
   transform: translateX(6px);
   background: var(--overlay-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
 }
 
 .call-date {

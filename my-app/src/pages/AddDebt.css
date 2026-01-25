@@ -42,7 +42,7 @@
   background: var(--primary);
   border-radius: 2px;
   transition: width 0.3s ease;
-  box-shadow: 0 0 10px var(--shadow);
+  
 }
 
 .form-container {
@@ -140,7 +140,7 @@
 .option-button:hover {
   
   background: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
   transform: translateY(-2px);
 }
 
@@ -179,7 +179,7 @@
 .boolean-button:hover {
   
   background: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
   transform: translateY(-2px);
 }
 
@@ -244,7 +244,7 @@
 .btn-next {
   background: var(--primary);
   color: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
 }
 
 .btn-next:disabled {
@@ -254,6 +254,6 @@
 
 .btn-next:not(:disabled):hover {
   background: var(--primary-bright);
-  box-shadow: 0 6px 16px var(--shadow-medium);
+  
   transform: translateY(-2px);
 }

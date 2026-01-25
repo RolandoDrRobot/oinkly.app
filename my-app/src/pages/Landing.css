@@ -75,12 +75,12 @@
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 8px;
-  box-shadow: 0 4px 12px var(--shadow);
+  
 }
 
 .btn-primary:hover {
   background: var(--primary-bright);
-  box-shadow: 0 6px 16px var(--shadow-medium);
+  
   transform: translateY(-2px);
 }
 

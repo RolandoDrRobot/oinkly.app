@@ -14,9 +14,7 @@
   --primary-overlay: rgba(0, 223, 129, 0.1);
   --primary-overlay-light: rgba(0, 223, 129, 0.05);
   --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-border: rgba(0, 223, 129, 0.3);
   --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-  --primary-bright-border: rgba(0, 223, 129, 0.3);
 }
 
 :root[data-color-scheme="blue"] {
@@ -29,9 +27,7 @@
   --primary-overlay: rgba(0, 223, 129, 0.1);
   --primary-overlay-light: rgba(0, 223, 129, 0.05);
   --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-border: rgba(0, 223, 129, 0.3);
   --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-  --primary-bright-border: rgba(0, 223, 129, 0.3);
 }
 
 :root[data-color-scheme="purple"] {
@@ -44,9 +40,7 @@
   --primary-overlay: rgba(0, 223, 129, 0.1);
   --primary-overlay-light: rgba(0, 223, 129, 0.05);
   --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-border: rgba(0, 223, 129, 0.3);
   --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-  --primary-bright-border: rgba(0, 223, 129, 0.3);
 }
 
 :root[data-color-scheme="green"] {
@@ -59,9 +53,7 @@
   --primary-overlay: rgba(0, 223, 129, 0.1);
   --primary-overlay-light: rgba(0, 223, 129, 0.05);
   --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-border: rgba(0, 223, 129, 0.3);
   --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-  --primary-bright-border: rgba(0, 223, 129, 0.3);
 }
 
 /* Dark Mode - Simplified palette */

@@ -53,7 +53,7 @@
   padding: 40px 20px;
   text-align: center;
   
-  box-shadow: 0 4px 16px var(--shadow);
+  
   margin-bottom: 24px;
 }
 
@@ -67,7 +67,7 @@
   justify-content: center;
   margin: 0 auto 24px;
   color: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
 }
 
 .profile-card h2 {
@@ -108,7 +108,7 @@
 .btn-action:hover {
   
   background: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
 }
 
 .btn-action.btn-logout {

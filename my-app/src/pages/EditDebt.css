@@ -46,7 +46,7 @@
   
   max-width: 500px;
   margin: 0 auto;
-  box-shadow: 0 4px 16px var(--shadow);
+  
 }
 
 .form-group {
@@ -137,12 +137,12 @@
 .btn-submit {
   background: var(--primary);
   color: var(--dark-bg);
-  box-shadow: 0 4px 12px var(--shadow);
+  
 }
 
 .btn-submit:hover {
   background: var(--primary-bright);
-  box-shadow: 0 6px 16px var(--shadow-medium);
+  
   transform: translateY(-2px);
 }
 
