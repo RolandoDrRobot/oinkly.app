@@ -41,7 +41,7 @@ const EditDebt: React.FC = () => {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         >
-          Loading...
+          {t('common.loading')}
         </motion.div>
       </motion.div>
     );
@@ -142,8 +142,8 @@ const EditDebt: React.FC = () => {
               onChange={handleChange}
               required
             >
-              <option value="prestamo">Loan</option>
-              <option value="tarjeta">Credit Card</option>
+              <option value="prestamo">{t('addDebt.loan')}</option>
+              <option value="tarjeta">{t('addDebt.creditCard')}</option>
             </select>
           </div>
 
@@ -235,7 +235,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.feeToUpdateDollars || 0}
               onChange={handleNumberChange}
-              placeholder="Amount to update (USD)"
+              placeholder={t('editDebt.amountToUpdateDollar')}
               required
             />
           </div>
@@ -259,7 +259,7 @@ const EditDebt: React.FC = () => {
                 checked={formData.hasCallTask}
                 onChange={handleChange}
               />
-              <span>Call reminder</span>
+              <span>{t('editDebt.callReminder')}</span>
             </label>
           </div>
 
@@ -273,7 +273,7 @@ const EditDebt: React.FC = () => {
                   onChange={handleChange}
                 />
                 <span className={formData.callCompleted ? 'completed' : ''}>
-                  Completed
+                  {t('common.completed')}
                 </span>
               </label>
             </div>

@@ -209,7 +209,7 @@ const AddCommitment: React.FC = () => {
     return (
       <div className="add-debt">
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-          Loading...
+          {t('common.loading')}
         </div>
       </div>
     );

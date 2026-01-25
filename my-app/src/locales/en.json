@@ -113,7 +113,8 @@
     "amountToUpdateDollar": "Amount to update (USD)",
     "currentPlan": "Current plan",
     "phoneOptional": "Phone (optional)",
-    "inOrder": "In Order"
+    "inOrder": "In Order",
+    "callReminder": "Call reminder"
   },
   "editCommitment": {
     "title": "Edit Commitment",
@@ -151,16 +152,23 @@
     "localCurrency": "Local Currency",
     "language": "Language",
     "english": "English",
-    "spanish": "Spanish"
+    "spanish": "Spanish",
+    "teal": "Teal",
+    "blue": "Blue",
+    "purple": "Purple",
+    "green": "Green"
   },
   "profile": {
-    "title": "Profile"
+    "title": "Profile",
+    "preferences": "Preferences",
+    "logout": "Logout"
   },
   "commitment": {
     "markCompleted": "Mark as completed",
     "deleteCommitment": "Delete commitment",
     "deleteConfirm": "Are you sure you want to delete this commitment?",
-    "editCommitment": "Edit commitment"
+    "editCommitment": "Edit commitment",
+    "completedOn": "Completed:"
   },
   "debt": {
     "deleteConfirm": "Are you sure you want to delete this debt?",

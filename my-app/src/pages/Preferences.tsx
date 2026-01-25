@@ -12,11 +12,11 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
-const colorSchemes: { value: ColorScheme; label: string; color: string }[] = [
-  { value: 'teal', label: 'Teal', color: '#14B8A6' },
-  { value: 'blue', label: 'Blue', color: '#3B82F6' },
-  { value: 'purple', label: 'Purple', color: '#8B5CF6' },
-  { value: 'green', label: 'Green', color: '#10B981' },
+const colorSchemes: { value: ColorScheme; color: string }[] = [
+  { value: 'teal', color: '#14B8A6' },
+  { value: 'blue', color: '#3B82F6' },
+  { value: 'purple', color: '#8B5CF6' },
+  { value: 'green', color: '#10B981' },
 ];
 
 const currencies = [
@@ -94,6 +94,37 @@ const Preferences: React.FC = () => {
           className="preferences-section"
         >
           <h2 className="section-title">
+            <Icon component={FaGlobe} className="section-icon" />
+            {t('preferences.language')}
+          </h2>
+          
+          <div className="mode-toggle">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`mode-button ${language === 'en' ? 'active' : ''}`}
+              onClick={() => handleLanguageChange('en')}
+            >
+              <span>{t('preferences.english')}</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`mode-button ${language === 'es' ? 'active' : ''}`}
+              onClick={() => handleLanguageChange('es')}
+            >
+              <span>{t('preferences.spanish')}</span>
+            </motion.button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="preferences-section"
+        >
+          <h2 className="section-title">
             <Icon component={FaSun} className="section-icon" />
             {t('preferences.appearance')}
           </h2>
@@ -126,7 +157,7 @@ const Preferences: React.FC = () => {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
           className="preferences-section"
         >
           <h2 className="section-title">
@@ -144,7 +175,7 @@ const Preferences: React.FC = () => {
                 onClick={() => setColorScheme(scheme.value)}
               >
                 <div className="color-preview" style={{ backgroundColor: scheme.color }} />
-                <span>{scheme.label}</span>
+                <span>{t(`preferences.${scheme.value}` as any)}</span>
                 {colorScheme === scheme.value && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -162,7 +193,7 @@ const Preferences: React.FC = () => {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="preferences-section"
         >
           <h2 className="section-title">
@@ -195,37 +226,6 @@ const Preferences: React.FC = () => {
                 )}
               </motion.button>
             ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="preferences-section"
-        >
-          <h2 className="section-title">
-            <Icon component={FaGlobe} className="section-icon" />
-            {t('preferences.language')}
-          </h2>
-          
-          <div className="mode-toggle">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`mode-button ${language === 'en' ? 'active' : ''}`}
-              onClick={() => handleLanguageChange('en')}
-            >
-              <span>{t('preferences.english')}</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`mode-button ${language === 'es' ? 'active' : ''}`}
-              onClick={() => handleLanguageChange('es')}
-            >
-              <span>{t('preferences.spanish')}</span>
-            </motion.button>
           </div>
         </motion.div>
       </div>

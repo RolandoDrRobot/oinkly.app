@@ -113,7 +113,8 @@
     "amountToUpdateDollar": "Monto para poner al día (USD)",
     "currentPlan": "Plan actual",
     "phoneOptional": "Teléfono (opcional)",
-    "inOrder": "En Orden"
+    "inOrder": "En Orden",
+    "callReminder": "Recordatorio de llamada"
   },
   "editCommitment": {
     "title": "Editar Compromiso",
@@ -151,16 +152,23 @@
     "localCurrency": "Moneda Local",
     "language": "Idioma",
     "english": "Inglés",
-    "spanish": "Español"
+    "spanish": "Español",
+    "teal": "Verde Azulado",
+    "blue": "Azul",
+    "purple": "Morado",
+    "green": "Verde"
   },
   "profile": {
-    "title": "Perfil"
+    "title": "Perfil",
+    "preferences": "Preferencias",
+    "logout": "Cerrar Sesión"
   },
   "commitment": {
     "markCompleted": "Marcar como completado",
     "deleteCommitment": "Eliminar compromiso",
     "deleteConfirm": "¿Estás seguro de que quieres eliminar este compromiso?",
-    "editCommitment": "Editar compromiso"
+    "editCommitment": "Editar compromiso",
+    "completedOn": "Completado:"
   },
   "debt": {
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta deuda?",

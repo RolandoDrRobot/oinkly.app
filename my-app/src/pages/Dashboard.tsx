@@ -332,7 +332,7 @@ const Dashboard: React.FC = () => {
               <div className="summary-section">
                 <div className="summary-card-header">
                   <Icon component={FaMoneyBill} className="summary-icon" />
-                  <span className="summary-label">Monthly Payment</span>
+                  <span className="summary-label">{t('dashboard.monthlyPayment')}</span>
                 </div>
                 <div className="summary-values">
                   <div className="summary-value">
@@ -462,7 +462,7 @@ const Dashboard: React.FC = () => {
                           )}
                           <p className="debt-type">
                             <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
-                            {debt.type === 'prestamo' ? 'Loan' : 'Credit Card'}
+                            {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
                           </p>
                         </div>
                       </div>
@@ -483,9 +483,9 @@ const Dashboard: React.FC = () => {
                             const urgent = hasUrgentCommitments(debt);
                             if (urgent.hasUrgent) {
                               const alertConfig = {
-                                'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: 'Overdue', icon: FaExclamationTriangle },
-                                'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: 'Due Today', icon: FaExclamationTriangle },
-                                'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: 'Due Tomorrow', icon: FaExclamationTriangle },
+                                'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.overdue'), icon: FaExclamationTriangle },
+                                'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.dueToday'), icon: FaExclamationTriangle },
+                                'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: t('dashboard.dueTomorrow'), icon: FaExclamationTriangle },
                               };
                               const config = urgent.highestPriority ? alertConfig[urgent.highestPriority] : alertConfig['due-tomorrow'];
                               return (
@@ -691,7 +691,7 @@ const Dashboard: React.FC = () => {
                                   )}
                                   {debt.feeToUpdateDollars > 0 && (
                                     <div className="payment-item update-amount">
-                                      <span className="payment-label">To Update (USD)</span>
+                                      <span className="payment-label">{t('dashboard.toUpdate')} (USD)</span>
                                       {editingField?.debtId === debt.id && editingField?.field === 'feeToUpdateDollars' ? (
                                         <input
                                           type="number"
@@ -955,7 +955,7 @@ const Dashboard: React.FC = () => {
                                           const config = {
                                             color: 'var(--primary-bright)',
                                             bg: 'var(--overlay)',
-                                            label: 'Completed',
+                                            label: t('common.completed'),
                                           };
                                           
                                           return (
@@ -997,7 +997,7 @@ const Dashboard: React.FC = () => {
                                                 )}
                                                 {commitment.completedAt && (
                                                   <p className="commitment-completed-date" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                                    Completed: {formatDate(commitment.completedAt)}
+                                                    {t('commitment.completedOn')} {formatDate(commitment.completedAt)}
                                                   </p>
                                                 )}
                                               </div>
@@ -1107,7 +1107,7 @@ const Dashboard: React.FC = () => {
                                 onClick={(e) => e.stopPropagation()}
                                 className="inline-edit-input"
                                 autoFocus
-                                placeholder="Phone number"
+                                placeholder={t('editDebt.phoneOptional')}
                               />
                             ) : (
                               debt.bankPhone ? (

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaUser, FaCog } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import './Profile.css';
@@ -11,6 +12,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 };
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -27,14 +29,14 @@ const Profile: React.FC = () => {
         className="page-header"
       >
         <div className="header-content">
-          <h1>Profile</h1>
+          <h1>{t('profile.title')}</h1>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="btn-back"
             onClick={() => navigate('/dashboard')}
           >
-            <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
+            <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
           </motion.button>
         </div>
       </motion.header>
@@ -66,7 +68,7 @@ const Profile: React.FC = () => {
             onClick={() => navigate('/preferences')}
           >
             <Icon component={FaCog} style={{ marginRight: '12px' }} />
-            Preferences
+            {t('profile.preferences')}
           </motion.button>
 
           <motion.button
@@ -75,7 +77,7 @@ const Profile: React.FC = () => {
             className="btn-action btn-logout"
             onClick={logout}
           >
-            Logout
+            {t('profile.logout')}
           </motion.button>
         </motion.div>
       </div>
