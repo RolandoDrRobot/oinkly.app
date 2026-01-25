@@ -1231,12 +1231,18 @@ const Dashboard: React.FC = () => {
                               />
                             ) : (
                               debt.bankPhone ? (
-                                <a href={`tel:${debt.bankPhone}`} className="phone-link editable-field" onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditing(debt.id, 'bankPhone', debt.bankPhone || '', e);
-                                }}>
+                                <span 
+                                  className="phone-link editable-field" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    startEditing(debt.id, 'bankPhone', debt.bankPhone || '', e);
+                                  }}
+                                  style={{ cursor: 'pointer' }}
+                                  title={t('dashboard.addPhone')}
+                                >
                                   {debt.bankPhone}
-                                </a>
+                                </span>
                               ) : (
                                 <span className="phone-link editable-field" onClick={(e) => {
                                   e.stopPropagation();
