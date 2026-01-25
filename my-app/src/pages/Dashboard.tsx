@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
 import EditCommitmentModal from './EditCommitmentModal';
-import AddCallModal from './AddCallModal';
 import UpdateBalancesModal from './UpdateBalancesModal';
 import './Dashboard.css';
 
@@ -23,7 +22,6 @@ const Dashboard: React.FC = () => {
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [editingCommitment, setEditingCommitment] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
-  const [addingCall, setAddingCall] = useState<Debt | null>(null);
   const [updatingBalances, setUpdatingBalances] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -1051,7 +1049,7 @@ const Dashboard: React.FC = () => {
                               className="btn-add-call"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setAddingCall(debt);
+                                navigate(`/add-call/${debt.id}`);
                               }}
                               style={{ marginTop: '16px', width: '100%' }}
                             >
@@ -1176,18 +1174,6 @@ const Dashboard: React.FC = () => {
           onSave={() => {
             loadDebts();
             setEditingCommitment(null);
-          }}
-        />
-      )}
-
-      {addingCall && (
-        <AddCallModal
-          debt={addingCall}
-          isOpen={true}
-          onClose={() => setAddingCall(null)}
-          onSave={() => {
-            loadDebts();
-            setAddingCall(null);
           }}
         />
       )}

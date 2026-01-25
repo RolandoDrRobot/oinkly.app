@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
 import AddCommitment from './pages/AddCommitment';
+import AddCall from './pages/AddCall';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -51,6 +52,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <AddCommitment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-call/:debtId"
+        element={
+          <ProtectedRoute>
+            <AddCall />
           </ProtectedRoute>
         }
       />

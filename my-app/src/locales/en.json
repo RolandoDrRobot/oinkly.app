@@ -126,11 +126,18 @@
   },
   "addCall": {
     "title": "Record Call",
+    "subtitle": "Let's record a call for {{debtName}}",
+    "thisDebt": "this debt",
     "date": "Date",
+    "dateSubtitle": "When did this call take place?",
     "notes": "Notes",
+    "notesSubtitle": "What did you discuss? Any agreements? Next steps?",
     "notesPlaceholder": "What did you discuss? Any agreements? Next steps?",
+    "createCommitmentTitle": "Create Commitment",
+    "createCommitmentSubtitle": "Do you want to create a payment commitment from this call?",
     "createCommitment": "Create payment commitment from this call",
-    "saveCall": "Save Call"
+    "saveCall": "Save Call",
+    "success": "Your call has been recorded successfully"
   },
   "updateBalances": {
     "title": "Update Balances",

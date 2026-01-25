@@ -126,11 +126,18 @@
   },
   "addCall": {
     "title": "Registrar Llamada",
+    "subtitle": "Registremos una llamada para {{debtName}}",
+    "thisDebt": "esta deuda",
     "date": "Fecha",
+    "dateSubtitle": "¿Cuándo tuvo lugar esta llamada?",
     "notes": "Notas",
+    "notesSubtitle": "¿De qué hablaron? ¿Algún acuerdo? ¿Próximos pasos?",
     "notesPlaceholder": "¿De qué hablaron? ¿Algún acuerdo? ¿Próximos pasos?",
+    "createCommitmentTitle": "Crear Compromiso",
+    "createCommitmentSubtitle": "¿Quieres crear un compromiso de pago de esta llamada?",
     "createCommitment": "Crear compromiso de pago de esta llamada",
-    "saveCall": "Guardar Llamada"
+    "saveCall": "Guardar Llamada",
+    "success": "Tu llamada ha sido registrada exitosamente"
   },
   "updateBalances": {
     "title": "Actualizar Saldos",
