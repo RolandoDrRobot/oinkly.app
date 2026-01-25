@@ -123,7 +123,6 @@ const Preferences: React.FC = () => {
           </h2>
           
           <div className="preference-item">
-            <label className="preference-label">{t('preferences.themeMode')}</label>
             <div className="mode-toggle">
               <motion.button
                 whileHover={{ scale: 1.05 }}

@@ -577,33 +577,35 @@ const Dashboard: React.FC = () => {
                               {debt.name}
                             </h3>
                           )}
-                          {editingField?.debtId === debt.id && editingField?.field === 'bankName' ? (
-                            <input
-                              type="text"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={() => saveEdit(debt.id, 'bankName')}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEdit(debt.id, 'bankName');
-                                if (e.key === 'Escape') cancelEdit();
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-edit-input"
-                              autoFocus
-                            />
-                          ) : (
-                            <p className="debt-bank editable-field" onClick={(e) => {
-                              e.stopPropagation();
-                              startEditing(debt.id, 'bankName', debt.bankName, e);
-                            }}>
-                              <Icon component={FaLandmark} className="debt-info-icon" />
-                              {debt.bankName}
+                          <div className="debt-bank-type-row">
+                            {editingField?.debtId === debt.id && editingField?.field === 'bankName' ? (
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveEdit(debt.id, 'bankName')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveEdit(debt.id, 'bankName');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <p className="debt-bank editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditing(debt.id, 'bankName', debt.bankName, e);
+                              }}>
+                                <Icon component={FaLandmark} className="debt-info-icon" />
+                                {debt.bankName}
+                              </p>
+                            )}
+                            <p className="debt-type">
+                              <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
+                              {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
                             </p>
-                          )}
-                          <p className="debt-type">
-                            <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
-                            {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
-                          </p>
+                          </div>
                         </div>
                       </div>
                       <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>

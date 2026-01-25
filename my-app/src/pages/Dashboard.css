@@ -81,24 +81,24 @@
 }
 
 .dashboard-summary {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .summary-card {
   background: var(--dark-section);
   border: 1px solid var(--dark-green);
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 8px;
+  padding: 12px 16px;
   transition: all 0.3s;
 }
 
 .summary-card:hover {
   border-color: var(--primary);
-  box-shadow: 0 4px 12px var(--primary-overlay-medium);
+  box-shadow: 0 2px 8px var(--primary-overlay-medium);
 }
 
 .summary-section {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .summary-section:last-child {
@@ -108,41 +108,42 @@
 .summary-divider {
   height: 1px;
   background: var(--dark-green);
-  margin: 20px 0;
-  opacity: 0.5;
+  margin: 10px 0;
+  opacity: 0.3;
 }
 
 .summary-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .summary-icon {
-  font-size: 20px;
+  font-size: 14px;
   color: var(--primary);
 }
 
 .summary-label {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  opacity: 0.8;
 }
 
 .summary-values {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
 }
 
 .summary-value {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 8px 0;
+  padding: 2px 0;
 }
 
 .summary-value-main {
@@ -154,24 +155,26 @@
 }
 
 .summary-currency {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  opacity: 0.7;
+  margin-right: 4px;
 }
 
 .summary-amount {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .summary-amount-large {
-  font-size: 32px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--primary-bright);
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 
 .fab-add-debt {
@@ -233,7 +236,7 @@
 }
 
 .debt-card {
-  background: var(--dark-section);
+  background: var(--dark-card, #014a3a);
   border-radius: 8px;
   padding: 20px;
   border: 1px solid var(--dark-green);
@@ -375,6 +378,13 @@
   border-radius: 4px;
 }
 
+.debt-bank-type-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .debt-type {
   margin: 0;
   font-size: 12px;
@@ -490,7 +500,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   border-radius: 6px;
 }
 
@@ -531,7 +541,7 @@
   gap: 8px;
   margin-bottom: 16px;
   padding: 12px;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   border-radius: 6px;
   font-size: 14px;
 }
@@ -593,7 +603,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   border-radius: 8px;
   border: 1px solid var(--dark-green);
   margin-top: 16px;
@@ -684,7 +694,7 @@
   margin-top: 16px;
   margin-bottom: 16px;
   padding: 16px;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   border-radius: 8px;
   border: 1px solid var(--dark-green);
 }
@@ -737,6 +747,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 12px;
+  background: var(--dark-card, #014a3a);
   border-radius: 6px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -1082,7 +1093,7 @@
   margin-top: 16px;
   margin-bottom: 16px;
   padding: 16px;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   border-radius: 8px;
   border: 1px solid var(--dark-green);
 }
@@ -1132,7 +1143,7 @@
 
 .call-item {
   padding: 12px;
-  background: var(--dark-section);
+  background: var(--dark-card, #014a3a);
   border-radius: 6px;
   border-left: 3px solid var(--primary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

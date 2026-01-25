@@ -67,6 +67,7 @@
 /* Dark Mode - Simplified palette */
 :root[data-theme="dark"] {
   --dark-section: #01634c;
+  --dark-card: #014a3a;
   --dark-bg: #030e0f;
   --text-primary: #FFFFFF;
   --text-secondary: #FFFFFF;
@@ -82,6 +83,7 @@
 /* Light Mode - Simplified palette */
 :root[data-theme="light"] {
   --dark-section: #01634c;
+  --dark-card: #014a3a;
   --dark-bg: #030e0f;
   --text-primary: #FFFFFF;
   --text-secondary: #FFFFFF;
