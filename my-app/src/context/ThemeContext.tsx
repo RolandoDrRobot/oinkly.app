@@ -11,18 +11,16 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [mode, setModeState] = useState<ThemeMode>('dark');
+  const [mode] = useState<ThemeMode>('dark');
 
   useEffect(() => {
-    const savedMode = storage.getThemeMode();
-    if (savedMode) setModeState(savedMode);
-    applyTheme(savedMode || 'dark');
+    // Always set to dark mode
+    applyTheme('dark');
   }, []);
 
-  const setMode = (newMode: ThemeMode) => {
-    setModeState(newMode);
-    storage.setThemeMode(newMode);
-    applyTheme(newMode);
+  const setMode = (_newMode: ThemeMode) => {
+    // No-op: theme is always dark
+    applyTheme('dark');
   };
 
   const applyTheme = (themeMode: ThemeMode) => {

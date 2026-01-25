@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaArrowLeft, FaMoon, FaSun, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
-import { useTheme } from '../context/ThemeContext';
+import { FaArrowLeft, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
 import { storage } from '../utils/storage';
 import './Preferences.css';
 
@@ -34,7 +33,6 @@ const currencies = [
 const Preferences: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { mode, setMode } = useTheme();
   const [localCurrency, setLocalCurrencyState] = useState<string>(storage.getLocalCurrency());
   const [language, setLanguageState] = useState<string>(storage.getLanguage());
 
@@ -115,41 +113,6 @@ const Preferences: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="preferences-section"
-        >
-          <h2 className="section-title">
-            <Icon component={FaSun} className="section-icon" />
-            {t('preferences.appearance')}
-          </h2>
-          
-          <div className="preference-item">
-            <div className="mode-toggle">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`mode-button ${mode === 'light' ? 'active' : ''}`}
-                onClick={() => setMode('light')}
-              >
-                <Icon component={FaSun} />
-                <span>{t('preferences.light')}</span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`mode-button ${mode === 'dark' ? 'active' : ''}`}
-                onClick={() => setMode('dark')}
-              >
-                <Icon component={FaMoon} />
-                <span>{t('preferences.dark')}</span>
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
           className="preferences-section"
         >
           <h2 className="section-title">

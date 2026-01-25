@@ -1208,8 +1208,11 @@ const Dashboard: React.FC = () => {
                             </div>
                           )}
 
-                          <div className="debt-phone">
-                            <Icon component={FaPhone} size={14} />
+                          <div className="payment-item">
+                            <span className="payment-label">
+                              <Icon component={FaPhone} size={14} style={{ marginRight: '6px' }} />
+                              {t('addDebt.bankPhone')}
+                            </span>
                             {editingField?.debtId === debt.id && editingField?.field === 'bankPhone' ? (
                               <input
                                 type="tel"
@@ -1228,7 +1231,7 @@ const Dashboard: React.FC = () => {
                             ) : (
                               debt.bankPhone ? (
                                 <span 
-                                  className="phone-link editable-field" 
+                                  className="payment-value editable-field" 
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -1240,7 +1243,7 @@ const Dashboard: React.FC = () => {
                                   {debt.bankPhone}
                                 </span>
                               ) : (
-                                <span className="phone-link editable-field" onClick={(e) => {
+                                <span className="payment-value editable-field" onClick={(e) => {
                                   e.stopPropagation();
                                   startEditing(debt.id, 'bankPhone', '', e);
                                 }} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
