@@ -10,7 +10,8 @@ import {
   FaMoneyBill, 
   FaClipboardList,
   FaGift,
-  FaArrowLeft
+  FaArrowLeft,
+  FaCheckCircle
 } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -49,6 +50,10 @@ interface StepData {
   amountLocal?: number;
   amountDollars?: number;
   notes?: string;
+  setTotalLocal?: boolean;
+  subtractFromTotalLocal?: boolean;
+  setTotalDollars?: boolean;
+  subtractFromTotalDollars?: boolean;
 }
 
 const AddCommitment: React.FC = () => {
@@ -97,6 +102,8 @@ const AddCommitment: React.FC = () => {
     placeholder?: string;
     type?: string;
     optional?: boolean;
+    hasOptions?: boolean;
+    currencyType?: 'local' | 'dollars';
   }> = [
     {
       id: 'welcome',
@@ -122,6 +129,8 @@ const AddCommitment: React.FC = () => {
       field: 'amountLocal' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
+      hasOptions: true,
+      currencyType: 'local',
     },
     {
       id: 'amountDollars',
@@ -131,6 +140,8 @@ const AddCommitment: React.FC = () => {
       field: 'amountDollars' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
+      hasOptions: true,
+      currencyType: 'dollars',
     },
     {
       id: 'notes',
@@ -175,6 +186,8 @@ const AddCommitment: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete' && debt) {
       const timer = setTimeout(() => {
+        let updatedDebt: Debt = { ...debt };
+
         if (isEditing && commitment) {
           // Update existing commitment
           const updatedCommitment: PaymentCommitment = {
@@ -186,15 +199,13 @@ const AddCommitment: React.FC = () => {
             updatedAt: new Date().toISOString(),
           };
 
-          const updatedDebt: Debt = {
-            ...debt,
-            commitments: debt.commitments?.map(c => 
+          updatedDebt = {
+            ...updatedDebt,
+            commitments: updatedDebt.commitments?.map(c => 
               c.id === commitment.id ? updatedCommitment : c
             ),
             updatedAt: new Date().toISOString(),
           };
-
-          storage.saveDebt(updatedDebt);
         } else {
           // Create new commitment
           const newCommitment: PaymentCommitment = {
@@ -208,15 +219,30 @@ const AddCommitment: React.FC = () => {
             createdAt: new Date().toISOString(),
           };
 
-          const updatedDebt: Debt = {
-            ...debt,
-            commitments: [...(debt.commitments || []), newCommitment],
+          updatedDebt = {
+            ...updatedDebt,
+            commitments: [...(updatedDebt.commitments || []), newCommitment],
             updatedAt: new Date().toISOString(),
           };
-
-          storage.saveDebt(updatedDebt);
         }
-        
+
+        // Handle total updates based on options
+        if (formData.setTotalLocal && formData.amountLocal !== undefined) {
+          updatedDebt.totalLocal = formData.amountLocal;
+        } else if (formData.subtractFromTotalLocal && formData.amountLocal !== undefined) {
+          updatedDebt.totalLocal = Math.max(0, (updatedDebt.totalLocal || 0) - formData.amountLocal);
+        }
+
+        if (formData.setTotalDollars && formData.amountDollars !== undefined) {
+          updatedDebt.totalDollars = formData.amountDollars;
+        } else if (formData.subtractFromTotalDollars && formData.amountDollars !== undefined) {
+          updatedDebt.totalDollars = Math.max(0, (updatedDebt.totalDollars || 0) - formData.amountDollars);
+        }
+
+        // Recalculate inOrder
+        updatedDebt.inOrder = (updatedDebt.feeToUpdate || 0) === 0 && (updatedDebt.feeToUpdateDollars || 0) === 0;
+
+        storage.saveDebt(updatedDebt);
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
@@ -312,29 +338,150 @@ const AddCommitment: React.FC = () => {
 
             <div className="step-input">
               {currentStepData.field ? (
-                <motion.input
-                  initial={{ scale: 0.95, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                  type={currentStepData.type || 'text'}
-                  placeholder={currentStepData.placeholder}
-                  value={
-                    typeof formData[currentStepData.field] === 'number'
-                      ? formData[currentStepData.field]?.toString() || ''
-                      : (formData[currentStepData.field] as string) || ''
-                  }
-                  onChange={(e) => {
-                    if (currentStepData.type === 'number') {
-                      handleInputChange(parseFloat(e.target.value) || 0);
-                    } else if (currentStepData.type === 'date') {
-                      handleInputChange(e.target.value);
-                    } else {
-                      handleInputChange(e.target.value);
+                <>
+                  <motion.input
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    type={currentStepData.type || 'text'}
+                    placeholder={currentStepData.placeholder}
+                    value={
+                      typeof formData[currentStepData.field] === 'number'
+                        ? formData[currentStepData.field]?.toString() || ''
+                        : (formData[currentStepData.field] as string) || ''
                     }
-                  }}
-                  className="step-input-field"
-                  autoFocus
-                />
+                    onChange={(e) => {
+                      if (currentStepData.type === 'number') {
+                        handleInputChange(parseFloat(e.target.value) || 0);
+                      } else if (currentStepData.type === 'date') {
+                        handleInputChange(e.target.value);
+                      } else {
+                        handleInputChange(e.target.value);
+                      }
+                    }}
+                    className="step-input-field"
+                    autoFocus
+                  />
+                  {currentStepData.hasOptions && debt && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="commitment-options"
+                      style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                    >
+                      <motion.label
+                        whileHover={{ scale: 1.02, backgroundColor: 'var(--overlay)' }}
+                        whileTap={{ scale: 0.98 }}
+                        className="commitment-option"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '14px 16px',
+                          background: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                            ? 'var(--primary-overlay)' 
+                            : 'var(--bg-secondary)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          border: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                            ? '2px solid var(--accent-color)' 
+                            : '2px solid var(--bg-tertiary)',
+                          transition: 'all 0.2s',
+                        }}
+                        onClick={() => {
+                          const field = currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars';
+                          const otherField = currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars';
+                          const amountField = currentStepData.currencyType === 'local' ? 'amountLocal' : 'amountDollars';
+                          const totalValue = currentStepData.currencyType === 'local' ? debt.totalLocal : debt.totalDollars;
+                          
+                          setFormData(prev => ({
+                            ...prev,
+                            [field]: !prev[field],
+                            [otherField]: false, // Uncheck the other option
+                            [amountField]: !prev[field] ? totalValue : prev[amountField], // Auto-fill if checking
+                          }));
+                        }}
+                      >
+                        <Icon 
+                          component={FaCheckCircle} 
+                          size={20}
+                          style={{ 
+                            color: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                              ? 'var(--accent-color)' 
+                              : 'var(--text-muted)',
+                            transition: 'color 0.2s',
+                          }}
+                        />
+                        <span style={{ 
+                          color: 'var(--text-primary)', 
+                          fontSize: '14px',
+                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] ? 500 : 400,
+                        }}>
+                          {t('addCommitment.setTotal', { 
+                            currency: currentStepData.currencyType === 'local' 
+                              ? getCurrencyName(debt.localCurrency) 
+                              : 'USD',
+                            total: currentStepData.currencyType === 'local' 
+                              ? debt.totalLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                              : debt.totalDollars.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          })}
+                        </span>
+                      </motion.label>
+                      <motion.label
+                        whileHover={{ scale: 1.02, backgroundColor: 'var(--overlay)' }}
+                        whileTap={{ scale: 0.98 }}
+                        className="commitment-option"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '14px 16px',
+                          background: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                            ? 'var(--primary-overlay)' 
+                            : 'var(--bg-secondary)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          border: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                            ? '2px solid var(--accent-color)' 
+                            : '2px solid var(--bg-tertiary)',
+                          transition: 'all 0.2s',
+                        }}
+                        onClick={() => {
+                          const field = currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars';
+                          const otherField = currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars';
+                          setFormData(prev => ({
+                            ...prev,
+                            [field]: !prev[field],
+                            [otherField]: false, // Uncheck the other option
+                          }));
+                        }}
+                      >
+                        <Icon 
+                          component={FaCheckCircle} 
+                          size={20}
+                          style={{ 
+                            color: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                              ? 'var(--accent-color)' 
+                              : 'var(--text-muted)',
+                            transition: 'color 0.2s',
+                          }}
+                        />
+                        <span style={{ 
+                          color: 'var(--text-primary)', 
+                          fontSize: '14px',
+                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] ? 500 : 400,
+                        }}>
+                          {t('addCommitment.subtractFromTotal', { 
+                            currency: currentStepData.currencyType === 'local' 
+                              ? getCurrencyName(debt.localCurrency) 
+                              : 'USD'
+                          })}
+                        </span>
+                      </motion.label>
+                    </motion.div>
+                  )}
+                </>
               ) : currentStepData.id === 'notes' ? (
                 <motion.textarea
                   initial={{ scale: 0.95, opacity: 0 }}

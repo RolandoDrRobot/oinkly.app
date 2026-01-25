@@ -13,7 +13,8 @@
     "yes": "Yes",
     "no": "No",
     "allDone": "All Done!",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "close": "Close"
   },
   "landing": {
     "title": "Debts",
@@ -98,6 +99,8 @@
     "paymentAmount": "Payment Amount",
     "paymentAmountLocalSubtitle": "How much will you pay in {{currency}}?",
     "paymentAmountDollarSubtitle": "How much will you pay in US Dollars?",
+    "setTotal": "Set total debt to this amount (Current: {{currency}} {{total}})",
+    "subtractFromTotal": "Subtract this amount from total debt ({{currency}})",
     "notes": "Notes",
     "notesSubtitle": "Any additional notes about this commitment? (optional)",
     "notesPlaceholder": "e.g. Agreed to pay in two installments",

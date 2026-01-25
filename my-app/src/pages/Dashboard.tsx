@@ -435,9 +435,29 @@ const Dashboard: React.FC = () => {
                     transition={{ delay: 0.05 * index }}
                     whileHover={{ y: -2 }}
                     className="debt-card"
-                    onClick={() => toggleExpand(debt.id)}
+                    onClick={() => {
+                      if (!isExpanded) {
+                        toggleExpand(debt.id);
+                      }
+                    }}
                   >
                     <div className="debt-header">
+                      {isExpanded && (
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="btn-close-debt"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(debt.id);
+                          }}
+                          title={t('common.close')}
+                        >
+                          <Icon component={FaTimes} size={16} />
+                        </motion.button>
+                      )}
                       <div className="debt-header-main">
                         <div className="debt-header-info">
                           {editingField?.debtId === debt.id && editingField?.field === 'name' ? (

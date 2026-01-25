@@ -221,15 +221,21 @@ const CompleteCommitment: React.FC = () => {
           completedAt: new Date().toISOString(),
         };
 
+        // Automatically subtract commitment amounts from debt totals
+        let newTotalLocal = Math.max(0, (debt.totalLocal || 0) - (commitment.amountLocal || 0));
+        let newTotalDollars = Math.max(0, (debt.totalDollars || 0) - (commitment.amountDollars || 0));
+
         let updatedDebt: Debt = {
           ...debt,
           commitments: debt.commitments?.map(c => 
             c.id === commitment.id ? updatedCommitment : c
           ),
+          totalLocal: newTotalLocal,
+          totalDollars: newTotalDollars,
           updatedAt: new Date().toISOString(),
         };
 
-        // Update balances if user chose to
+        // Update balances if user chose to (overrides automatic subtraction)
         if (formData.updateBalances === true) {
           const inOrder = (formData.feeToUpdate || 0) === 0 && (formData.feeToUpdateDollars || 0) === 0;
           updatedDebt = {
@@ -240,6 +246,9 @@ const CompleteCommitment: React.FC = () => {
             feeToUpdateDollars: formData.feeToUpdateDollars || 0,
             inOrder: inOrder,
           };
+        } else {
+          // Recalculate inOrder after automatic subtraction
+          updatedDebt.inOrder = (updatedDebt.feeToUpdate || 0) === 0 && (updatedDebt.feeToUpdateDollars || 0) === 0;
         }
 
         storage.saveDebt(updatedDebt);
@@ -399,7 +408,6 @@ const CompleteCommitment: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
                 className="btn-next"
                 onClick={handleNext}
-                disabled={!canProceed()}
               >
                 {t('common.next')}
               </motion.button>
