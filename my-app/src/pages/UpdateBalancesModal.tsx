@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -47,6 +48,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     totalLocal: debt.totalLocal,
     totalDollars: debt.totalDollars,
@@ -129,7 +131,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
           <div className="modal-header">
             <h2>
               <Icon component={FaCheckCircle} style={{ marginRight: '8px', display: 'inline', color: 'var(--primary-bright)' }} />
-              Update Balances
+              {t('updateBalances.title')}
             </h2>
             <button className="modal-close" onClick={onClose}>
               <Icon component={FaTimes} />
@@ -138,10 +140,10 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
 
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--dark-green)' }}>
             <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>
-              Great! You completed a payment commitment. Would you like to update your debt balances?
+              {t('updateBalances.message')}
             </p>
             <div style={{ marginTop: '12px', padding: '12px', background: 'var(--overlay)', borderRadius: '6px' }}>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Payment made:</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>{t('updateBalances.paymentMade')}</p>
               {commitment.amountLocal > 0 && (
                 <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: '4px 0' }}>
                   {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
@@ -157,7 +159,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
 
           <form onSubmit={handleSubmit} className="modal-form">
             <div className="form-group">
-              <label>Total Debt ({storage.getLocalCurrency()})</label>
+              <label>{t('updateBalances.totalDebtLocal')} ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"
@@ -169,7 +171,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Total Debt (USD)</label>
+              <label>{t('updateBalances.totalDebtDollar')}</label>
               <input
                 type="number"
                 step="0.01"
@@ -181,7 +183,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount to Update ({storage.getLocalCurrency()})</label>
+              <label>{t('updateBalances.amountToUpdateLocal')} ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"
@@ -193,7 +195,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount to Update (USD)</label>
+              <label>{t('updateBalances.amountToUpdateDollar')}</label>
               <input
                 type="number"
                 step="0.01"
@@ -212,7 +214,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
                 className="btn-cancel"
                 onClick={onClose}
               >
-                Skip
+                {t('common.skip')}
               </motion.button>
               <motion.button
                 type="submit"
@@ -220,7 +222,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
                 whileTap={{ scale: 0.98 }}
                 className="btn-submit"
               >
-                Update Balances
+                {t('updateBalances.updateBalances')}
               </motion.button>
             </div>
           </form>

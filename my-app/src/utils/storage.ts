@@ -80,4 +80,13 @@ export const storage = {
   getLocalCurrency: (): string => {
     return localStorage.getItem('localCurrency') || 'USD';
   },
+
+  // Language management
+  setLanguage: (language: string) => {
+    localStorage.setItem('language', language);
+  },
+
+  getLanguage: (): string => {
+    return localStorage.getItem('language') || 'en';
+  },
 };

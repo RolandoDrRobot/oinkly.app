@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaTimes, FaPhone, FaCalendarAlt } from 'react-icons/fa';
 import { CallRecord, Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -23,6 +24,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0], // Today's date
@@ -87,7 +89,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
           <div className="modal-header">
             <h2>
               <Icon component={FaPhone} style={{ marginRight: '8px', display: 'inline' }} />
-              Record Call
+              {t('addCall.title')}
             </h2>
             <button className="modal-close" onClick={onClose}>
               <Icon component={FaTimes} />
@@ -98,7 +100,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
             <div className="form-group">
               <label>
                 <Icon component={FaCalendarAlt} style={{ marginRight: '6px', display: 'inline' }} />
-                Date
+                {t('addCall.date')}
               </label>
               <input
                 type="date"
@@ -109,11 +111,11 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Notes</label>
+              <label>{t('addCall.notes')}</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="What did you discuss? Any agreements? Next steps?"
+                placeholder={t('addCall.notesPlaceholder')}
                 rows={5}
                 required
               />
@@ -127,7 +129,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, createCommitment: e.target.checked })}
                   style={{ width: 'auto', cursor: 'pointer' }}
                 />
-                <span>Create payment commitment from this call</span>
+                <span>{t('addCall.createCommitment')}</span>
               </label>
             </div>
 
@@ -139,7 +141,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
                 className="btn-cancel"
                 onClick={onClose}
               >
-                Cancel
+                {t('common.cancel')}
               </motion.button>
               <motion.button
                 type="submit"
@@ -147,7 +149,7 @@ const AddCallModal: React.FC<AddCallModalProps> = ({
                 whileTap={{ scale: 0.98 }}
                 className="btn-submit"
               >
-                Save Call
+                {t('addCall.saveCall')}
               </motion.button>
             </div>
           </form>

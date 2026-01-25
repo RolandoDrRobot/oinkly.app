@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser, FaChartLine, FaDollarSign, FaMoneyBill, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Debt, PaymentCommitment } from '../types';
@@ -16,6 +17,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 };
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [debts, setDebts] = useState<Debt[]>([]);
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
@@ -72,7 +74,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this debt?')) {
+    if (window.confirm(t('debt.deleteConfirm'))) {
       storage.deleteDebt(id);
       loadDebts();
     }
@@ -284,7 +286,7 @@ const Dashboard: React.FC = () => {
       >
         <div className="header-content">
           <div>
-            <h1>Debts</h1>
+            <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
             <motion.button
@@ -311,7 +313,7 @@ const Dashboard: React.FC = () => {
               <div className="summary-section">
                 <div className="summary-card-header">
                   <Icon component={FaChartLine} className="summary-icon" />
-                  <span className="summary-label">Total Debt</span>
+                  <span className="summary-label">{t('dashboard.totalDebt')}</span>
                 </div>
                 <div className="summary-values">
                   <div className="summary-value">
@@ -349,7 +351,7 @@ const Dashboard: React.FC = () => {
               <div className="summary-section">
                 <div className="summary-card-header">
                   <Icon component={FaDollarSign} className="summary-icon" />
-                  <span className="summary-label">To Update</span>
+                  <span className="summary-label">{t('dashboard.toUpdate')}</span>
                 </div>
                 <div className="summary-values">
                   {totals.toUpdate > 0 && (
@@ -366,7 +368,7 @@ const Dashboard: React.FC = () => {
                   )}
                   {totals.toUpdate === 0 && totals.toUpdateDollars === 0 && (
                     <div className="summary-value-main">
-                      <span className="summary-amount-large">All up to date</span>
+                      <span className="summary-amount-large">{t('dashboard.allUpToDate')}</span>
                     </div>
                   )}
                 </div>
@@ -385,8 +387,8 @@ const Dashboard: React.FC = () => {
               transition={{ delay: 0.3 }}
               className="empty-state"
             >
-              <p>No debts yet</p>
-              <p className="empty-subtitle">Add your first debt to get started</p>
+              <p>{t('dashboard.noDebts')}</p>
+              <p className="empty-subtitle">{t('dashboard.noDebtsSubtitle')}</p>
             </motion.div>
           ) : (
             <motion.div
@@ -469,11 +471,11 @@ const Dashboard: React.FC = () => {
                           <div className="debt-status">
                             {debt.inOrder ? (
                               <span className="status-badge in-order">
-                                <Icon component={FaCheck} size={12} /> In Order
+                                <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
                               </span>
                             ) : (
                               <span className="status-badge not-in-order">
-                                <Icon component={FaTimes} size={12} /> Not in Order
+                                <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
                               </span>
                             )}
                           </div>
@@ -496,7 +498,7 @@ const Dashboard: React.FC = () => {
                                     borderColor: config.color,
                                     color: config.color,
                                   }}
-                                  title={`${urgent.count} commitment${urgent.count > 1 ? 's' : ''} need${urgent.count > 1 ? '' : 's'} attention`}
+                                  title={t('dashboard.commitmentsNeedAttention', { count: urgent.count })}
                                 >
                                   <Icon component={config.icon} size={12} />
                                   <span>{urgent.count}</span>
@@ -512,7 +514,7 @@ const Dashboard: React.FC = () => {
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
                               className="call-task-icon"
-                              title="Call bank task"
+                              title={t('debt.callTask')}
                             >
                               <Icon component={FaPhone} />
                             </motion.div>
@@ -522,7 +524,7 @@ const Dashboard: React.FC = () => {
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
                               className="call-completed-icon"
-                              title="Call completed"
+                              title={t('debt.callCompleted')}
                             >
                               <Icon component={FaCheck} />
                             </motion.div>
@@ -554,7 +556,7 @@ const Dashboard: React.FC = () => {
                           <div className="debt-main-info">
                             <div className="debt-payments">
                               <div className="payment-item">
-                                <span className="payment-label">Monthly ({storage.getLocalCurrency()})</span>
+                                <span className="payment-label">{t('dashboard.monthly')} ({storage.getLocalCurrency()})</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'localFee' ? (
                                   <input
                                     type="number"
@@ -580,7 +582,7 @@ const Dashboard: React.FC = () => {
                                 )}
                               </div>
                               <div className="payment-item">
-                                <span className="payment-label">Monthly (USD)</span>
+                                <span className="payment-label">{t('dashboard.monthly')} (USD)</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'dollarFee' ? (
                                   <input
                                     type="number"
@@ -606,7 +608,7 @@ const Dashboard: React.FC = () => {
                                 )}
                               </div>
                               <div className="payment-item total-debt">
-                                <span className="payment-label">Total ({storage.getLocalCurrency()})</span>
+                                <span className="payment-label">{t('dashboard.total')} ({storage.getLocalCurrency()})</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'totalLocal' ? (
                                   <input
                                     type="number"
@@ -632,7 +634,7 @@ const Dashboard: React.FC = () => {
                                 )}
                               </div>
                               <div className="payment-item total-debt">
-                                <span className="payment-label">Total (USD)</span>
+                                <span className="payment-label">{t('dashboard.total')} (USD)</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'totalDollars' ? (
                                   <input
                                     type="number"
@@ -661,7 +663,7 @@ const Dashboard: React.FC = () => {
                                 <>
                                   {debt.feeToUpdate > 0 && (
                                     <div className="payment-item update-amount">
-                                      <span className="payment-label">To Update ({storage.getLocalCurrency()})</span>
+                                      <span className="payment-label">{t('dashboard.toUpdate')} ({storage.getLocalCurrency()})</span>
                                       {editingField?.debtId === debt.id && editingField?.field === 'feeToUpdate' ? (
                                         <input
                                           type="number"
@@ -719,9 +721,9 @@ const Dashboard: React.FC = () => {
                               )}
                               {(debt.feeToUpdate === 0 && debt.feeToUpdateDollars === 0) && (
                                 <div className="payment-item update-amount" style={{ background: 'var(--overlay)', border: '1px solid var(--primary-bright)' }}>
-                                  <span className="payment-label">To Update</span>
+                                  <span className="payment-label">{t('dashboard.toUpdate')}</span>
                                   <span className="payment-value" style={{ color: 'var(--primary-bright)' }}>
-                                    All up to date
+                                    {t('dashboard.allUpToDate')}
                                   </span>
                                 </div>
                               )}
@@ -743,7 +745,7 @@ const Dashboard: React.FC = () => {
                                   return (
                                     <div className="commitments-progress">
                                       <span className="progress-text">
-                                        {completed} of {total} completed
+                                        {t('dashboard.ofCompleted', { total })}
                                       </span>
                                       <div className="progress-bar-container-small">
                                         <motion.div
@@ -784,31 +786,31 @@ const Dashboard: React.FC = () => {
                                     'pending': { 
                                       color: 'var(--text-muted)', 
                                       bg: 'var(--dark-bg)', 
-                                      label: 'Pending',
+                                      label: t('dashboard.pending'),
                                       pulse: false,
                                     },
                                     'due-tomorrow': { 
                                       color: '#ff9800', 
                                       bg: 'rgba(255, 152, 0, 0.15)', 
-                                      label: 'Due Tomorrow',
+                                      label: t('dashboard.dueTomorrow'),
                                       pulse: true,
                                     },
                                     'due-today': { 
                                       color: '#f44336', 
                                       bg: 'rgba(244, 67, 54, 0.15)', 
-                                      label: 'Due Today',
+                                      label: t('dashboard.dueToday'),
                                       pulse: true,
                                     },
                                     'overdue': { 
                                       color: '#d32f2f', 
                                       bg: 'rgba(211, 47, 47, 0.2)', 
-                                      label: 'Overdue',
+                                      label: t('dashboard.overdue'),
                                       pulse: true,
                                     },
                                     'completed': { 
                                       color: 'var(--primary-bright)', 
                                       bg: 'var(--overlay)', 
-                                      label: 'Completed',
+                                      label: t('common.completed'),
                                       pulse: false,
                                     },
                                   };
@@ -879,7 +881,7 @@ const Dashboard: React.FC = () => {
                                                 e.stopPropagation();
                                                 setEditingCommitment({ debt, commitment });
                                               }}
-                                              title="Edit commitment"
+                                              title={t('commitment.editCommitment')}
                                             >
                                               <Icon component={FaEdit} size={14} />
                                             </motion.button>
@@ -903,7 +905,7 @@ const Dashboard: React.FC = () => {
                                                 setUpdatingBalances({ debt: updated, commitment });
                                                 loadDebts();
                                               }}
-                                              title="Mark as completed"
+                                              title={t('commitment.markCompleted')}
                                             >
                                               <Icon component={FaCheck} size={14} />
                                             </motion.button>
@@ -913,7 +915,7 @@ const Dashboard: React.FC = () => {
                                               className="btn-commitment-action btn-delete"
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (window.confirm('Are you sure you want to delete this commitment?')) {
+                                                if (window.confirm(t('commitment.deleteConfirm'))) {
                                                   const updated = {
                                                     ...debt,
                                                     commitments: debt.commitments?.filter(c => c.id !== commitment.id),
@@ -923,7 +925,7 @@ const Dashboard: React.FC = () => {
                                                   loadDebts();
                                                 }
                                               }}
-                                              title="Delete commitment"
+                                              title={t('commitment.deleteCommitment')}
                                             >
                                               <Icon component={FaTrash} size={14} />
                                             </motion.button>
@@ -939,7 +941,7 @@ const Dashboard: React.FC = () => {
                                 {/* Completed Commitments History */}
                                 {debt.commitments.filter(c => c.status === 'completed').length > 0 && (
                                   <div className="commitments-completed-section">
-                                    <h5 className="completed-title">Completed Commitments</h5>
+                                    <h5 className="completed-title">{t('dashboard.completedCommitments')}</h5>
                                     <div className="commitments-list">
                                       {debt.commitments
                                         .filter(c => c.status === 'completed')
@@ -1008,8 +1010,8 @@ const Dashboard: React.FC = () => {
                               </>
                             ) : (
                               <div className="commitments-empty">
-                                <p>No payment commitments yet</p>
-                                <p className="empty-subtitle">Add a commitment to track your payment agreements</p>
+                                <p>{t('dashboard.noCommitments')}</p>
+                                <p className="empty-subtitle">{t('dashboard.noCommitmentsSubtitle')}</p>
                               </div>
                             )}
                           </div>
@@ -1019,7 +1021,7 @@ const Dashboard: React.FC = () => {
                             <div className="call-history-header">
                               <h4 className="call-history-title">
                                 <Icon component={FaPhone} size={16} />
-                                Call History
+                                {t('dashboard.callHistory')}
                               </h4>
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
@@ -1031,7 +1033,7 @@ const Dashboard: React.FC = () => {
                                 }}
                               >
                                 <Icon component={FaPlus} size={12} />
-                                Record Call
+                                {t('dashboard.recordCall')}
                               </motion.button>
                             </div>
                             
@@ -1056,15 +1058,15 @@ const Dashboard: React.FC = () => {
                               </div>
                             ) : (
                               <div className="call-history-empty">
-                                <p>No calls recorded yet</p>
-                                <p className="empty-subtitle">Record your first call to track communication with the bank</p>
+                                <p>{t('dashboard.noCalls')}</p>
+                                <p className="empty-subtitle">{t('dashboard.noCallsSubtitle')}</p>
                               </div>
                             )}
                           </div>
 
                           {debt.currentPlan && (
                             <div className="debt-plan">
-                              <span className="plan-label">Plan:</span>
+                              <span className="plan-label">{t('dashboard.plan')}:</span>
                               {editingField?.debtId === debt.id && editingField?.field === 'currentPlan' ? (
                                 <input
                                   type="text"
@@ -1120,7 +1122,7 @@ const Dashboard: React.FC = () => {
                                   e.stopPropagation();
                                   startEditing(debt.id, 'bankPhone', '', e);
                                 }} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                  Add phone
+                                  {t('dashboard.addPhone')}
                                 </span>
                               )
                             )}
@@ -1133,7 +1135,7 @@ const Dashboard: React.FC = () => {
                                 checked={debt.hasCallTask}
                                 onChange={() => handleToggleCallTask(debt)}
                               />
-                              <span>Call bank</span>
+                              <span>{t('dashboard.callBank')}</span>
                             </label>
                             {debt.hasCallTask && (
                               <label className="task-checkbox" onClick={(e) => e.stopPropagation()}>
@@ -1142,7 +1144,7 @@ const Dashboard: React.FC = () => {
                                   checked={debt.callCompleted}
                                   onChange={() => handleToggleCallCompleted(debt)}
                                 />
-                                <span className={debt.callCompleted ? 'completed' : ''}>Completed</span>
+                                <span className={debt.callCompleted ? 'completed' : ''}>{t('common.completed')}</span>
                               </label>
                             )}
                           </div>

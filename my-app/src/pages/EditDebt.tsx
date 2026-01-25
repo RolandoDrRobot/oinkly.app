@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -12,6 +13,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 };
 
 const EditDebt: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Debt | null>(null);
@@ -109,9 +111,9 @@ const EditDebt: React.FC = () => {
           className="btn-back"
           onClick={() => navigate('/dashboard')}
         >
-          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
+          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
         </motion.button>
-        <h1>Edit Debt</h1>
+        <h1>{t('editDebt.title')}</h1>
       </motion.header>
 
       <div className="form-container">
@@ -128,7 +130,7 @@ const EditDebt: React.FC = () => {
               type="text"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Debt name"
+              placeholder={t('addDebt.debtName')}
               required
             />
           </div>
@@ -151,7 +153,7 @@ const EditDebt: React.FC = () => {
               type="text"
               value={formData.bankName}
               onChange={handleChange}
-              placeholder="Bank name"
+              placeholder={t('addDebt.bankName')}
               required
             />
           </div>
@@ -162,7 +164,7 @@ const EditDebt: React.FC = () => {
               type="tel"
               value={formData.bankPhone || ''}
               onChange={handleChange}
-              placeholder="Phone (optional)"
+              placeholder={t('editDebt.phoneOptional')}
             />
           </div>
 
@@ -173,7 +175,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.localFee}
               onChange={handleNumberChange}
-              placeholder="Monthly payment (local currency)"
+              placeholder={t('editDebt.monthlyPaymentLocal')}
               required
             />
           </div>
@@ -185,7 +187,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.dollarFee}
               onChange={handleNumberChange}
-              placeholder="Monthly payment (USD)"
+              placeholder={t('editDebt.monthlyPaymentDollar')}
               required
             />
           </div>
@@ -197,7 +199,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.totalLocal}
               onChange={handleNumberChange}
-              placeholder="Total debt (local currency)"
+              placeholder={t('editDebt.totalDebtLocal')}
               required
             />
           </div>
@@ -209,7 +211,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.totalDollars}
               onChange={handleNumberChange}
-              placeholder="Total debt (USD)"
+              placeholder={t('editDebt.totalDebtDollar')}
               required
             />
           </div>
@@ -221,7 +223,7 @@ const EditDebt: React.FC = () => {
               step="0.01"
               value={formData.feeToUpdate}
               onChange={handleNumberChange}
-              placeholder="Amount to update (local currency)"
+              placeholder={t('editDebt.amountToUpdateLocal')}
               required
             />
           </div>
@@ -244,7 +246,7 @@ const EditDebt: React.FC = () => {
               type="text"
               value={formData.currentPlan}
               onChange={handleChange}
-              placeholder="Current plan"
+              placeholder={t('editDebt.currentPlan')}
               required
             />
           </div>
@@ -290,16 +292,16 @@ const EditDebt: React.FC = () => {
               className="btn-cancel"
               onClick={() => navigate('/dashboard')}
             >
-              Cancel
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="btn-submit"
-            >
-              Save
-            </motion.button>
+                {t('common.cancel')}
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="btn-submit"
+              >
+                {t('common.save')}
+              </motion.button>
           </motion.div>
         </motion.form>
       </div>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import './Landing.css';
 
 const Landing: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const { login } = useAuth();
@@ -32,8 +34,8 @@ const Landing: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="landing-header"
         >
-          <h1 className="landing-title">Debts</h1>
-          <p className="landing-subtitle">Manage your finances</p>
+          <h1 className="landing-title">{t('landing.title')}</h1>
+          <p className="landing-subtitle">{t('landing.subtitle')}</p>
         </motion.div>
 
         <motion.form
@@ -48,7 +50,7 @@ const Landing: React.FC = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Name"
+              placeholder={t('landing.name')}
               required
             />
           </div>
@@ -58,7 +60,7 @@ const Landing: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder={t('landing.email')}
               required
             />
           </div>
@@ -69,7 +71,7 @@ const Landing: React.FC = () => {
             type="submit"
             className="btn-primary"
           >
-            Continue
+            {t('landing.continue')}
           </motion.button>
         </motion.form>
       </div>

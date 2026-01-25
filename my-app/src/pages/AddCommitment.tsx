@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { 
   FaHandPaper, 
@@ -51,6 +52,7 @@ interface StepData {
 }
 
 const AddCommitment: React.FC = () => {
+  const { t } = useTranslation();
   const { debtId } = useParams<{ debtId: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -80,22 +82,22 @@ const AddCommitment: React.FC = () => {
   }> = [
     {
       id: 'welcome',
-      title: 'New Payment Commitment',
-      subtitle: `Let's add a payment commitment for ${debt?.name || 'this debt'}`,
+      title: t('addCommitment.title'),
+      subtitle: t('addCommitment.subtitle', { debtName: debt?.name || t('addCommitment.thisDebt') }),
       icon: FaHandPaper,
     },
     {
       id: 'date',
-      title: 'Commitment Date',
-      subtitle: 'When did you agree to make this payment?',
+      title: t('addCommitment.commitmentDate'),
+      subtitle: t('addCommitment.commitmentDateSubtitle'),
       icon: FaCalendarAlt,
       field: 'date' as keyof StepData,
       type: 'date',
     },
     {
       id: 'amountLocal',
-      title: 'Payment Amount',
-      subtitle: `How much will you pay in ${debt ? getCurrencyName(storage.getLocalCurrency()) : 'local currency'}?`,
+      title: t('addCommitment.paymentAmount'),
+      subtitle: t('addCommitment.paymentAmountLocalSubtitle', { currency: debt ? getCurrencyName(storage.getLocalCurrency()) : t('addCommitment.localCurrency') }),
       icon: FaMoneyBill,
       field: 'amountLocal' as keyof StepData,
       placeholder: '0.00',
@@ -103,8 +105,8 @@ const AddCommitment: React.FC = () => {
     },
     {
       id: 'amountDollars',
-      title: 'Payment Amount',
-      subtitle: 'How much will you pay in US Dollars?',
+      title: t('addCommitment.paymentAmount'),
+      subtitle: t('addCommitment.paymentAmountDollarSubtitle'),
       icon: FaDollarSign,
       field: 'amountDollars' as keyof StepData,
       placeholder: '0.00',
@@ -112,17 +114,17 @@ const AddCommitment: React.FC = () => {
     },
     {
       id: 'notes',
-      title: 'Notes',
-      subtitle: 'Any additional notes about this commitment? (optional)',
+      title: t('addCommitment.notes'),
+      subtitle: t('addCommitment.notesSubtitle'),
       icon: FaClipboardList,
       field: 'notes' as keyof StepData,
-      placeholder: 'e.g. Agreed to pay in two installments',
+      placeholder: t('addCommitment.notesPlaceholder'),
       optional: true,
     },
     {
       id: 'complete',
-      title: 'All Done!',
-      subtitle: 'Your payment commitment has been added successfully',
+      title: t('common.allDone'),
+      subtitle: t('addCommitment.success'),
       icon: FaGift,
     },
   ];
@@ -181,11 +183,7 @@ const AddCommitment: React.FC = () => {
 
   // Get dynamic subtitle based on current step and form data
   const getSubtitle = (step: typeof steps[0]) => {
-    if (step.id === 'amountLocal' && debt) {
-      const localCurrency = storage.getLocalCurrency();
-      const currencyName = getCurrencyName(localCurrency);
-      return `How much will you pay in ${currencyName}?`;
-    }
+    // Subtitles are already translated in the steps array
     return step.subtitle;
   };
 
@@ -221,7 +219,7 @@ const AddCommitment: React.FC = () => {
     <div className="add-debt">
       <header className="page-header">
         <button className="btn-back" onClick={() => navigate('/dashboard')}>
-          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
+          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
         </button>
         <div className="progress-bar-container">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
@@ -319,7 +317,7 @@ const AddCommitment: React.FC = () => {
               className="btn-back-step"
               onClick={handleBack}
             >
-              Back
+              {t('common.back')}
             </motion.button>
           )}
           {currentStepData.optional && (
@@ -329,7 +327,7 @@ const AddCommitment: React.FC = () => {
               className="btn-skip"
               onClick={handleSkip}
             >
-              Skip
+              {t('common.skip')}
             </motion.button>
           )}
           {currentStepData.id !== 'complete' && (
@@ -340,7 +338,7 @@ const AddCommitment: React.FC = () => {
               onClick={handleNext}
               disabled={!canProceed()}
             >
-              Next
+              {t('common.next')}
             </motion.button>
           )}
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { 
   FaHandPaper, 
@@ -67,6 +68,7 @@ interface StepData {
 }
 
 const AddDebt: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<StepData>({});
@@ -84,40 +86,40 @@ const AddDebt: React.FC = () => {
   }> = [
     {
       id: 'welcome',
-      title: 'New Debt',
-      subtitle: 'Let\'s add your debt step by step',
+      title: t('addDebt.title'),
+      subtitle: t('addDebt.subtitle'),
       icon: FaHandPaper,
     },
     {
       id: 'name',
-      title: 'Debt Name',
-      subtitle: 'Give this debt a name to identify it',
+      title: t('addDebt.debtName'),
+      subtitle: t('addDebt.debtNameSubtitle'),
       icon: FaPen,
       field: 'name' as keyof StepData,
-      placeholder: 'e.g. Personal Loan, Credit Card',
+      placeholder: t('addDebt.debtNamePlaceholder'),
     },
     {
       id: 'type',
-      title: 'Debt Type',
-      subtitle: 'What type of debt is this?',
+      title: t('addDebt.debtType'),
+      subtitle: t('addDebt.debtTypeSubtitle'),
       icon: FaCreditCard,
       options: [
-        { value: 'prestamo', label: 'Loan', icon: FaMoneyBillWave },
-        { value: 'tarjeta', label: 'Credit Card', icon: FaCreditCard },
+        { value: 'prestamo', label: t('addDebt.loan'), icon: FaMoneyBillWave },
+        { value: 'tarjeta', label: t('addDebt.creditCard'), icon: FaCreditCard },
       ],
     },
     {
       id: 'bank',
-      title: 'Bank Name',
-      subtitle: 'Which bank is this debt with?',
+      title: t('addDebt.bankName'),
+      subtitle: t('addDebt.bankNameSubtitle'),
       icon: FaLandmark,
       field: 'bankName' as keyof StepData,
-      placeholder: 'e.g. National Bank',
+      placeholder: t('addDebt.bankNamePlaceholder'),
     },
     {
       id: 'phone',
-      title: 'Bank Phone',
-      subtitle: 'Bank contact number (optional)',
+      title: t('addDebt.bankPhone'),
+      subtitle: t('addDebt.bankPhoneSubtitle'),
       icon: FaPhone,
       field: 'bankPhone' as keyof StepData,
       placeholder: '+1 234 567 8900',
@@ -125,8 +127,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'localFee',
-      title: 'Monthly Payment',
-      subtitle: 'How much do you pay monthly in local currency?',
+      title: t('addDebt.monthlyPaymentLocal'),
+      subtitle: t('addDebt.monthlyPaymentLocalSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
       icon: FaMoneyBill,
       field: 'localFee' as keyof StepData,
       placeholder: '0.00',
@@ -134,8 +136,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'dollarFee',
-      title: 'Monthly Payment',
-      subtitle: 'How much do you pay monthly in US Dollars?',
+      title: t('addDebt.monthlyPaymentDollar'),
+      subtitle: t('addDebt.monthlyPaymentDollarSubtitle'),
       icon: FaDollarSign,
       field: 'dollarFee' as keyof StepData,
       placeholder: '0.00',
@@ -143,8 +145,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'totalLocal',
-      title: 'Total Debt Amount',
-      subtitle: 'What is the total debt amount in local currency?',
+      title: t('addDebt.totalDebtLocal'),
+      subtitle: t('addDebt.totalDebtLocalSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
       icon: FaMoneyBill,
       field: 'totalLocal' as keyof StepData,
       placeholder: '0.00',
@@ -152,8 +154,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'totalDollars',
-      title: 'Total Debt Amount',
-      subtitle: 'What is the total debt amount in US Dollars?',
+      title: t('addDebt.totalDebtDollar'),
+      subtitle: t('addDebt.totalDebtDollarSubtitle'),
       icon: FaDollarSign,
       field: 'totalDollars' as keyof StepData,
       placeholder: '0.00',
@@ -161,8 +163,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'feeToUpdate',
-      title: 'Amount to Update',
-      subtitle: 'How much do you need to pay to be up to date?',
+      title: t('addDebt.amountToUpdate'),
+      subtitle: t('addDebt.amountToUpdateSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
       icon: FaChartLine,
       field: 'feeToUpdate' as keyof StepData,
       placeholder: '0.00',
@@ -170,8 +172,8 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'feeToUpdateDollars',
-      title: 'Amount to Update',
-      subtitle: 'How much do you need to pay to be up to date in US Dollars?',
+      title: t('addDebt.amountToUpdateDollar'),
+      subtitle: t('addDebt.amountToUpdateDollarSubtitle'),
       icon: FaDollarSign,
       field: 'feeToUpdateDollars' as keyof StepData,
       placeholder: '0.00',
@@ -179,23 +181,23 @@ const AddDebt: React.FC = () => {
     },
     {
       id: 'currentPlan',
-      title: 'Payment Plan',
-      subtitle: 'Describe your current payment plan',
+      title: t('addDebt.paymentPlan'),
+      subtitle: t('addDebt.paymentPlanSubtitle'),
       icon: FaClipboardList,
       field: 'currentPlan' as keyof StepData,
-      placeholder: 'e.g. 12 monthly installments',
+      placeholder: t('addDebt.paymentPlanPlaceholder'),
     },
     {
       id: 'callTask',
-      title: 'Call Reminder',
-      subtitle: 'Do you want a reminder to call the bank?',
+      title: t('addDebt.callReminder'),
+      subtitle: t('addDebt.callReminderSubtitle'),
       icon: FaPhoneAlt,
       type: 'boolean',
     },
     {
       id: 'complete',
-      title: 'All Done!',
-      subtitle: 'Your debt has been added successfully',
+      title: t('common.allDone'),
+      subtitle: t('addDebt.success'),
       icon: FaGift,
     },
   ];
@@ -276,18 +278,7 @@ const AddDebt: React.FC = () => {
 
   // Get dynamic subtitle based on current step and form data
   const getSubtitle = (step: typeof steps[0]) => {
-    const localCurrency = storage.getLocalCurrency();
-    const currencyName = getCurrencyName(localCurrency);
-    
-    if (step.id === 'localFee') {
-      return `How much do you pay monthly in ${currencyName}?`;
-    }
-    if (step.id === 'totalLocal') {
-      return `What is the total debt amount in ${currencyName}?`;
-    }
-    if (step.id === 'feeToUpdate') {
-      return `How much do you need to pay in ${currencyName} to be up to date?`;
-    }
+    // Subtitles are already translated in the steps array
     return step.subtitle;
   };
 
@@ -313,7 +304,7 @@ const AddDebt: React.FC = () => {
     <div className="add-debt">
       <header className="page-header">
         <button className="btn-back" onClick={() => navigate('/dashboard')}>
-          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
+          <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
         </button>
         <div className="progress-bar-container">
           <div className="progress-bar" style={{ width: `${progress}%` }} />
@@ -392,7 +383,7 @@ const AddDebt: React.FC = () => {
                     onClick={() => handleBooleanSelect(true)}
                   >
                     <Icon component={FaCheckCircle} className="boolean-icon" size={32} />
-                    <span>Yes</span>
+                    <span>{t('common.yes')}</span>
                   </motion.button>
                   <motion.button
                     initial={{ scale: 0.9, opacity: 0 }}
@@ -404,7 +395,7 @@ const AddDebt: React.FC = () => {
                     onClick={() => handleBooleanSelect(false)}
                   >
                     <Icon component={FaTimes} className="boolean-icon" size={32} />
-                    <span>No</span>
+                    <span>{t('common.no')}</span>
                   </motion.button>
                 </div>
               ) : currentStepData.field ? (
@@ -442,7 +433,7 @@ const AddDebt: React.FC = () => {
               className="btn-back-step"
               onClick={handleBack}
             >
-              Back
+              {t('common.back')}
             </motion.button>
           )}
           {currentStepData.optional && (
@@ -452,7 +443,7 @@ const AddDebt: React.FC = () => {
               className="btn-skip"
               onClick={handleSkip}
             >
-              Skip
+              {t('common.skip')}
             </motion.button>
           )}
           {currentStepData.id !== 'complete' &&
@@ -465,7 +456,7 @@ const AddDebt: React.FC = () => {
                 onClick={handleNext}
                 disabled={!canProceed()}
               >
-                Next
+                {t('common.next')}
               </motion.button>
             )}
         </div>

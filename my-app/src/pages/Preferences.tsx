@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaMoon, FaSun, FaPalette, FaCheck, FaDollarSign } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { FaArrowLeft, FaMoon, FaSun, FaPalette, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
 import { useTheme, ColorScheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
 import './Preferences.css';
@@ -19,7 +20,6 @@ const colorSchemes: { value: ColorScheme; label: string; color: string }[] = [
 ];
 
 const currencies = [
-  { code: 'USD', name: 'US Dollar', country: 'United States' },
   { code: 'MXN', name: 'Peso Mexicano', country: 'México' },
   { code: 'ARS', name: 'Peso Argentino', country: 'Argentina' },
   { code: 'CLP', name: 'Peso Chileno', country: 'Chile' },
@@ -40,16 +40,25 @@ const currencies = [
 
 const Preferences: React.FC = () => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { mode, colorScheme, setMode, setColorScheme } = useTheme();
   const [localCurrency, setLocalCurrencyState] = useState<string>(storage.getLocalCurrency());
+  const [language, setLanguageState] = useState<string>(storage.getLanguage());
 
   useEffect(() => {
     setLocalCurrencyState(storage.getLocalCurrency());
+    setLanguageState(storage.getLanguage());
   }, []);
 
   const handleCurrencyChange = (currency: string) => {
     storage.setLocalCurrency(currency);
     setLocalCurrencyState(currency);
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    storage.setLanguage(lang);
+    i18n.changeLanguage(lang);
+    setLanguageState(lang);
   };
 
   return (
@@ -59,23 +68,23 @@ const Preferences: React.FC = () => {
       transition={{ duration: 0.3 }}
       className="preferences"
     >
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="page-header"
-      >
-        <div className="header-content">
-          <h1>Preferences</h1>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-back"
-            onClick={() => navigate('/profile')}
-          >
-            <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> Back
-          </motion.button>
-        </div>
-      </motion.header>
+        <motion.header
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="page-header"
+        >
+          <div className="header-content">
+            <h1>{t('preferences.title')}</h1>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-back"
+              onClick={() => navigate('/profile')}
+            >
+              <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
+            </motion.button>
+          </div>
+        </motion.header>
 
       <div className="preferences-content">
         <motion.div
@@ -86,11 +95,11 @@ const Preferences: React.FC = () => {
         >
           <h2 className="section-title">
             <Icon component={FaSun} className="section-icon" />
-            Appearance
+            {t('preferences.appearance')}
           </h2>
           
           <div className="preference-item">
-            <label className="preference-label">Theme Mode</label>
+            <label className="preference-label">{t('preferences.themeMode')}</label>
             <div className="mode-toggle">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -99,7 +108,7 @@ const Preferences: React.FC = () => {
                 onClick={() => setMode('light')}
               >
                 <Icon component={FaSun} />
-                <span>Light</span>
+                <span>{t('preferences.light')}</span>
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -108,7 +117,7 @@ const Preferences: React.FC = () => {
                 onClick={() => setMode('dark')}
               >
                 <Icon component={FaMoon} />
-                <span>Dark</span>
+                <span>{t('preferences.dark')}</span>
               </motion.button>
             </div>
           </div>
@@ -122,7 +131,7 @@ const Preferences: React.FC = () => {
         >
           <h2 className="section-title">
             <Icon component={FaPalette} className="section-icon" />
-            Color Scheme
+            {t('preferences.colorScheme')}
           </h2>
           
           <div className="color-schemes-grid">
@@ -158,7 +167,7 @@ const Preferences: React.FC = () => {
         >
           <h2 className="section-title">
             <Icon component={FaDollarSign} className="section-icon" />
-            Local Currency
+            {t('preferences.localCurrency')}
           </h2>
           
           <div className="currency-grid">
@@ -186,6 +195,37 @@ const Preferences: React.FC = () => {
                 )}
               </motion.button>
             ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="preferences-section"
+        >
+          <h2 className="section-title">
+            <Icon component={FaGlobe} className="section-icon" />
+            {t('preferences.language')}
+          </h2>
+          
+          <div className="mode-toggle">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`mode-button ${language === 'en' ? 'active' : ''}`}
+              onClick={() => handleLanguageChange('en')}
+            >
+              <span>{t('preferences.english')}</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`mode-button ${language === 'es' ? 'active' : ''}`}
+              onClick={() => handleLanguageChange('es')}
+            >
+              <span>{t('preferences.spanish')}</span>
+            </motion.button>
           </div>
         </motion.div>
       </div>

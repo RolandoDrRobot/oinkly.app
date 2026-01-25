@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -24,6 +25,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     date: commitment.date.split('T')[0], // Extract date part from ISO string
     amountLocal: commitment.amountLocal,
@@ -119,7 +121,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="modal-header">
-            <h2>Edit Commitment</h2>
+            <h2>{t('editCommitment.title')}</h2>
             <button className="modal-close" onClick={onClose}>
               <Icon component={FaTimes} />
             </button>
@@ -127,7 +129,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
 
           <form onSubmit={handleSubmit} className="modal-form">
             <div className="form-group">
-              <label>Date</label>
+              <label>{t('editCommitment.date')}</label>
               <input
                 type="date"
                 value={formData.date}
@@ -137,7 +139,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount ({storage.getLocalCurrency()})</label>
+              <label>{t('editCommitment.amountLocal')} ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"
@@ -149,7 +151,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount (USD)</label>
+              <label>{t('editCommitment.amountDollar')}</label>
               <input
                 type="number"
                 step="0.01"
@@ -161,11 +163,11 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Notes (optional)</label>
+              <label>{t('editCommitment.notesOptional')}</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Additional notes about this commitment"
+                placeholder={t('editCommitment.notesPlaceholder')}
                 rows={3}
               />
             </div>
@@ -178,7 +180,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 className="btn-cancel"
                 onClick={onClose}
               >
-                Cancel
+                {t('common.cancel')}
               </motion.button>
               <motion.button
                 type="submit"
@@ -186,7 +188,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 whileTap={{ scale: 0.98 }}
                 className="btn-submit"
               >
-                Save
+                {t('common.save')}
               </motion.button>
             </div>
           </form>
