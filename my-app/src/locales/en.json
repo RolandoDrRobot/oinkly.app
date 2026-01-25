@@ -136,6 +136,10 @@
     "createCommitmentTitle": "Create Commitment",
     "createCommitmentSubtitle": "Do you want to create a payment commitment from this call?",
     "createCommitment": "Create payment commitment from this call",
+    "amountLocal": "Payment Amount",
+    "amountLocalSubtitle": "How much will you pay in {{currency}}?",
+    "amountDollar": "Payment Amount",
+    "amountDollarSubtitle": "How much will you pay in US Dollars?",
     "saveCall": "Save Call",
     "success": "Your call has been recorded successfully"
   },

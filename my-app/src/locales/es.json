@@ -136,6 +136,10 @@
     "createCommitmentTitle": "Crear Compromiso",
     "createCommitmentSubtitle": "¿Quieres crear un compromiso de pago de esta llamada?",
     "createCommitment": "Crear compromiso de pago de esta llamada",
+    "amountLocal": "Monto del Pago",
+    "amountLocalSubtitle": "¿Cuánto pagarás en {{currency}}?",
+    "amountDollar": "Monto del Pago",
+    "amountDollarSubtitle": "¿Cuánto pagarás en Dólares Estadounidenses?",
     "saveCall": "Guardar Llamada",
     "success": "Tu llamada ha sido registrada exitosamente"
   },

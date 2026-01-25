@@ -10,11 +10,37 @@ import {
   FaPhoneAlt,
   FaGift,
   FaArrowLeft,
-  FaCheckCircle
+  FaCheckCircle,
+  FaFileInvoiceDollar,
+  FaDollarSign,
+  FaMoneyBill
 } from 'react-icons/fa';
-import { CallRecord, Debt } from '../types';
+import { CallRecord, Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
 import './AddDebt.css';
+
+const getCurrencyName = (code: string): string => {
+  const currencyNames: { [key: string]: string } = {
+    'USD': 'US Dollar',
+    'MXN': 'Peso Mexicano',
+    'ARS': 'Peso Argentino',
+    'CLP': 'Peso Chileno',
+    'COP': 'Peso Colombiano',
+    'PEN': 'Sol Peruano',
+    'BRL': 'Real Brasileño',
+    'CRC': 'Colones',
+    'GTQ': 'Quetzal',
+    'PAB': 'Balboa',
+    'DOP': 'Peso Dominicano',
+    'VES': 'Bolívar',
+    'UYU': 'Peso Uruguayo',
+    'PYG': 'Guaraní',
+    'BOB': 'Boliviano',
+    'HNL': 'Lempira',
+    'NIO': 'Córdoba',
+  };
+  return currencyNames[code] || code;
+};
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -25,6 +51,8 @@ interface StepData {
   date?: string;
   notes?: string;
   createCommitment?: boolean;
+  amountLocal?: number;
+  amountDollars?: number;
 }
 
 const AddCall: React.FC = () => {
@@ -46,7 +74,8 @@ const AddCall: React.FC = () => {
     }
   }, [debtId, navigate]);
 
-  const steps: Array<{
+  // Get steps dynamically based on whether user wants to create commitment
+  const getSteps = (): Array<{
     id: string;
     title: string;
     subtitle?: string;
@@ -55,54 +84,106 @@ const AddCall: React.FC = () => {
     placeholder?: string;
     type?: string;
     optional?: boolean;
-  }> = [
-    {
-      id: 'welcome',
-      title: t('addCall.title'),
-      subtitle: t('addCall.subtitle', { debtName: debt?.name || t('addCall.thisDebt') }),
-      icon: FaHandPaper,
-    },
-    {
-      id: 'date',
-      title: t('addCall.date'),
-      subtitle: t('addCall.dateSubtitle'),
-      icon: FaCalendarAlt,
-      field: 'date' as keyof StepData,
-      type: 'date',
-    },
-    {
-      id: 'notes',
-      title: t('addCall.notes'),
-      subtitle: t('addCall.notesSubtitle'),
-      icon: FaClipboardList,
-      field: 'notes' as keyof StepData,
-      placeholder: t('addCall.notesPlaceholder'),
-      type: 'textarea',
-    },
-    {
-      id: 'createCommitment',
-      title: t('addCall.createCommitmentTitle'),
-      subtitle: t('addCall.createCommitmentSubtitle'),
-      icon: FaCheckCircle,
-      type: 'boolean',
-    },
-    {
-      id: 'complete',
-      title: t('common.allDone'),
-      subtitle: t('addCall.success'),
-      icon: FaGift,
-    },
-  ];
+  }> => {
+    const baseSteps = [
+      {
+        id: 'welcome',
+        title: t('addCall.title'),
+        subtitle: t('addCall.subtitle', { debtName: debt?.name || t('addCall.thisDebt') }),
+        icon: FaPhoneAlt,
+      },
+      {
+        id: 'date',
+        title: t('addCall.date'),
+        subtitle: t('addCall.dateSubtitle'),
+        icon: FaCalendarAlt,
+        field: 'date' as keyof StepData,
+        type: 'date',
+      },
+      {
+        id: 'notes',
+        title: t('addCall.notes'),
+        subtitle: t('addCall.notesSubtitle'),
+        icon: FaClipboardList,
+        field: 'notes' as keyof StepData,
+        placeholder: t('addCall.notesPlaceholder'),
+        type: 'textarea',
+      },
+      {
+        id: 'createCommitment',
+        title: t('addCall.createCommitmentTitle'),
+        subtitle: t('addCall.createCommitmentSubtitle'),
+        icon: FaFileInvoiceDollar,
+        type: 'boolean',
+      },
+    ];
+
+    // If user selected to create commitment, add amount steps
+    if (formData.createCommitment === true) {
+      return [
+        ...baseSteps,
+        {
+          id: 'amountLocal',
+          title: t('addCall.amountLocal'),
+          subtitle: t('addCall.amountLocalSubtitle', { currency: debt ? getCurrencyName(debt.localCurrency) : getCurrencyName(storage.getLocalCurrency()) }),
+          icon: FaMoneyBill,
+          field: 'amountLocal' as keyof StepData,
+          placeholder: '0.00',
+          type: 'number',
+        },
+        {
+          id: 'amountDollars',
+          title: t('addCall.amountDollar'),
+          subtitle: t('addCall.amountDollarSubtitle'),
+          icon: FaDollarSign,
+          field: 'amountDollars' as keyof StepData,
+          placeholder: '0.00',
+          type: 'number',
+        },
+        {
+          id: 'complete',
+          title: t('common.allDone'),
+          subtitle: t('addCall.success'),
+          icon: FaGift,
+        },
+      ];
+    }
+
+    // If user selected not to create commitment or hasn't selected yet
+    return [
+      ...baseSteps,
+      {
+        id: 'complete',
+        title: t('common.allDone'),
+        subtitle: t('addCall.success'),
+        icon: FaGift,
+      },
+    ];
+  };
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    const currentSteps = getSteps();
+    if (currentStep < currentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      // If going back from amount steps, need to handle dynamic steps
+      const currentSteps = getSteps();
+      const currentStepData = currentSteps[currentStep];
+      
+      // If we're on amountLocal (step 4 when commitment=true) and going back, go to createCommitment (step 3)
+      if (currentStepData.id === 'amountLocal') {
+        setCurrentStep(3);
+      } else if (currentStepData.id === 'amountDollars') {
+        // If on amountDollars, go back to amountLocal
+        setCurrentStep(4);
+      } else {
+        // Normal back navigation
+        setCurrentStep(currentStep - 1);
+      }
     }
   };
 
@@ -111,19 +192,32 @@ const AddCall: React.FC = () => {
   };
 
   const handleInputChange = (value: any) => {
-    const currentStepData = steps[currentStep];
+    const currentSteps = getSteps();
+    const currentStepData = currentSteps[currentStep];
     if (currentStepData.field) {
-      setFormData({ ...formData, [currentStepData.field]: value });
+      const field = currentStepData.field as keyof StepData;
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
   };
 
   const handleBooleanSelect = (value: boolean) => {
-    setFormData({ ...formData, createCommitment: value });
-    setTimeout(() => handleNext(), 300);
+    setFormData(prev => ({ ...prev, createCommitment: value }));
+    
+    // Navigate based on selection after state update
+    setTimeout(() => {
+      if (value) {
+        // User selected "Yes", go to amountLocal step (index 4: welcome, date, notes, createCommitment, amountLocal)
+        setCurrentStep(4);
+      } else {
+        // User selected "No", go to complete step (index 4: welcome, date, notes, createCommitment, complete)
+        setCurrentStep(4);
+      }
+    }, 300);
   };
 
   const canProceed = (): boolean => {
-    const currentStepData = steps[currentStep];
+    const currentSteps = getSteps();
+    const currentStepData = currentSteps[currentStep];
     if (currentStepData.field) {
       const value = formData[currentStepData.field];
       if (currentStepData.type === 'date') {
@@ -132,13 +226,22 @@ const AddCall: React.FC = () => {
       if (currentStepData.type === 'textarea') {
         return value !== undefined && value !== '' && value !== null;
       }
+      if (currentStepData.type === 'number') {
+        return value !== undefined && value !== null && !isNaN(Number(value)) && Number(value) >= 0;
+      }
       return value !== undefined && value !== '' && value !== null;
     }
     return false;
   };
 
   useEffect(() => {
-    if (currentStep === steps.length - 1 && debt) {
+    if (!debt) return;
+    
+    const currentSteps = getSteps();
+    const isLastStep = currentStep === currentSteps.length - 1;
+    const isCompleteStep = currentSteps[currentStep]?.id === 'complete';
+    
+    if (isLastStep && isCompleteStep) {
       const timer = setTimeout(() => {
         const newCall: CallRecord = {
           id: Date.now().toString(),
@@ -148,25 +251,45 @@ const AddCall: React.FC = () => {
           createdAt: new Date().toISOString(),
         };
 
-        const updatedDebt: Debt = {
+        let updatedDebt: Debt = {
           ...debt,
           callHistory: [...(debt.callHistory || []), newCall],
           lastCallDate: newCall.date,
           updatedAt: new Date().toISOString(),
         };
 
-        storage.saveDebt(updatedDebt);
-        
-        if (formData.createCommitment) {
-          navigate(`/add-commitment/${debt.id}`);
-        } else {
-          navigate('/dashboard');
+        // If user wants to create commitment, create it now
+        if (formData.createCommitment === true && 
+            formData.amountLocal !== undefined && 
+            formData.amountDollars !== undefined &&
+            (formData.amountLocal > 0 || formData.amountDollars > 0)) {
+          const newCommitment: PaymentCommitment = {
+            id: Date.now().toString() + '-commitment',
+            debtId: debt.id,
+            date: new Date(formData.date || new Date().toISOString()).toISOString(),
+            amountLocal: formData.amountLocal || 0,
+            amountDollars: formData.amountDollars || 0,
+            status: 'pending',
+            notes: formData.notes,
+            createdAt: new Date().toISOString(),
+          };
+
+          updatedDebt = {
+            ...updatedDebt,
+            commitments: [...(debt.commitments || []), newCommitment],
+          };
+
+          // Link commitment to call
+          newCall.commitmentsCreated = [newCommitment.id];
         }
+
+        storage.saveDebt(updatedDebt);
+        navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep]);
+  }, [currentStep, formData.createCommitment, formData.amountLocal, formData.amountDollars]);
 
   if (!debt) {
     return (
@@ -178,8 +301,9 @@ const AddCall: React.FC = () => {
     );
   }
 
-  const currentStepData = steps[currentStep];
-  const progress = ((currentStep + 1) / steps.length) * 100;
+  const currentSteps = getSteps();
+  const currentStepData = currentSteps[currentStep];
+  const progress = ((currentStep + 1) / currentSteps.length) * 100;
 
   return (
     <div className="add-debt">
@@ -288,8 +412,8 @@ const AddCall: React.FC = () => {
                     }
                     onChange={(e) =>
                       handleInputChange(
-                        currentStepData.type === 'date'
-                          ? e.target.value
+                        currentStepData.type === 'number'
+                          ? parseFloat(e.target.value) || 0
                           : e.target.value
                       )
                     }
