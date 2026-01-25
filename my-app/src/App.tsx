@@ -7,6 +7,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
+import AddCommitment from './pages/AddCommitment';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import './App.css';
@@ -41,6 +42,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <EditDebt />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-commitment/:debtId"
+        element={
+          <ProtectedRoute>
+            <AddCommitment />
           </ProtectedRoute>
         }
       />

@@ -639,3 +639,582 @@
   box-shadow: 0 0 0 3px var(--overlay);
   background: var(--dark-bg);
 }
+
+/* Commitments Section */
+.debt-commitments {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--dark-bg);
+  border-radius: 8px;
+  border: 1px solid var(--dark-green);
+}
+
+.commitments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.commitments-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add-commitment {
+  background: var(--primary);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-commitment:hover {
+  background: var(--primary-bright);
+  transform: translateY(-1px);
+}
+
+.commitments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.commitment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.commitment-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.commitment-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commitment-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.commitment-date {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commitment-status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.commitment-status-badge.pulse-badge {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
+  }
+}
+
+.commitment-alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 2px solid;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.commitment-alert-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Commitments Progress */
+.commitments-progress {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.progress-bar-container-small {
+  width: 100%;
+  height: 6px;
+  background: var(--dark-bg);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-bright));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.commitment-amounts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.commitment-amount {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.commitment-notes {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+.commitment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-commitment-action {
+  background: transparent;
+  border: 1px solid var(--dark-green);
+  color: var(--text-secondary);
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+
+.btn-commitment-action::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: currentColor;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-commitment-action:hover::after {
+  opacity: 0.1;
+  transform: scale(1);
+}
+
+.btn-commitment-action:hover {
+  background: var(--overlay-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.btn-commitment-action:active {
+  transform: scale(0.95);
+}
+
+.btn-commitment-action.btn-delete:hover {
+  background: var(--error-light);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.commitments-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+}
+
+.commitments-empty p {
+  margin: 8px 0;
+}
+
+.commitments-empty .empty-subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--dark-section);
+  border-radius: 12px;
+  border: 1px solid var(--dark-green);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--dark-green);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.modal-close:hover {
+  background: var(--overlay-light);
+  color: var(--text-primary);
+}
+
+.modal-form {
+  padding: 24px;
+}
+
+.modal-form .form-group {
+  margin-bottom: 20px;
+}
+
+.modal-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  padding: 12px;
+  background: var(--dark-bg);
+  border: 1px solid var(--dark-green);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--overlay);
+}
+
+.modal-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--dark-green);
+}
+
+.modal-actions .btn-cancel,
+.modal-actions .btn-submit {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.modal-actions .btn-cancel {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--dark-green);
+}
+
+.modal-actions .btn-cancel:hover {
+  background: var(--overlay-light);
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.modal-actions .btn-submit {
+  background: var(--primary);
+  color: white;
+}
+
+.modal-actions .btn-submit:hover {
+  background: var(--primary-bright);
+}
+
+/* Call History Section */
+.debt-call-history {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--dark-bg);
+  border-radius: 8px;
+  border: 1px solid var(--dark-green);
+}
+
+.call-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.call-history-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add-call {
+  background: var(--primary);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-call:hover {
+  background: var(--primary-bright);
+  transform: translateY(-1px);
+}
+
+.call-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.call-item {
+  padding: 12px;
+  background: var(--dark-section);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.call-item:hover {
+  transform: translateX(6px);
+  background: var(--overlay-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.call-date {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.call-notes {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.call-history-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+}
+
+.call-history-empty p {
+  margin: 8px 0;
+}
+
+.call-history-empty .empty-subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Completed Commitments Section */
+.commitments-completed-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--dark-green);
+}
+
+.completed-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.commitment-completed {
+  opacity: 0.85;
+}
+
+.commitment-completed-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+  
+  .dashboard-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .debt-card {
+    padding: 16px;
+  }
+
+  .debt-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .debt-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .commitment-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .commitment-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .modal-content {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .commitments-header,
+  .call-history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .btn-add-commitment,
+  .btn-add-call {
+    width: 100%;
+    justify-content: center;
+  }
+}

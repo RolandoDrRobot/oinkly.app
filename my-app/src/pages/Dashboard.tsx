@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser, FaChartLine, FaDollarSign, FaMoneyBill } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser, FaChartLine, FaDollarSign, FaMoneyBill, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { Debt } from '../types';
+import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
+import EditCommitmentModal from './EditCommitmentModal';
+import AddCallModal from './AddCallModal';
+import UpdateBalancesModal from './UpdateBalancesModal';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -17,6 +20,9 @@ const Dashboard: React.FC = () => {
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [editingCommitment, setEditingCommitment] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
+  const [addingCall, setAddingCall] = useState<Debt | null>(null);
+  const [updatingBalances, setUpdatingBalances] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -33,6 +39,10 @@ const Dashboard: React.FC = () => {
       const feeToUpdateDollars = debt.feeToUpdateDollars ?? 0;
       const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
       
+      // Ensure commitments and callHistory arrays exist
+      if (!debt.commitments) debt.commitments = [];
+      if (!debt.callHistory) debt.callHistory = [];
+      
       // Update if inOrder changed or feeToUpdateDollars is missing
       if (debt.inOrder !== inOrder || debt.feeToUpdateDollars === undefined) {
         const updated = { 
@@ -46,7 +56,19 @@ const Dashboard: React.FC = () => {
       }
       return debt;
     });
-    setDebts(updatedDebts);
+    
+    // Sort by snowball method: smallest total debt first
+    // Total debt = totalLocal + totalDollars (converted to a common base)
+    // For simplicity, we'll use totalDollars as primary, then totalLocal
+    const sortedDebts = [...updatedDebts].sort((a, b) => {
+      // Calculate total in a common currency (using USD as base)
+      // For simplicity, we'll prioritize by totalDollars first, then totalLocal
+      const totalA = a.totalDollars + (a.totalLocal * 0.001); // Simple conversion approximation
+      const totalB = b.totalDollars + (b.totalLocal * 0.001);
+      return totalA - totalB; // Ascending order (smallest first
+    });
+    
+    setDebts(sortedDebts);
   };
 
   const handleDelete = (id: string) => {
@@ -125,6 +147,61 @@ const Dashboard: React.FC = () => {
   const cancelEdit = () => {
     setEditingField(null);
     setEditValue('');
+  };
+
+  // Get commitment status based on date
+  const getCommitmentStatus = (commitment: PaymentCommitment): 'pending' | 'completed' | 'overdue' | 'due-today' | 'due-tomorrow' => {
+    if (commitment.status === 'completed') return 'completed';
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const commitmentDate = new Date(commitment.date);
+    commitmentDate.setHours(0, 0, 0, 0);
+    const diffTime = commitmentDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return 'overdue'; // Vencido
+    if (diffDays === 0) return 'due-today'; // Hoy
+    if (diffDays === 1) return 'due-tomorrow'; // Mañana
+    return 'pending'; // Pendiente normal
+  };
+
+  // Check if debt has commitments that need attention
+  const hasUrgentCommitments = (debt: Debt): { hasUrgent: boolean; count: number; highestPriority: 'overdue' | 'due-today' | 'due-tomorrow' | null } => {
+    if (!debt.commitments || debt.commitments.length === 0) {
+      return { hasUrgent: false, count: 0, highestPriority: null };
+    }
+
+    const urgentStatuses: Array<'overdue' | 'due-today' | 'due-tomorrow'> = ['overdue', 'due-today', 'due-tomorrow'];
+    const priorityOrder = { 'overdue': 3, 'due-today': 2, 'due-tomorrow': 1 };
+    
+    const urgentCommitments = debt.commitments.filter(c => {
+      const status = getCommitmentStatus(c);
+      return urgentStatuses.includes(status as any);
+    });
+
+    if (urgentCommitments.length === 0) {
+      return { hasUrgent: false, count: 0, highestPriority: null };
+    }
+
+    const highestPriority = urgentCommitments.reduce((highest, c) => {
+      const status = getCommitmentStatus(c);
+      const currentPriority = priorityOrder[status as keyof typeof priorityOrder] || 0;
+      const highestPriorityValue = priorityOrder[highest as keyof typeof priorityOrder] || 0;
+      return currentPriority > highestPriorityValue ? status : highest;
+    }, urgentCommitments[0] ? getCommitmentStatus(urgentCommitments[0]) : null) as 'overdue' | 'due-today' | 'due-tomorrow' | null;
+
+    return {
+      hasUrgent: true,
+      count: urgentCommitments.length,
+      highestPriority,
+    };
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -402,6 +479,34 @@ const Dashboard: React.FC = () => {
                               </span>
                             )}
                           </div>
+                          {(() => {
+                            const urgent = hasUrgentCommitments(debt);
+                            if (urgent.hasUrgent) {
+                              const alertConfig = {
+                                'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: 'Overdue', icon: FaExclamationTriangle },
+                                'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: 'Due Today', icon: FaExclamationTriangle },
+                                'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: 'Due Tomorrow', icon: FaExclamationTriangle },
+                              };
+                              const config = urgent.highestPriority ? alertConfig[urgent.highestPriority] : alertConfig['due-tomorrow'];
+                              return (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="commitment-alert-badge"
+                                  style={{ 
+                                    background: config.bg,
+                                    borderColor: config.color,
+                                    color: config.color,
+                                  }}
+                                  title={`${urgent.count} commitment${urgent.count > 1 ? 's' : ''} need${urgent.count > 1 ? '' : 's'} attention`}
+                                >
+                                  <Icon component={config.icon} size={12} />
+                                  <span>{urgent.count}</span>
+                                </motion.div>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                         <div className="debt-actions">
                           {debt.hasCallTask && (
@@ -604,6 +709,329 @@ const Dashboard: React.FC = () => {
                             </div>
                           </div>
 
+                          {/* Commitments Section */}
+                          <div className="debt-commitments">
+                            <div className="commitments-header">
+                              <div>
+                                <h4 className="commitments-title">
+                                  <Icon component={FaCalendarAlt} size={16} />
+                                  Payment Commitments
+                                </h4>
+                                {debt.commitments && debt.commitments.length > 0 && (() => {
+                                  const completed = debt.commitments.filter(c => c.status === 'completed').length;
+                                  const total = debt.commitments.length;
+                                  const pending = total - completed;
+                                  return (
+                                    <div className="commitments-progress">
+                                      <span className="progress-text">
+                                        {completed} of {total} completed
+                                      </span>
+                                      <div className="progress-bar-container-small">
+                                        <motion.div
+                                          className="progress-bar-fill"
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${(completed / total) * 100}%` }}
+                                          transition={{ duration: 0.5, ease: "easeOut" }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="btn-add-commitment"
+                                onClick={() => navigate(`/add-commitment/${debt.id}`)}
+                              >
+                                <Icon component={FaPlus} size={12} />
+                                Add Commitment
+                              </motion.button>
+                            </div>
+                            
+                            {debt.commitments && debt.commitments.length > 0 ? (
+                              <>
+                                {/* Active Commitments */}
+                                {debt.commitments.filter(c => c.status !== 'completed').length > 0 && (
+                                  <div className="commitments-list">
+                                    {debt.commitments
+                                      .filter(c => c.status !== 'completed')
+                                      .map((commitment) => {
+                                  const status = getCommitmentStatus(commitment);
+                                  const statusConfig = {
+                                    'pending': { 
+                                      color: 'var(--text-muted)', 
+                                      bg: 'var(--dark-bg)', 
+                                      label: 'Pending',
+                                      pulse: false,
+                                    },
+                                    'due-tomorrow': { 
+                                      color: '#ff9800', 
+                                      bg: 'rgba(255, 152, 0, 0.15)', 
+                                      label: 'Due Tomorrow',
+                                      pulse: true,
+                                    },
+                                    'due-today': { 
+                                      color: '#f44336', 
+                                      bg: 'rgba(244, 67, 54, 0.15)', 
+                                      label: 'Due Today',
+                                      pulse: true,
+                                    },
+                                    'overdue': { 
+                                      color: '#d32f2f', 
+                                      bg: 'rgba(211, 47, 47, 0.2)', 
+                                      label: 'Overdue',
+                                      pulse: true,
+                                    },
+                                    'completed': { 
+                                      color: 'var(--primary-bright)', 
+                                      bg: 'var(--overlay)', 
+                                      label: 'Completed',
+                                      pulse: false,
+                                    },
+                                  };
+                                  const config = statusConfig[status];
+                                  
+                                  return (
+                                    <motion.div
+                                      key={commitment.id}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      className="commitment-item"
+                                      style={{ 
+                                        borderLeft: `4px solid ${config.color}`,
+                                        background: config.bg 
+                                      }}
+                                    >
+                                      <div className="commitment-info">
+                                        <div className="commitment-header-row">
+                                          <span className="commitment-date">
+                                            <Icon component={FaCalendarAlt} size={12} />
+                                            {formatDate(commitment.date)}
+                                          </span>
+                                          <motion.span 
+                                            className={`commitment-status-badge ${config.pulse ? 'pulse-badge' : ''}`}
+                                            style={{ 
+                                              color: config.color,
+                                              background: config.bg,
+                                              border: `1px solid ${config.color}`,
+                                            }}
+                                            animate={config.pulse ? {
+                                              scale: [1, 1.05, 1],
+                                              opacity: [1, 0.9, 1],
+                                            } : {}}
+                                            transition={config.pulse ? {
+                                              duration: 2,
+                                              repeat: Infinity,
+                                              ease: "easeInOut",
+                                            } : {}}
+                                          >
+                                            {config.pulse && <Icon component={FaExclamationTriangle} size={10} style={{ marginRight: '4px' }} />}
+                                            {config.label}
+                                          </motion.span>
+                                        </div>
+                                        <div className="commitment-amounts">
+                                          {commitment.amountLocal > 0 && (
+                                            <span className="commitment-amount">
+                                              {formatCurrency(commitment.amountLocal, debt.localCurrency)}
+                                            </span>
+                                          )}
+                                          {commitment.amountDollars > 0 && (
+                                            <span className="commitment-amount">
+                                              {formatCurrency(commitment.amountDollars, 'USD')}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {commitment.notes && (
+                                          <p className="commitment-notes">{commitment.notes}</p>
+                                        )}
+                                      </div>
+                                      <div className="commitment-actions">
+                                        {status !== 'completed' && (
+                                          <>
+                                            <motion.button
+                                              whileHover={{ scale: 1.1 }}
+                                              whileTap={{ scale: 0.9 }}
+                                              className="btn-commitment-action"
+                                              onClick={() => setEditingCommitment({ debt, commitment })}
+                                              title="Edit commitment"
+                                            >
+                                              <Icon component={FaEdit} size={14} />
+                                            </motion.button>
+                                            <motion.button
+                                              whileHover={{ scale: 1.1 }}
+                                              whileTap={{ scale: 0.9 }}
+                                              className="btn-commitment-action"
+                                              onClick={() => {
+                                                const updated = {
+                                                  ...debt,
+                                                  commitments: debt.commitments?.map(c => 
+                                                    c.id === commitment.id 
+                                                      ? { ...c, status: 'completed' as const, completedAt: new Date().toISOString() }
+                                                      : c
+                                                  ),
+                                                  updatedAt: new Date().toISOString(),
+                                                };
+                                                storage.saveDebt(updated);
+                                                // Show suggestion to update balances
+                                                setUpdatingBalances({ debt: updated, commitment });
+                                                loadDebts();
+                                              }}
+                                              title="Mark as completed"
+                                            >
+                                              <Icon component={FaCheck} size={14} />
+                                            </motion.button>
+                                            <motion.button
+                                              whileHover={{ scale: 1.1 }}
+                                              whileTap={{ scale: 0.9 }}
+                                              className="btn-commitment-action btn-delete"
+                                              onClick={() => {
+                                                if (window.confirm('Are you sure you want to delete this commitment?')) {
+                                                  const updated = {
+                                                    ...debt,
+                                                    commitments: debt.commitments?.filter(c => c.id !== commitment.id),
+                                                    updatedAt: new Date().toISOString(),
+                                                  };
+                                                  storage.saveDebt(updated);
+                                                  loadDebts();
+                                                }
+                                              }}
+                                              title="Delete commitment"
+                                            >
+                                              <Icon component={FaTrash} size={14} />
+                                            </motion.button>
+                                          </>
+                                        )}
+                                      </div>
+                                    </motion.div>
+                                  );
+                                })}
+                              </div>
+                                )}
+                                
+                                {/* Completed Commitments History */}
+                                {debt.commitments.filter(c => c.status === 'completed').length > 0 && (
+                                  <div className="commitments-completed-section">
+                                    <h5 className="completed-title">Completed Commitments</h5>
+                                    <div className="commitments-list">
+                                      {debt.commitments
+                                        .filter(c => c.status === 'completed')
+                                        .sort((a, b) => {
+                                          const dateA = a.completedAt || a.date;
+                                          const dateB = b.completedAt || b.date;
+                                          return new Date(dateB).getTime() - new Date(dateA).getTime();
+                                        })
+                                        .map((commitment) => {
+                                          const status = getCommitmentStatus(commitment);
+                                          const config = {
+                                            color: 'var(--primary-bright)',
+                                            bg: 'var(--overlay)',
+                                            label: 'Completed',
+                                          };
+                                          
+                                          return (
+                                            <motion.div
+                                              key={commitment.id}
+                                              initial={{ opacity: 0, y: 10 }}
+                                              animate={{ opacity: 1, y: 0 }}
+                                              className="commitment-item commitment-completed"
+                                              style={{ 
+                                                borderLeft: `4px solid ${config.color}`,
+                                                background: config.bg,
+                                                opacity: 0.8,
+                                              }}
+                                            >
+                                              <div className="commitment-info">
+                                                <div className="commitment-header-row">
+                                                  <span className="commitment-date">
+                                                    <Icon component={FaCalendarAlt} size={12} />
+                                                    {formatDate(commitment.date)}
+                                                  </span>
+                                                  <span className="commitment-status-badge" style={{ color: config.color }}>
+                                                    {config.label}
+                                                  </span>
+                                                </div>
+                                                <div className="commitment-amounts">
+                                                  {commitment.amountLocal > 0 && (
+                                                    <span className="commitment-amount">
+                                                      {formatCurrency(commitment.amountLocal, debt.localCurrency)}
+                                                    </span>
+                                                  )}
+                                                  {commitment.amountDollars > 0 && (
+                                                    <span className="commitment-amount">
+                                                      {formatCurrency(commitment.amountDollars, 'USD')}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                {commitment.notes && (
+                                                  <p className="commitment-notes">{commitment.notes}</p>
+                                                )}
+                                                {commitment.completedAt && (
+                                                  <p className="commitment-completed-date" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                                    Completed: {formatDate(commitment.completedAt)}
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </motion.div>
+                                          );
+                                        })}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="commitments-empty">
+                                <p>No payment commitments yet</p>
+                                <p className="empty-subtitle">Add a commitment to track your payment agreements</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Call History Section */}
+                          <div className="debt-call-history">
+                            <div className="call-history-header">
+                              <h4 className="call-history-title">
+                                <Icon component={FaPhone} size={16} />
+                                Call History
+                              </h4>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="btn-add-call"
+                                onClick={() => setAddingCall(debt)}
+                              >
+                                <Icon component={FaPlus} size={12} />
+                                Record Call
+                              </motion.button>
+                            </div>
+                            
+                            {debt.callHistory && debt.callHistory.length > 0 ? (
+                              <div className="call-history-list">
+                                {debt.callHistory
+                                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Most recent first
+                                  .map((call) => (
+                                    <motion.div
+                                      key={call.id}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      className="call-item"
+                                    >
+                                      <div className="call-date">
+                                        <Icon component={FaCalendarAlt} size={12} />
+                                        {formatDate(call.date)}
+                                      </div>
+                                      <div className="call-notes">{call.notes}</div>
+                                    </motion.div>
+                                  ))}
+                              </div>
+                            ) : (
+                              <div className="call-history-empty">
+                                <p>No calls recorded yet</p>
+                                <p className="empty-subtitle">Record your first call to track communication with the bank</p>
+                              </div>
+                            )}
+                          </div>
+
                           {debt.currentPlan && (
                             <div className="debt-plan">
                               <span className="plan-label">Plan:</span>
@@ -701,6 +1129,44 @@ const Dashboard: React.FC = () => {
       >
         <Icon component={FaPlus} />
       </motion.button>
+
+      {editingCommitment && (
+        <EditCommitmentModal
+          commitment={editingCommitment.commitment}
+          debt={editingCommitment.debt}
+          isOpen={true}
+          onClose={() => setEditingCommitment(null)}
+          onSave={() => {
+            loadDebts();
+            setEditingCommitment(null);
+          }}
+        />
+      )}
+
+      {addingCall && (
+        <AddCallModal
+          debt={addingCall}
+          isOpen={true}
+          onClose={() => setAddingCall(null)}
+          onSave={() => {
+            loadDebts();
+            setAddingCall(null);
+          }}
+        />
+      )}
+
+      {updatingBalances && (
+        <UpdateBalancesModal
+          debt={updatingBalances.debt}
+          commitment={updatingBalances.commitment}
+          isOpen={true}
+          onClose={() => setUpdatingBalances(null)}
+          onSave={() => {
+            loadDebts();
+            setUpdatingBalances(null);
+          }}
+        />
+      )}
     </motion.div>
   );
 };
