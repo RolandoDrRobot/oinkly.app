@@ -22,14 +22,14 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
 }
 
 .btn-profile {
   background: transparent;
   border: 1px solid var(--dark-green);
   color: var(--text-secondary);
-  padding: 8px 16px;
+  padding: 0;
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
@@ -37,6 +37,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.btn-profile svg {
+  width: 20px;
+  height: 20px;
 }
 
 .btn-profile:hover {

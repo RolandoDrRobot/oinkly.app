@@ -2,7 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaPlus, FaEdit, FaTrash, FaPhone, FaCheck, FaTimes, FaChevronDown, FaChevronUp, FaFileInvoiceDollar, FaLandmark, FaCreditCard, FaMoneyBillWave, FaUser, FaChartLine, FaDollarSign, FaMoneyBill, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaEdit, 
+  FaTrash, 
+  FaPhone, 
+  FaCheck, 
+  FaTimes, 
+  FaChevronDown, 
+  FaChevronUp, 
+  FaFileInvoiceDollar, 
+  FaLandmark, 
+  FaCreditCard, 
+  FaMoneyBillWave, 
+  FaUser, 
+  FaChartLine, 
+  FaDollarSign, 
+  FaMoneyBill, 
+  FaCalendarAlt, 
+  FaExclamationTriangle, 
+  FaStar 
+} from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
@@ -291,7 +311,17 @@ const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-profile"
+              onClick={() => navigate('/about')}
+              title={t('about.title')}
+            >
+              <Icon component={FaStar} />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
               onClick={() => navigate('/profile')}
+              title={t('profile.title')}
             >
               <Icon component={FaUser} />
             </motion.button>
