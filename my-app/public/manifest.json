@@ -1,0 +1,26 @@
+{
+  "short_name": "Oinkly",
+  "name": "Oinkly - Debt Management",
+  "description": "Manage your debts, track payments, and stay in control of your finances",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2B3332",
+  "background_color": "#2B3332",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en"
+}
