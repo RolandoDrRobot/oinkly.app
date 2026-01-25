@@ -71,4 +71,13 @@ export const storage = {
   getColorScheme: (): string | null => {
     return localStorage.getItem('colorScheme');
   },
+
+  // Local currency management
+  setLocalCurrency: (currency: string) => {
+    localStorage.setItem('localCurrency', currency);
+  },
+
+  getLocalCurrency: (): string => {
+    return localStorage.getItem('localCurrency') || 'USD';
+  },
 };

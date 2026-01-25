@@ -69,9 +69,23 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
 
   const formatCurrency = (amount: number, currency: string) => {
     const currencyMap: { [key: string]: string } = {
-      'CRC': 'CRC',
-      'ARS': 'ARS',
       'USD': 'USD',
+      'MXN': 'MXN',
+      'ARS': 'ARS',
+      'CLP': 'CLP',
+      'COP': 'COP',
+      'PEN': 'PEN',
+      'BRL': 'BRL',
+      'CRC': 'CRC',
+      'GTQ': 'GTQ',
+      'PAB': 'PAB',
+      'DOP': 'DOP',
+      'VES': 'VES',
+      'UYU': 'UYU',
+      'PYG': 'PYG',
+      'BOB': 'BOB',
+      'HNL': 'HNL',
+      'NIO': 'NIO',
     };
     
     const currencyCode = currencyMap[currency] || 'USD';
@@ -123,7 +137,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount ({debt.localCurrency})</label>
+              <label>Amount ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"

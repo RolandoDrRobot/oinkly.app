@@ -82,6 +82,7 @@ const EditDebt: React.FC = () => {
       
       storage.saveDebt({
         ...formData,
+        localCurrency: storage.getLocalCurrency(), // Use currency from preferences
         feeToUpdateDollars: feeToUpdateDollars,
         inOrder: inOrder,
         updatedAt: new Date().toISOString(),
@@ -163,19 +164,6 @@ const EditDebt: React.FC = () => {
               onChange={handleChange}
               placeholder="Phone (optional)"
             />
-          </div>
-
-          <div className="form-group">
-            <select
-              name="localCurrency"
-              value={formData.localCurrency}
-              onChange={handleChange}
-              required
-            >
-              <option value="CRC">CRC (Colones)</option>
-              <option value="ARS">ARS</option>
-              <option value="USD">USD</option>
-            </select>
           </div>
 
           <div className="form-group">

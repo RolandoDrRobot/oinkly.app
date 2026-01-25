@@ -23,6 +23,29 @@ import { Debt } from '../types';
 import { storage } from '../utils/storage';
 import './AddDebt.css';
 
+const getCurrencyName = (code: string): string => {
+  const currencyNames: { [key: string]: string } = {
+    'USD': 'US Dollar',
+    'MXN': 'Peso Mexicano',
+    'ARS': 'Peso Argentino',
+    'CLP': 'Peso Chileno',
+    'COP': 'Peso Colombiano',
+    'PEN': 'Sol Peruano',
+    'BRL': 'Real Brasileño',
+    'CRC': 'Colones',
+    'GTQ': 'Quetzal',
+    'PAB': 'Balboa',
+    'DOP': 'Peso Dominicano',
+    'VES': 'Bolívar',
+    'UYU': 'Peso Uruguayo',
+    'PYG': 'Guaraní',
+    'BOB': 'Boliviano',
+    'HNL': 'Lempira',
+    'NIO': 'Córdoba',
+  };
+  return currencyNames[code] || code;
+};
+
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
@@ -33,7 +56,6 @@ interface StepData {
   type?: 'prestamo' | 'tarjeta';
   bankName?: string;
   bankPhone?: string;
-  localCurrency?: string;
   localFee?: number;
   dollarFee?: number;
   totalLocal?: number;
@@ -100,17 +122,6 @@ const AddDebt: React.FC = () => {
       field: 'bankPhone' as keyof StepData,
       placeholder: '+1 234 567 8900',
       optional: true,
-    },
-    {
-      id: 'currency',
-      title: 'Local Currency',
-      subtitle: 'What currency do you use locally?',
-      icon: FaDollarSign,
-      options: [
-        { value: 'CRC', label: 'CRC (Colones)', icon: FaDollarSign },
-        { value: 'ARS', label: 'ARS', icon: FaDollarSign },
-        { value: 'USD', label: 'USD', icon: FaDollarSign },
-      ],
     },
     {
       id: 'localFee',
@@ -209,8 +220,6 @@ const AddDebt: React.FC = () => {
     const step = steps[currentStep];
     if (step.id === 'type') {
       setFormData({ ...formData, type: value as 'prestamo' | 'tarjeta' });
-    } else if (step.id === 'currency') {
-      setFormData({ ...formData, localCurrency: value });
     }
     setTimeout(() => handleNext(), 300);
   };
@@ -241,7 +250,7 @@ const AddDebt: React.FC = () => {
           id: Date.now().toString(),
           name: formData.name || '',
           type: formData.type || 'prestamo',
-          localCurrency: formData.localCurrency || 'USD',
+          localCurrency: storage.getLocalCurrency(),
           localFee: formData.localFee || 0,
           dollarFee: formData.dollarFee || 0,
           totalLocal: formData.totalLocal || 0,
@@ -267,16 +276,16 @@ const AddDebt: React.FC = () => {
 
   // Get dynamic subtitle based on current step and form data
   const getSubtitle = (step: typeof steps[0]) => {
-    if (step.id === 'localFee' && formData.localCurrency) {
-      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+    const localCurrency = storage.getLocalCurrency();
+    const currencyName = getCurrencyName(localCurrency);
+    
+    if (step.id === 'localFee') {
       return `How much do you pay monthly in ${currencyName}?`;
     }
-    if (step.id === 'totalLocal' && formData.localCurrency) {
-      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+    if (step.id === 'totalLocal') {
       return `What is the total debt amount in ${currencyName}?`;
     }
-    if (step.id === 'feeToUpdate' && formData.localCurrency) {
-      const currencyName = formData.localCurrency === 'CRC' ? 'Colones' : formData.localCurrency;
+    if (step.id === 'feeToUpdate') {
       return `How much do you need to pay in ${currencyName} to be up to date?`;
     }
     return step.subtitle;
@@ -347,7 +356,6 @@ const AddDebt: React.FC = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="step-subtitle"
-                key={formData.localCurrency} // Force re-render when currency changes
               >
                 {getSubtitle(currentStepData)}
               </motion.p>

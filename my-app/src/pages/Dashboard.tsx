@@ -207,9 +207,23 @@ const Dashboard: React.FC = () => {
   const formatCurrency = (amount: number, currency: string) => {
     // Map currency codes to Intl.NumberFormat compatible codes
     const currencyMap: { [key: string]: string } = {
-      'CRC': 'CRC',
-      'ARS': 'ARS',
       'USD': 'USD',
+      'MXN': 'MXN',
+      'ARS': 'ARS',
+      'CLP': 'CLP',
+      'COP': 'COP',
+      'PEN': 'PEN',
+      'BRL': 'BRL',
+      'CRC': 'CRC',
+      'GTQ': 'GTQ',
+      'PAB': 'PAB',
+      'DOP': 'DOP',
+      'VES': 'VES',
+      'UYU': 'UYU',
+      'PYG': 'PYG',
+      'BOB': 'BOB',
+      'HNL': 'HNL',
+      'NIO': 'NIO',
     };
     
     const currencyCode = currencyMap[currency] || 'USD';
@@ -227,6 +241,8 @@ const Dashboard: React.FC = () => {
 
   // Calculate totals
   const calculateTotals = () => {
+    const localCurrency = storage.getLocalCurrency();
+    
     const totals = debts.reduce((acc, debt) => {
       acc.totalLocal += debt.totalLocal || 0;
       acc.totalDollars += debt.totalDollars || 0;
@@ -234,11 +250,6 @@ const Dashboard: React.FC = () => {
       acc.monthlyDollars += debt.dollarFee || 0;
       acc.toUpdate += debt.feeToUpdate || 0;
       acc.toUpdateDollars += debt.feeToUpdateDollars || 0;
-      
-      // Get the most common currency for local currency display
-      if (debt.localCurrency) {
-        acc.currencies[debt.localCurrency] = (acc.currencies[debt.localCurrency] || 0) + 1;
-      }
       
       return acc;
     }, {
@@ -248,20 +259,11 @@ const Dashboard: React.FC = () => {
       monthlyDollars: 0,
       toUpdate: 0,
       toUpdateDollars: 0,
-      currencies: {} as { [key: string]: number },
     });
-
-    // Get the most common local currency
-    const currencyKeys = Object.keys(totals.currencies);
-    const mostCommonCurrency = currencyKeys.length > 0
-      ? currencyKeys.reduce((a, b) => 
-          totals.currencies[a] > totals.currencies[b] ? a : b
-        )
-      : 'USD';
 
     return {
       ...totals,
-      mostCommonCurrency,
+      mostCommonCurrency: localCurrency,
     };
   };
 
@@ -552,7 +554,7 @@ const Dashboard: React.FC = () => {
                           <div className="debt-main-info">
                             <div className="debt-payments">
                               <div className="payment-item">
-                                <span className="payment-label">Monthly ({debt.localCurrency})</span>
+                                <span className="payment-label">Monthly ({storage.getLocalCurrency()})</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'localFee' ? (
                                   <input
                                     type="number"
@@ -573,7 +575,7 @@ const Dashboard: React.FC = () => {
                                     e.stopPropagation();
                                     startEditing(debt.id, 'localFee', debt.localFee, e);
                                   }}>
-                                    {formatCurrency(debt.localFee, debt.localCurrency)}
+                                    {formatCurrency(debt.localFee, storage.getLocalCurrency())}
                                   </span>
                                 )}
                               </div>
@@ -604,7 +606,7 @@ const Dashboard: React.FC = () => {
                                 )}
                               </div>
                               <div className="payment-item total-debt">
-                                <span className="payment-label">Total ({debt.localCurrency})</span>
+                                <span className="payment-label">Total ({storage.getLocalCurrency()})</span>
                                 {editingField?.debtId === debt.id && editingField?.field === 'totalLocal' ? (
                                   <input
                                     type="number"
@@ -625,7 +627,7 @@ const Dashboard: React.FC = () => {
                                     e.stopPropagation();
                                     startEditing(debt.id, 'totalLocal', debt.totalLocal, e);
                                   }}>
-                                    {formatCurrency(debt.totalLocal, debt.localCurrency)}
+                                    {formatCurrency(debt.totalLocal, storage.getLocalCurrency())}
                                   </span>
                                 )}
                               </div>
@@ -659,7 +661,7 @@ const Dashboard: React.FC = () => {
                                 <>
                                   {debt.feeToUpdate > 0 && (
                                     <div className="payment-item update-amount">
-                                      <span className="payment-label">To Update ({debt.localCurrency})</span>
+                                      <span className="payment-label">To Update ({storage.getLocalCurrency()})</span>
                                       {editingField?.debtId === debt.id && editingField?.field === 'feeToUpdate' ? (
                                         <input
                                           type="number"
@@ -680,7 +682,7 @@ const Dashboard: React.FC = () => {
                                           e.stopPropagation();
                                           startEditing(debt.id, 'feeToUpdate', debt.feeToUpdate, e);
                                         }}>
-                                          {formatCurrency(debt.feeToUpdate, debt.localCurrency)}
+                                          {formatCurrency(debt.feeToUpdate, storage.getLocalCurrency())}
                                         </span>
                                       )}
                                     </div>
@@ -853,7 +855,7 @@ const Dashboard: React.FC = () => {
                                         <div className="commitment-amounts">
                                           {commitment.amountLocal > 0 && (
                                             <span className="commitment-amount">
-                                              {formatCurrency(commitment.amountLocal, debt.localCurrency)}
+                                              {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
                                             </span>
                                           )}
                                           {commitment.amountDollars > 0 && (
@@ -979,7 +981,7 @@ const Dashboard: React.FC = () => {
                                                 <div className="commitment-amounts">
                                                   {commitment.amountLocal > 0 && (
                                                     <span className="commitment-amount">
-                                                      {formatCurrency(commitment.amountLocal, debt.localCurrency)}
+                                                      {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
                                                     </span>
                                                   )}
                                                   {commitment.amountDollars > 0 && (

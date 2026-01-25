@@ -178,3 +178,58 @@
   color: var(--primary);
   font-size: 16px;
 }
+
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.currency-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--dark-bg);
+  border: 2px solid var(--dark-green);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  text-align: left;
+}
+
+.currency-button:hover {
+  border-color: var(--primary);
+  background: var(--primary-overlay-light);
+}
+
+.currency-button.active {
+  border-color: var(--primary);
+  background: var(--primary-overlay);
+}
+
+.currency-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.currency-code {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.currency-name {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.currency-country {
+  font-size: 12px;
+  color: var(--text-muted);
+}

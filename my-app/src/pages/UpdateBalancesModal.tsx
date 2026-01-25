@@ -4,6 +4,29 @@ import { FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
 
+const getCurrencyName = (code: string): string => {
+  const currencyNames: { [key: string]: string } = {
+    'USD': 'US Dollar',
+    'MXN': 'Peso Mexicano',
+    'ARS': 'Peso Argentino',
+    'CLP': 'Peso Chileno',
+    'COP': 'Peso Colombiano',
+    'PEN': 'Sol Peruano',
+    'BRL': 'Real Brasileño',
+    'CRC': 'Colones',
+    'GTQ': 'Quetzal',
+    'PAB': 'Balboa',
+    'DOP': 'Peso Dominicano',
+    'VES': 'Bolívar',
+    'UYU': 'Peso Uruguayo',
+    'PYG': 'Guaraní',
+    'BOB': 'Boliviano',
+    'HNL': 'Lempira',
+    'NIO': 'Córdoba',
+  };
+  return currencyNames[code] || code;
+};
+
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
@@ -54,9 +77,23 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
 
   const formatCurrency = (amount: number, currency: string) => {
     const currencyMap: { [key: string]: string } = {
-      'CRC': 'CRC',
-      'ARS': 'ARS',
       'USD': 'USD',
+      'MXN': 'MXN',
+      'ARS': 'ARS',
+      'CLP': 'CLP',
+      'COP': 'COP',
+      'PEN': 'PEN',
+      'BRL': 'BRL',
+      'CRC': 'CRC',
+      'GTQ': 'GTQ',
+      'PAB': 'PAB',
+      'DOP': 'DOP',
+      'VES': 'VES',
+      'UYU': 'UYU',
+      'PYG': 'PYG',
+      'BOB': 'BOB',
+      'HNL': 'HNL',
+      'NIO': 'NIO',
     };
     
     const currencyCode = currencyMap[currency] || 'USD';
@@ -107,7 +144,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Payment made:</p>
               {commitment.amountLocal > 0 && (
                 <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: '4px 0' }}>
-                  {formatCurrency(commitment.amountLocal, debt.localCurrency)}
+                  {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
                 </p>
               )}
               {commitment.amountDollars > 0 && (
@@ -120,7 +157,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
 
           <form onSubmit={handleSubmit} className="modal-form">
             <div className="form-group">
-              <label>Total Debt ({debt.localCurrency})</label>
+              <label>Total Debt ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"
@@ -144,7 +181,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             </div>
 
             <div className="form-group">
-              <label>Amount to Update ({debt.localCurrency})</label>
+              <label>Amount to Update ({storage.getLocalCurrency()})</label>
               <input
                 type="number"
                 step="0.01"

@@ -15,6 +15,29 @@ import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
 import './AddDebt.css';
 
+const getCurrencyName = (code: string): string => {
+  const currencyNames: { [key: string]: string } = {
+    'USD': 'US Dollar',
+    'MXN': 'Peso Mexicano',
+    'ARS': 'Peso Argentino',
+    'CLP': 'Peso Chileno',
+    'COP': 'Peso Colombiano',
+    'PEN': 'Sol Peruano',
+    'BRL': 'Real Brasileño',
+    'CRC': 'Colones',
+    'GTQ': 'Quetzal',
+    'PAB': 'Balboa',
+    'DOP': 'Peso Dominicano',
+    'VES': 'Bolívar',
+    'UYU': 'Peso Uruguayo',
+    'PYG': 'Guaraní',
+    'BOB': 'Boliviano',
+    'HNL': 'Lempira',
+    'NIO': 'Córdoba',
+  };
+  return currencyNames[code] || code;
+};
+
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
@@ -72,7 +95,7 @@ const AddCommitment: React.FC = () => {
     {
       id: 'amountLocal',
       title: 'Payment Amount',
-      subtitle: `How much will you pay in ${debt?.localCurrency || 'local currency'}?`,
+      subtitle: `How much will you pay in ${debt ? getCurrencyName(storage.getLocalCurrency()) : 'local currency'}?`,
       icon: FaMoneyBill,
       field: 'amountLocal' as keyof StepData,
       placeholder: '0.00',
@@ -158,8 +181,9 @@ const AddCommitment: React.FC = () => {
 
   // Get dynamic subtitle based on current step and form data
   const getSubtitle = (step: typeof steps[0]) => {
-    if (step.id === 'amountLocal' && debt?.localCurrency) {
-      const currencyName = debt.localCurrency === 'CRC' ? 'Colones' : debt.localCurrency;
+    if (step.id === 'amountLocal' && debt) {
+      const localCurrency = storage.getLocalCurrency();
+      const currencyName = getCurrencyName(localCurrency);
       return `How much will you pay in ${currencyName}?`;
     }
     return step.subtitle;
@@ -240,7 +264,6 @@ const AddCommitment: React.FC = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="step-subtitle"
-                key={formData.date || debt.localCurrency}
               >
                 {getSubtitle(currentStepData)}
               </motion.p>
