@@ -36,7 +36,7 @@ import {
   FaExclamationTriangle, 
   FaStar 
 } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
 import SortableDebtCard from '../components/SortableDebtCard';
