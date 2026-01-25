@@ -118,6 +118,7 @@
   },
   "editCommitment": {
     "title": "Editar Compromiso",
+    "subtitle": "Actualicemos el compromiso para {{debtName}}",
     "date": "Fecha",
     "amountLocal": "Monto",
     "amountDollar": "Monto (USD)",
@@ -182,6 +183,27 @@
     "deleteConfirm": "¿Estás seguro de que quieres eliminar este compromiso?",
     "editCommitment": "Editar compromiso",
     "completedOn": "Completado:"
+  },
+  "deleteCommitment": {
+    "title": "Eliminar Compromiso",
+    "subtitle": "¿Estás seguro de que quieres eliminar este compromiso?",
+    "confirmMessage": "Esta acción no se puede deshacer.",
+    "success": "Compromiso eliminado exitosamente"
+  },
+  "completeCommitment": {
+    "title": "Completar Compromiso",
+    "subtitle": "¡Excelente! Completaste un compromiso de pago.",
+    "updateBalances": "Actualizar Saldos",
+    "updateBalancesSubtitle": "¿Te gustaría actualizar los saldos de tu deuda?",
+    "totalDebtLocal": "Deuda Total",
+    "totalDebtLocalSubtitle": "¿Cuál es tu nueva deuda total en {{currency}}?",
+    "totalDebtDollar": "Deuda Total (USD)",
+    "totalDebtDollarSubtitle": "¿Cuál es tu nueva deuda total en Dólares Estadounidenses?",
+    "amountToUpdateLocal": "Monto para Poner al Día",
+    "amountToUpdateLocalSubtitle": "¿Cuánto necesitas pagar en {{currency}} para estar al día?",
+    "amountToUpdateDollar": "Monto para Poner al Día (USD)",
+    "amountToUpdateDollarSubtitle": "¿Cuánto necesitas pagar para estar al día en Dólares Estadounidenses?",
+    "success": "Compromiso completado exitosamente"
   },
   "debt": {
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta deuda?",

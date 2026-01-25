@@ -41,8 +41,6 @@ const Dashboard: React.FC = () => {
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
-  const [editingCommitment, setEditingCommitment] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
-  const [updatingBalances, setUpdatingBalances] = useState<{ debt: Debt; commitment: PaymentCommitment } | null>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -891,7 +889,7 @@ const Dashboard: React.FC = () => {
                                               className="btn-commitment-action"
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                setEditingCommitment({ debt, commitment });
+                                                navigate(`/edit-commitment/${debt.id}/${commitment.id}`);
                                               }}
                                               title={t('commitment.editCommitment')}
                                             >
@@ -903,19 +901,7 @@ const Dashboard: React.FC = () => {
                                               className="btn-commitment-action"
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                const updated = {
-                                                  ...debt,
-                                                  commitments: debt.commitments?.map(c => 
-                                                    c.id === commitment.id 
-                                                      ? { ...c, status: 'completed' as const, completedAt: new Date().toISOString() }
-                                                      : c
-                                                  ),
-                                                  updatedAt: new Date().toISOString(),
-                                                };
-                                                storage.saveDebt(updated);
-                                                // Show suggestion to update balances
-                                                setUpdatingBalances({ debt: updated, commitment });
-                                                loadDebts();
+                                                navigate(`/complete-commitment/${debt.id}/${commitment.id}`);
                                               }}
                                               title={t('commitment.markCompleted')}
                                             >
@@ -927,15 +913,7 @@ const Dashboard: React.FC = () => {
                                               className="btn-commitment-action btn-delete"
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (window.confirm(t('commitment.deleteConfirm'))) {
-                                                  const updated = {
-                                                    ...debt,
-                                                    commitments: debt.commitments?.filter(c => c.id !== commitment.id),
-                                                    updatedAt: new Date().toISOString(),
-                                                  };
-                                                  storage.saveDebt(updated);
-                                                  loadDebts();
-                                                }
+                                                navigate(`/delete-commitment/${debt.id}/${commitment.id}`);
                                               }}
                                               title={t('commitment.deleteCommitment')}
                                             >
@@ -1195,31 +1173,6 @@ const Dashboard: React.FC = () => {
         <Icon component={FaPlus} />
       </motion.button>
 
-      {editingCommitment && (
-        <EditCommitmentModal
-          commitment={editingCommitment.commitment}
-          debt={editingCommitment.debt}
-          isOpen={true}
-          onClose={() => setEditingCommitment(null)}
-          onSave={() => {
-            loadDebts();
-            setEditingCommitment(null);
-          }}
-        />
-      )}
-
-      {updatingBalances && (
-        <UpdateBalancesModal
-          debt={updatingBalances.debt}
-          commitment={updatingBalances.commitment}
-          isOpen={true}
-          onClose={() => setUpdatingBalances(null)}
-          onSave={() => {
-            loadDebts();
-            setUpdatingBalances(null);
-          }}
-        />
-      )}
     </motion.div>
   );
 };

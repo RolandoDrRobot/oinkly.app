@@ -9,6 +9,8 @@ import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
 import AddCommitment from './pages/AddCommitment';
 import AddCall from './pages/AddCall';
+import DeleteCommitment from './pages/DeleteCommitment';
+import CompleteCommitment from './pages/CompleteCommitment';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -53,6 +55,30 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <AddCommitment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-commitment/:debtId/:commitmentId"
+        element={
+          <ProtectedRoute>
+            <AddCommitment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delete-commitment/:debtId/:commitmentId"
+        element={
+          <ProtectedRoute>
+            <DeleteCommitment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complete-commitment/:debtId/:commitmentId"
+        element={
+          <ProtectedRoute>
+            <CompleteCommitment />
           </ProtectedRoute>
         }
       />

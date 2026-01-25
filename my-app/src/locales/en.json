@@ -118,6 +118,7 @@
   },
   "editCommitment": {
     "title": "Edit Commitment",
+    "subtitle": "Let's update the commitment for {{debtName}}",
     "date": "Date",
     "amountLocal": "Amount",
     "amountDollar": "Amount (USD)",
@@ -182,6 +183,27 @@
     "deleteConfirm": "Are you sure you want to delete this commitment?",
     "editCommitment": "Edit commitment",
     "completedOn": "Completed:"
+  },
+  "deleteCommitment": {
+    "title": "Delete Commitment",
+    "subtitle": "Are you sure you want to delete this commitment?",
+    "confirmMessage": "This action cannot be undone.",
+    "success": "Commitment deleted successfully"
+  },
+  "completeCommitment": {
+    "title": "Complete Commitment",
+    "subtitle": "Great! You completed a payment commitment.",
+    "updateBalances": "Update Balances",
+    "updateBalancesSubtitle": "Would you like to update your debt balances?",
+    "totalDebtLocal": "Total Debt",
+    "totalDebtLocalSubtitle": "What is your new total debt in {{currency}}?",
+    "totalDebtDollar": "Total Debt (USD)",
+    "totalDebtDollarSubtitle": "What is your new total debt in US Dollars?",
+    "amountToUpdateLocal": "Amount to Update",
+    "amountToUpdateLocalSubtitle": "How much do you need to pay in {{currency}} to be up to date?",
+    "amountToUpdateDollar": "Amount to Update (USD)",
+    "amountToUpdateDollarSubtitle": "How much do you need to pay to be up to date in US Dollars?",
+    "success": "Commitment completed successfully"
   },
   "debt": {
     "deleteConfirm": "Are you sure you want to delete this debt?",

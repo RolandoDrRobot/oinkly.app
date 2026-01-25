@@ -53,22 +53,40 @@ interface StepData {
 
 const AddCommitment: React.FC = () => {
   const { t } = useTranslation();
-  const { debtId } = useParams<{ debtId: string }>();
+  const { debtId, commitmentId } = useParams<{ debtId: string; commitmentId?: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<StepData>({});
   const [debt, setDebt] = useState<Debt | null>(null);
+  const [commitment, setCommitment] = useState<PaymentCommitment | null>(null);
+  const isEditing = !!commitmentId;
 
   useEffect(() => {
     if (debtId) {
       const foundDebt = storage.getDebt(debtId);
       if (foundDebt) {
         setDebt(foundDebt);
+        
+        // If editing, load commitment data
+        if (commitmentId) {
+          const foundCommitment = foundDebt.commitments?.find(c => c.id === commitmentId);
+          if (foundCommitment) {
+            setCommitment(foundCommitment);
+            setFormData({
+              date: foundCommitment.date.split('T')[0],
+              amountLocal: foundCommitment.amountLocal,
+              amountDollars: foundCommitment.amountDollars,
+              notes: foundCommitment.notes || '',
+            });
+          } else {
+            navigate('/dashboard');
+          }
+        }
       } else {
         navigate('/dashboard');
       }
     }
-  }, [debtId, navigate]);
+  }, [debtId, commitmentId, navigate]);
 
   const steps: Array<{
     id: string;
@@ -82,8 +100,10 @@ const AddCommitment: React.FC = () => {
   }> = [
     {
       id: 'welcome',
-      title: t('addCommitment.title'),
-      subtitle: t('addCommitment.subtitle', { debtName: debt?.name || t('addCommitment.thisDebt') }),
+      title: isEditing ? t('editCommitment.title') : t('addCommitment.title'),
+      subtitle: isEditing 
+        ? t('editCommitment.subtitle', { debtName: debt?.name || t('addCommitment.thisDebt') })
+        : t('addCommitment.subtitle', { debtName: debt?.name || t('addCommitment.thisDebt') }),
       icon: FaHandPaper,
     },
     {
@@ -155,31 +175,54 @@ const AddCommitment: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete' && debt) {
       const timer = setTimeout(() => {
-        const newCommitment: PaymentCommitment = {
-          id: Date.now().toString(),
-          debtId: debt.id,
-          date: formData.date || new Date().toISOString().split('T')[0],
-          amountLocal: formData.amountLocal || 0,
-          amountDollars: formData.amountDollars || 0,
-          status: 'pending',
-          notes: formData.notes,
-          createdAt: new Date().toISOString(),
-        };
+        if (isEditing && commitment) {
+          // Update existing commitment
+          const updatedCommitment: PaymentCommitment = {
+            ...commitment,
+            date: new Date(formData.date || commitment.date).toISOString(),
+            amountLocal: formData.amountLocal || 0,
+            amountDollars: formData.amountDollars || 0,
+            notes: formData.notes,
+            updatedAt: new Date().toISOString(),
+          };
 
-        // Add commitment to debt
-        const updatedDebt: Debt = {
-          ...debt,
-          commitments: [...(debt.commitments || []), newCommitment],
-          updatedAt: new Date().toISOString(),
-        };
+          const updatedDebt: Debt = {
+            ...debt,
+            commitments: debt.commitments?.map(c => 
+              c.id === commitment.id ? updatedCommitment : c
+            ),
+            updatedAt: new Date().toISOString(),
+          };
 
-        storage.saveDebt(updatedDebt);
+          storage.saveDebt(updatedDebt);
+        } else {
+          // Create new commitment
+          const newCommitment: PaymentCommitment = {
+            id: Date.now().toString(),
+            debtId: debt.id,
+            date: new Date(formData.date || new Date().toISOString()).toISOString(),
+            amountLocal: formData.amountLocal || 0,
+            amountDollars: formData.amountDollars || 0,
+            status: 'pending',
+            notes: formData.notes,
+            createdAt: new Date().toISOString(),
+          };
+
+          const updatedDebt: Debt = {
+            ...debt,
+            commitments: [...(debt.commitments || []), newCommitment],
+            updatedAt: new Date().toISOString(),
+          };
+
+          storage.saveDebt(updatedDebt);
+        }
+        
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, debt]);
+  }, [currentStep, debt, isEditing, commitment]);
 
   // Get dynamic subtitle based on current step and form data
   const getSubtitle = (step: typeof steps[0]) => {
