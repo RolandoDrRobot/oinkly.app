@@ -26,7 +26,6 @@
 
 .btn-profile {
   background: transparent;
-  border: 1px solid var(--dark-green);
   color: var(--text-secondary);
   padding: 0;
   border-radius: 6px;
@@ -46,7 +45,6 @@
 }
 
 .btn-profile:hover {
-  border-color: var(--primary);
   color: var(--primary);
   background: var(--primary-overlay);
 }
@@ -61,7 +59,7 @@
 
 .btn-logout {
   background: transparent;
-  border: 1px solid var(--dark-green);
+  
   color: var(--text-secondary);
   padding: 8px 16px;
   border-radius: 6px;
@@ -71,7 +69,7 @@
 }
 
 .btn-logout:hover {
-  border-color: var(--primary);
+  
   color: var(--text-primary);
 }
 
@@ -86,14 +84,14 @@
 
 .summary-card {
   background: var(--dark-section);
-  border: 1px solid var(--dark-green);
+  
   border-radius: 8px;
   padding: 12px 16px;
   transition: all 0.3s;
 }
 
 .summary-card:hover {
-  border-color: var(--primary);
+  
   box-shadow: 0 2px 8px var(--primary-overlay-medium);
 }
 
@@ -186,7 +184,7 @@
   border-radius: 50%;
   background: var(--primary);
   color: var(--dark-bg);
-  border: none;
+  
   font-size: 24px;
   font-weight: 600;
   cursor: pointer;
@@ -239,7 +237,7 @@
   background: var(--dark-card, #014a3a);
   border-radius: 8px;
   padding: 20px;
-  border: 1px solid var(--dark-green);
+  
   transition: all 0.3s;
   box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
@@ -253,7 +251,7 @@
 }
 
 .debt-card:hover {
-  border-color: var(--primary);
+  
   box-shadow: 0 4px 16px var(--primary-overlay-medium);
   transform: translateY(-2px);
 }
@@ -277,7 +275,7 @@
 
 .btn-close-debt {
   background: transparent;
-  border: none;
+  
   color: var(--text-secondary);
   cursor: pointer;
   padding: 8px;
@@ -349,8 +347,6 @@
   font-weight: 600;
   color: var(--text-primary);
 }
-
-
 .debt-header-info {
   display: flex;
   flex-direction: column;
@@ -421,13 +417,13 @@
   padding: 6px;
   border-radius: 4px;
   background: var(--primary-overlay);
-  border: 1px solid var(--primary-border);
+  
 }
 
 .call-task-icon.inactive {
   color: #f44336;
   background: rgba(244, 67, 54, 0.15);
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  
 }
 
 .call-completed-icon {
@@ -439,26 +435,26 @@
   padding: 6px;
   border-radius: 4px;
   background: var(--primary-bright-overlay);
-  border: 1px solid var(--primary-bright-border);
+  
 }
 
 .call-completed-icon.inactive {
   color: #f44336;
   background: rgba(244, 67, 54, 0.15);
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  
 }
 
 .debt-expanded-content {
   overflow: hidden;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--dark-green);
+  
 }
 
 .btn-edit,
 .btn-delete {
   background: transparent;
-  border: none;
+  
   font-size: 16px;
   cursor: pointer;
   padding: 6px;
@@ -486,7 +482,7 @@
   gap: 16px;
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--dark-green);
+  
 }
 
 .debt-payments {
@@ -506,7 +502,7 @@
 
 .payment-item.total-debt {
   background: var(--overlay);
-  border: 1px solid var(--primary);
+  
 }
 
 .payment-item.total-debt .payment-value {
@@ -517,7 +513,7 @@
 
 .payment-item.update-amount {
   background: var(--overlay-light);
-  border: 1px solid var(--primary-bright);
+  
 }
 
 .payment-label {
@@ -568,15 +564,13 @@
 .status-badge.in-order {
   background: var(--overlay);
   color: var(--primary-bright);
-  border: 1px solid var(--primary-bright);
+  
 }
 
 .status-badge.not-in-order {
   background: var(--error-light);
   color: var(--error);
 }
-
-
 .debt-task {
   display: flex;
   flex-direction: column;
@@ -584,7 +578,7 @@
   padding: 16px 0;
   background: var(--dark-card, #014a3a);
   border-radius: 8px;
-  border: 1px solid var(--dark-green);
+  
   margin-top: 16px;
 }
 
@@ -650,7 +644,7 @@
 
 .inline-edit-input {
   background: var(--dark-bg);
-  border: 2px solid var(--primary);
+  
   border-radius: 4px;
   padding: 4px 8px;
   color: var(--text-primary);
@@ -663,7 +657,7 @@
 }
 
 .inline-edit-input:focus {
-  border-color: var(--primary-bright);
+  
   box-shadow: 0 0 0 3px var(--overlay);
   background: var(--dark-bg);
 }
@@ -675,7 +669,7 @@
   padding: 16px;
   background: var(--dark-card, #014a3a);
   border-radius: 8px;
-  border: 1px solid var(--dark-green);
+  
 }
 
 .commitments-header {
@@ -697,7 +691,7 @@
 
 .btn-add-commitment {
   background: var(--primary);
-  border: none;
+  
   color: white;
   padding: 8px 16px;
   border-radius: 6px;
@@ -793,7 +787,7 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  border: 2px solid;
+  
   margin-left: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -860,7 +854,7 @@
 
 .btn-commitment-action {
   background: transparent;
-  border: 1px solid var(--dark-green);
+  
   color: var(--text-secondary);
   padding: 6px;
   border-radius: 6px;
@@ -892,7 +886,7 @@
 
 .btn-commitment-action:hover {
   background: var(--overlay-light);
-  border-color: var(--primary);
+  
   color: var(--primary);
   transform: scale(1.1);
 }
@@ -903,7 +897,7 @@
 
 .btn-commitment-action.btn-delete:hover {
   background: var(--error-light);
-  border-color: var(--error);
+  
   color: var(--error);
 }
 
@@ -940,7 +934,7 @@
 .modal-content {
   background: var(--dark-section);
   border-radius: 12px;
-  border: 1px solid var(--dark-green);
+  
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
@@ -953,7 +947,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--dark-green);
+  
 }
 
 .modal-header h2 {
@@ -965,7 +959,7 @@
 
 .modal-close {
   background: transparent;
-  border: none;
+  
   color: var(--text-secondary);
   font-size: 20px;
   cursor: pointer;
@@ -1005,7 +999,7 @@
   width: 100%;
   padding: 12px;
   background: var(--dark-bg);
-  border: 1px solid var(--dark-green);
+  
   border-radius: 6px;
   color: var(--text-primary);
   font-size: 14px;
@@ -1017,7 +1011,7 @@
 .modal-form input:focus,
 .modal-form textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  
   box-shadow: 0 0 0 3px var(--overlay);
 }
 
@@ -1032,7 +1026,7 @@
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid var(--dark-green);
+  
 }
 
 .modal-actions .btn-cancel,
@@ -1043,18 +1037,18 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  border: none;
+  
 }
 
 .modal-actions .btn-cancel {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--dark-green);
+  
 }
 
 .modal-actions .btn-cancel:hover {
   background: var(--overlay-light);
-  border-color: var(--primary);
+  
   color: var(--text-primary);
 }
 
@@ -1074,7 +1068,7 @@
   padding: 16px;
   background: var(--dark-card, #014a3a);
   border-radius: 8px;
-  border: 1px solid var(--dark-green);
+  
 }
 
 .call-history-header {
@@ -1096,7 +1090,7 @@
 
 .btn-add-call {
   background: var(--primary);
-  border: none;
+  
   color: white;
   padding: 8px 16px;
   border-radius: 6px;
@@ -1124,7 +1118,7 @@
   padding: 12px;
   background: var(--dark-card, #014a3a);
   border-radius: 6px;
-  border-left: 3px solid var(--primary);
+  
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
@@ -1171,7 +1165,7 @@
 .commitments-completed-section {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid var(--dark-green);
+  
 }
 
 .completed-title {

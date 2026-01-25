@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   background: transparent;
-  border: none;
+  
   color: var(--text-primary);
   font-size: 16px;
   cursor: pointer;
@@ -126,7 +126,7 @@
   background: var(--bg-primary);
   padding: 0;
   border-radius: 12px;
-  border: 2px solid var(--bg-tertiary);
+  
   position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -170,7 +170,7 @@
 .tip-card {
   background: var(--bg-primary);
   border-radius: 12px;
-  border-left: 4px solid var(--accent-color);
+  
 }
 
 .tip-title {
@@ -197,7 +197,7 @@
 .philosophy-card {
   background: var(--bg-primary);
   border-radius: 12px;
-  border: 1px solid var(--bg-tertiary);
+  
 }
 
 .philosophy-title {
@@ -222,7 +222,7 @@
 .btn-primary {
   background: var(--accent-color);
   color: white;
-  border: none;
+  
   padding: 16px 32px;
   font-size: 18px;
   font-weight: 600;

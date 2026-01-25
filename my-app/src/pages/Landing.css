@@ -45,8 +45,8 @@
 .form-group input {
   width: 100%;
   padding: 16px;
-  border: none;
-  border-bottom: 1px solid var(--dark-green);
+  
+  
   background: transparent;
   color: var(--text-primary);
   font-size: 16px;
@@ -56,7 +56,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-bottom-color: var(--primary);
+  
 }
 
 .form-group input::placeholder {
@@ -68,7 +68,7 @@
   padding: 16px;
   background: var(--primary);
   color: var(--dark-bg);
-  border: none;
+  
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;

@@ -13,7 +13,7 @@
 
 .btn-back {
   background: transparent;
-  border: 1px solid var(--dark-green);
+  
   color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 6px;
@@ -26,7 +26,7 @@
 }
 
 .btn-back:hover {
-  border-color: var(--primary);
+  
 }
 
 .progress-bar-container {
@@ -94,8 +94,8 @@
 .step-input-field {
   width: 100%;
   padding: 16px;
-  border: none;
-  border-bottom: 2px solid var(--dark-green);
+  
+  
   background: transparent;
   color: var(--text-primary);
   text-align: center;
@@ -106,7 +106,7 @@
 
 .step-input-field:focus {
   outline: none;
-  border-bottom-color: var(--primary);
+  
 }
 
 .step-input-field::placeholder {
@@ -128,7 +128,7 @@
   gap: 12px;
   padding: 24px;
   background: var(--dark-section);
-  border: 1px solid var(--dark-green);
+  
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
@@ -138,7 +138,7 @@
 }
 
 .option-button:hover {
-  border-color: var(--primary-bright);
+  
   background: var(--dark-bg);
   box-shadow: 0 4px 12px var(--shadow);
   transform: translateY(-2px);
@@ -167,7 +167,7 @@
   gap: 12px;
   padding: 24px;
   background: var(--dark-section);
-  border: 1px solid var(--dark-green);
+  
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
@@ -177,19 +177,19 @@
 }
 
 .boolean-button:hover {
-  border-color: var(--primary-bright);
+  
   background: var(--dark-bg);
   box-shadow: 0 4px 12px var(--shadow);
   transform: translateY(-2px);
 }
 
 .boolean-button.yes:hover {
-  border-color: var(--primary-bright);
+  
   background: var(--primary-bright-overlay);
 }
 
 .boolean-button.no:hover {
-  border-color: var(--error);
+  
   background: var(--error-light);
 }
 
@@ -211,7 +211,7 @@
 .btn-next {
   width: 100%;
   padding: 16px;
-  border: none;
+  
   border-radius: 6px;
   font-size: 16px;
   font-weight: 500;
@@ -222,22 +222,22 @@
 .btn-back-step {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--dark-green);
+  
 }
 
 .btn-back-step:hover {
-  border-color: var(--primary);
+  
   color: var(--text-primary);
 }
 
 .btn-skip {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--dark-green);
+  
 }
 
 .btn-skip:hover {
-  border-color: var(--primary);
+  
   color: var(--text-primary);
 }
 

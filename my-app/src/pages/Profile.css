@@ -26,7 +26,7 @@
 
 .btn-back {
   background: transparent;
-  border: 1px solid var(--dark-green);
+  
   color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 6px;
@@ -38,7 +38,7 @@
 }
 
 .btn-back:hover {
-  border-color: var(--primary);
+  
 }
 
 .profile-content {
@@ -52,7 +52,7 @@
   border-radius: 12px;
   padding: 40px 20px;
   text-align: center;
-  border: 1px solid var(--dark-green);
+  
   box-shadow: 0 4px 16px var(--shadow);
   margin-bottom: 24px;
 }
@@ -94,7 +94,7 @@
   padding: 16px;
   background: var(--dark-section);
   color: var(--text-primary);
-  border: 1px solid var(--dark-green);
+  
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
@@ -106,7 +106,7 @@
 }
 
 .btn-action:hover {
-  border-color: var(--primary);
+  
   background: var(--dark-bg);
   box-shadow: 0 4px 12px var(--shadow);
 }
@@ -118,6 +118,6 @@
 
 .btn-action.btn-logout:hover {
   background: var(--error-light);
-  border-color: var(--error);
+  
   color: var(--error);
 }
