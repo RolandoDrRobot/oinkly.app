@@ -163,15 +163,10 @@
     "themeMode": "Theme Mode",
     "light": "Light",
     "dark": "Dark",
-    "colorScheme": "Color Scheme",
     "localCurrency": "Local Currency",
     "language": "Language",
     "english": "English",
-    "spanish": "Spanish",
-    "teal": "Teal",
-    "blue": "Blue",
-    "purple": "Purple",
-    "green": "Green"
+    "spanish": "Spanish"
   },
   "profile": {
     "title": "Profile",

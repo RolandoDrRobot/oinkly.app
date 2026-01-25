@@ -163,15 +163,10 @@
     "themeMode": "Modo de Tema",
     "light": "Claro",
     "dark": "Oscuro",
-    "colorScheme": "Esquema de Color",
     "localCurrency": "Moneda Local",
     "language": "Idioma",
     "english": "Inglés",
-    "spanish": "Español",
-    "teal": "Verde Azulado",
-    "blue": "Azul",
-    "purple": "Morado",
-    "green": "Verde"
+    "spanish": "Español"
   },
   "profile": {
     "title": "Perfil",

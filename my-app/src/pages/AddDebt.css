@@ -6,11 +6,9 @@
 }
 
 .page-header {
-  background: var(--dark-section);
   color: var(--text-primary);
   padding: 20px 20px 0 20px;
   padding-bottom: 0;
-  border-bottom: 2px solid var(--dark-green);
 }
 
 .btn-back {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaArrowLeft, FaMoon, FaSun, FaPalette, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
-import { useTheme, ColorScheme } from '../context/ThemeContext';
+import { FaArrowLeft, FaMoon, FaSun, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
+import { useTheme } from '../context/ThemeContext';
 import { storage } from '../utils/storage';
 import './Preferences.css';
 
@@ -11,13 +11,6 @@ import './Preferences.css';
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
 };
-
-const colorSchemes: { value: ColorScheme; color: string }[] = [
-  { value: 'teal', color: '#14B8A6' },
-  { value: 'blue', color: '#3B82F6' },
-  { value: 'purple', color: '#8B5CF6' },
-  { value: 'green', color: '#10B981' },
-];
 
 const currencies = [
   { code: 'MXN', name: 'Peso Mexicano', country: 'México' },
@@ -41,7 +34,7 @@ const currencies = [
 const Preferences: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { mode, colorScheme, setMode, setColorScheme } = useTheme();
+  const { mode, setMode } = useTheme();
   const [localCurrency, setLocalCurrencyState] = useState<string>(storage.getLocalCurrency());
   const [language, setLanguageState] = useState<string>(storage.getLanguage());
 
@@ -158,42 +151,6 @@ const Preferences: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="preferences-section"
-        >
-          <h2 className="section-title">
-            <Icon component={FaPalette} className="section-icon" />
-            {t('preferences.colorScheme')}
-          </h2>
-          
-          <div className="color-schemes-grid">
-            {colorSchemes.map((scheme) => (
-              <motion.button
-                key={scheme.value}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`color-scheme-button ${colorScheme === scheme.value ? 'active' : ''}`}
-                onClick={() => setColorScheme(scheme.value)}
-              >
-                <div className="color-preview" style={{ backgroundColor: scheme.color }} />
-                <span>{t(`preferences.${scheme.value}` as any)}</span>
-                {colorScheme === scheme.value && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="check-mark"
-                  >
-                    <Icon component={FaCheck} />
-                  </motion.div>
-                )}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
           className="preferences-section"
         >
           <h2 className="section-title">

@@ -4,11 +4,9 @@
 }
 
 .page-header {
-  background: var(--dark-section);
   color: var(--text-primary);
   padding: 20px 20px 0 20px;
   padding-bottom: 0;
-  border-bottom: 2px solid var(--dark-green);
 }
 
 .header-content {
@@ -125,50 +123,6 @@
 
 .mode-button svg {
   font-size: 24px;
-}
-
-.color-schemes-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.color-scheme-button {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: var(--dark-bg);
-  border: 2px solid var(--dark-green);
-  border-radius: 8px;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 14px;
-  font-weight: 500;
-  position: relative;
-}
-
-.color-scheme-button:hover {
-  border-color: var(--primary);
-  background: var(--primary-overlay-light);
-}
-
-.color-scheme-button.active {
-  border-color: var(--primary);
-  background: var(--primary-overlay);
-}
-
-.color-preview {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 2px solid var(--dark-green);
-}
-
-.color-scheme-button.active .color-preview {
-  border-color: var(--primary);
 }
 
 .check-mark {
