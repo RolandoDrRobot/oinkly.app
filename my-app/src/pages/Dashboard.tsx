@@ -16,9 +16,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { 
   FaPlus, 
   FaEdit, 
@@ -26,8 +24,6 @@ import {
   FaPhone, 
   FaCheck, 
   FaTimes, 
-  FaChevronDown, 
-  FaChevronUp, 
   FaFileInvoiceDollar, 
   FaLandmark, 
   FaCreditCard, 
@@ -57,7 +53,7 @@ const Dashboard: React.FC = () => {
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -881,7 +877,6 @@ const Dashboard: React.FC = () => {
                                 {debt.commitments && debt.commitments.length > 0 && (() => {
                                   const completed = debt.commitments.filter(c => c.status === 'completed').length;
                                   const total = debt.commitments.length;
-                                  const pending = total - completed;
                                   return (
                                     <div className="commitments-progress">
                                       <span className="progress-text">
@@ -1059,7 +1054,6 @@ const Dashboard: React.FC = () => {
                                           return new Date(dateB).getTime() - new Date(dateA).getTime();
                                         })
                                         .map((commitment) => {
-                                          const status = getCommitmentStatus(commitment);
                                           const config = {
                                             color: 'var(--primary-bright)',
                                             bg: 'var(--overlay)',

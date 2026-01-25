@@ -278,21 +278,6 @@ const CompleteCommitment: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, formData.updateBalances, formData.totalLocal, formData.totalDollars, formData.feeToUpdate, formData.feeToUpdateDollars]);
 
-  const canProceed = (): boolean => {
-    const currentSteps = getSteps();
-    const currentStepData = currentSteps[currentStep];
-    if (currentStepData.field) {
-      const value = formData[currentStepData.field];
-      if (currentStepData.type === 'number') {
-        return value !== undefined && value !== null && !isNaN(Number(value)) && Number(value) >= 0;
-      }
-      if (typeof value === 'string') {
-        return value !== undefined && value !== '' && value !== null;
-      }
-      return value !== undefined && value !== null;
-    }
-    return false;
-  };
 
   if (!debt || !commitment) {
     return (

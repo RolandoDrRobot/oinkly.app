@@ -1,4 +1,4 @@
-import { Debt, PaymentCommitment, CallRecord } from '../types';
+import { PaymentCommitment, CallRecord } from '../types';
 import { storage } from './storage';
 
 const escapeCSV = (value: any): string => {
