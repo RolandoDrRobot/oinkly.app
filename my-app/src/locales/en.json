@@ -53,6 +53,8 @@
     "dueToday": "Due Today",
     "overdue": "Overdue",
     "addPhone": "Add phone",
+    "hideAmounts": "Hide amounts",
+    "showAmounts": "Show amounts",
     "commitmentsNeedAttention": "{{count}} commitment{{count, plural, one {} other {s}}} need{{count, plural, one {s} other {}}} attention"
   },
   "addDebt": {
@@ -215,7 +217,7 @@
     "callCompleted": "Call completed"
   },
   "about": {
-    "title": "About Oinkly",
+    "title": "Oinkly",
     "subtitle": "Your path to financial freedom",
     "methodTitle": "The Snowball Method",
     "methodDescription": "Pay off your smallest debt first. Build momentum. Win faster. Your debts auto-organize from smallest to largest—focus on one while paying minimums on others.",

@@ -53,6 +53,8 @@
     "dueToday": "Vence Hoy",
     "overdue": "Vencido",
     "addPhone": "Agregar teléfono",
+    "hideAmounts": "Ocultar montos",
+    "showAmounts": "Mostrar montos",
     "commitmentsNeedAttention": "{{count}} compromiso{{count, plural, one {} other {s}}} necesita{{count, plural, one {n} other {n}}} atención"
   },
   "addDebt": {
@@ -215,7 +217,7 @@
     "callCompleted": "Llamada completada"
   },
   "about": {
-    "title": "Acerca de Oinkly",
+    "title": "Oinkly",
     "subtitle": "Tu camino hacia la libertad financiera",
     "methodTitle": "El Método de Bola de Nieve",
     "methodDescription": "Paga primero tu deuda más pequeña. Genera impulso. Gana más rápido. Tus deudas se organizan automáticamente de menor a mayor—enfócate en una mientras pagas mínimos en las demás.",

@@ -34,7 +34,9 @@ import {
   FaMoneyBill, 
   FaCalendarAlt, 
   FaExclamationTriangle, 
-  FaStar 
+  FaStar,
+  FaEye,
+  FaEyeSlash
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment } from '../types';
@@ -53,6 +55,10 @@ const Dashboard: React.FC = () => {
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
+  const [hideAmounts, setHideAmounts] = useState<boolean>(() => {
+    const saved = localStorage.getItem('hideAmounts');
+    return saved === 'true';
+  });
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
@@ -267,6 +273,12 @@ const Dashboard: React.FC = () => {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
+    if (hideAmounts) {
+      // Return asterisks to hide the amount
+      const length = Math.max(8, amount.toString().length);
+      return '*'.repeat(length);
+    }
+    
     // Map currency codes to Intl.NumberFormat compatible codes
     const currencyMap: { [key: string]: string } = {
       'USD': 'USD',
@@ -299,6 +311,12 @@ const Dashboard: React.FC = () => {
       // Fallback for currencies that might not be supported
       return `${currencyCode} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
+  };
+
+  const toggleHideAmounts = () => {
+    const newValue = !hideAmounts;
+    setHideAmounts(newValue);
+    localStorage.setItem('hideAmounts', String(newValue));
   };
 
   // Calculate totals
@@ -349,6 +367,15 @@ const Dashboard: React.FC = () => {
             <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
+              onClick={toggleHideAmounts}
+              title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
+            >
+              <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
