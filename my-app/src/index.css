@@ -1,3 +1,6 @@
+/* Import Color Standard */
+@import './styles/colors.css';
+
 /* Global styles - Mobile First */
 * {
   box-sizing: border-box;
@@ -60,7 +63,7 @@
 :root[data-theme="dark"] {
   --dark-section: #01634c;
   --dark-card: #014a3a;
-  --dark-bg: #030e0f;
+  --dark-bg: #041715;
   --text-primary: #FFFFFF;
   --text-secondary: #FFFFFF;
   --text-muted: #FFFFFF;
@@ -76,7 +79,7 @@
 :root[data-theme="light"] {
   --dark-section: #01634c;
   --dark-card: #014a3a;
-  --dark-bg: #030e0f;
+  --dark-bg: #041715;
   --text-primary: #FFFFFF;
   --text-secondary: #FFFFFF;
   --text-muted: #FFFFFF;

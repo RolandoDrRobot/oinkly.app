@@ -10,6 +10,7 @@
 }
 
 .btn-back {
+  border: 0;
   
   background: transparent;
   
@@ -58,6 +59,7 @@
 .form-group input[type="tel"],
 .form-group input[type="number"],
 .form-group select {
+  border: 0;
   width: 100%;
   padding: 14px;
   
@@ -93,6 +95,7 @@
 }
 
 .checkbox-label input[type="checkbox"] {
+  border: 0;
   width: 18px;
   height: 18px;
   cursor: pointer;

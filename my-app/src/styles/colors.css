@@ -1,0 +1,74 @@
+/* 
+ * Oinkly Color Standard
+ * 
+ * This file defines the standard color palette for the entire application.
+ * All components should use these CSS variables for consistency.
+ * 
+ * Color Palette:
+ * - Darkest: #041715 (main background with subtle green tint)
+ * - Medium: #01634c (sections/cards)
+ * - Dark Card: #014a3a (cards, containers)
+ * - Lightest/Accent: #00df81 (primary actions, highlights)
+ * - Text: #FFFFFF (white)
+ */
+
+/* Primary Colors */
+:root {
+  /* Background Colors */
+  --color-bg-primary: #041715;      /* Main app background (darkest with subtle green tint) */
+  --color-bg-section: #01634c;      /* Section backgrounds (medium) */
+  --color-bg-card: #014a3a;         /* Card/container backgrounds (dark card) */
+  
+  /* Accent/Primary Colors */
+  --color-primary: #00df81;         /* Primary actions, buttons, highlights */
+  --color-primary-hover: #00df81;    /* Primary hover state (same as primary) */
+  
+  /* Text Colors */
+  --color-text-primary: #FFFFFF;     /* Main text color */
+  --color-text-secondary: #FFFFFF;   /* Secondary text */
+  --color-text-muted: #FFFFFF;       /* Muted/disabled text */
+  
+  /* Status Colors */
+  --color-error: #DC2626;            /* Error states */
+  --color-error-light: rgba(220, 38, 38, 0.1); /* Error background */
+  
+  /* Overlay Colors */
+  --color-overlay: rgba(0, 0, 0, 0.1);
+  --color-overlay-light: rgba(0, 0, 0, 0.05);
+  --color-overlay-medium: rgba(0, 0, 0, 0.08);
+  --color-primary-overlay: rgba(0, 223, 129, 0.1);
+  --color-primary-overlay-light: rgba(0, 223, 129, 0.05);
+  --color-primary-overlay-medium: rgba(0, 223, 129, 0.2);
+}
+
+/* Legacy variable mappings for backward compatibility */
+:root[data-color-scheme="teal"],
+:root[data-color-scheme="blue"],
+:root[data-color-scheme="purple"],
+:root[data-color-scheme="green"] {
+  --primary: var(--color-primary);
+  --primary-medium: var(--color-primary);
+  --primary-bright: var(--color-primary);
+  --dark-green: var(--color-bg-section);
+  --error: var(--color-error);
+  --error-light: var(--color-error-light);
+  --primary-overlay: var(--color-primary-overlay);
+  --primary-overlay-light: var(--color-primary-overlay-light);
+  --primary-overlay-medium: var(--color-primary-overlay-medium);
+}
+
+:root[data-theme="dark"],
+:root[data-theme="light"] {
+  --dark-section: var(--color-bg-section);
+  --dark-card: var(--color-bg-card);
+  --dark-bg: var(--color-bg-primary);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --overlay: var(--color-overlay);
+  --overlay-light: var(--color-overlay-light);
+  --overlay-medium: var(--color-overlay-medium);
+  --shadow: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --shadow-dark: rgba(0, 0, 0, 0.4);
+}

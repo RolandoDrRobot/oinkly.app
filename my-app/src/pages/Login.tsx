@@ -88,7 +88,7 @@ const Login: React.FC = () => {
             type="submit"
             className="btn-primary"
           >
-            {t('landing.getStarted')}
+            {t('landing.continue')}
           </motion.button>
         </motion.form>
       </div>

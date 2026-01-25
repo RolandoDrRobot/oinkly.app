@@ -1,6 +1,6 @@
 .landing {
   min-height: 100vh;
-  background: var(--dark-bg);
+  background: var(--dark-card, #014a3a);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@
 }
 
 .btn-back {
-  
+  border: 0;
   background: transparent;
   color: var(--text-primary);
   padding: 8px 16px;
@@ -60,15 +60,15 @@
 }
 
 .form-group input {
+  border: 0;
   width: 100%;
   padding: 16px;
-  
-  
   background: transparent;
   color: var(--text-primary);
   font-size: 16px;
   transition: all 0.3s;
   box-sizing: border-box;
+  border-radius: 8px;
 }
 
 .form-group input:focus {
@@ -81,24 +81,21 @@
 }
 
 .btn-primary {
-  
+  border: 0;
   width: 100%;
   padding: 16px;
   background: var(--primary);
   color: var(--dark-bg);
-  
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s;
   margin-top: 8px;
-  
 }
 
 .btn-primary:hover {
   background: var(--primary-bright);
-  
   transform: translateY(-2px);
 }
 

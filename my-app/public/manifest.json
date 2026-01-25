@@ -18,8 +18,8 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#030e0f",
-  "background_color": "#030e0f",
+  "theme_color": "#041715",
+  "background_color": "#041715",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en"

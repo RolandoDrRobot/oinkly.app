@@ -25,6 +25,7 @@
 }
 
 .btn-back {
+  border: 0;
   
   background: transparent;
   
@@ -91,6 +92,7 @@
 }
 
 .btn-action {
+  border: 0;
   width: 100%;
   padding: 16px;
   background: var(--dark-section);
