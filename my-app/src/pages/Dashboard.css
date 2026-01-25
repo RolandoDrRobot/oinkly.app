@@ -25,6 +25,7 @@
 }
 
 .btn-profile {
+  border: 0;
   background: transparent;
   color: var(--text-secondary);
   padding: 0;
