@@ -509,26 +509,22 @@ const Dashboard: React.FC = () => {
                           })()}
                         </div>
                         <div className="debt-actions">
-                          {debt.hasCallTask && (
-                            <motion.div
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              className="call-task-icon"
-                              title={t('debt.callTask')}
-                            >
-                              <Icon component={FaPhone} />
-                            </motion.div>
-                          )}
-                          {debt.callCompleted && (
-                            <motion.div
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              className="call-completed-icon"
-                              title={t('debt.callCompleted')}
-                            >
-                              <Icon component={FaCheck} />
-                            </motion.div>
-                          )}
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={`call-task-icon ${!debt.hasCallTask ? 'inactive' : ''}`}
+                            title={t('debt.callTask')}
+                          >
+                            <Icon component={FaPhone} />
+                          </motion.div>
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={`call-completed-icon ${!debt.callCompleted ? 'inactive' : ''}`}
+                            title={t('debt.callCompleted')}
+                          >
+                            <Icon component={FaCheck} />
+                          </motion.div>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}

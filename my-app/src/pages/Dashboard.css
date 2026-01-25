@@ -371,6 +371,12 @@
   border: 1px solid var(--primary-border);
 }
 
+.call-task-icon.inactive {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
 .call-completed-icon {
   display: flex;
   align-items: center;
@@ -381,6 +387,12 @@
   border-radius: 4px;
   background: var(--primary-bright-overlay);
   border: 1px solid var(--primary-bright-border);
+}
+
+.call-completed-icon.inactive {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 .debt-expanded-content {
