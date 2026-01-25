@@ -2,8 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaArrowLeft, FaUser, FaCog, FaFileContract } from 'react-icons/fa';
+import { FaArrowLeft, FaUser, FaCog, FaFileContract, FaDownload } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { exportAllDataToCSV } from '../utils/export';
 import './Profile.css';
 
 // Type assertion helper for icons
@@ -79,6 +80,16 @@ const Profile: React.FC = () => {
           >
             <Icon component={FaFileContract} style={{ marginRight: '12px' }} />
             {t('profile.termsAndConditions')}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="btn-action"
+            onClick={exportAllDataToCSV}
+          >
+            <Icon component={FaDownload} style={{ marginRight: '12px' }} />
+            {t('profile.exportData')}
           </motion.button>
 
           <motion.button

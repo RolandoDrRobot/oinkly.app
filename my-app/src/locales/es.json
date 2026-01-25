@@ -162,7 +162,8 @@
     "title": "Perfil",
     "preferences": "Preferencias",
     "logout": "Cerrar Sesión",
-    "termsAndConditions": "Términos y Privacidad"
+    "termsAndConditions": "Términos y Privacidad",
+    "exportData": "Exportar Datos"
   },
   "commitment": {
     "markCompleted": "Marcar como completado",
