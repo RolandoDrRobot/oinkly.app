@@ -3,6 +3,7 @@ import { Debt, User } from '../types';
 const DEBTS_KEY = 'debts';
 const USER_KEY = 'user';
 const IS_LOGGED_IN_KEY = 'isLoggedIn';
+const DEBTS_ORDER_KEY = 'debtsOrder';
 
 export const storage = {
   // User management
@@ -34,11 +35,15 @@ export const storage = {
   saveDebt: (debt: Debt) => {
     const debts = storage.getDebts();
     const existingIndex = debts.findIndex(d => d.id === debt.id);
+    const currentOrder = storage.getDebtsOrder() || debts.map(d => d.id);
     
     if (existingIndex >= 0) {
       debts[existingIndex] = { ...debt, updatedAt: new Date().toISOString() };
     } else {
       debts.push({ ...debt, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      // Add new debt to the end of the order
+      currentOrder.push(debt.id);
+      storage.setDebtsOrder(currentOrder);
     }
     
     localStorage.setItem(DEBTS_KEY, JSON.stringify(debts));
@@ -88,5 +93,15 @@ export const storage = {
 
   getLanguage: (): string => {
     return localStorage.getItem('language') || 'en';
+  },
+
+  // Debts order management
+  setDebtsOrder: (order: string[]) => {
+    localStorage.setItem(DEBTS_ORDER_KEY, JSON.stringify(order));
+  },
+
+  getDebtsOrder: (): string[] | null => {
+    const orderStr = localStorage.getItem(DEBTS_ORDER_KEY);
+    return orderStr ? JSON.parse(orderStr) : null;
   },
 };

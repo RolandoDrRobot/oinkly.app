@@ -242,6 +242,12 @@
   box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
   user-select: none;
+  position: relative;
+}
+
+.debt-card[data-dragging="true"] {
+  opacity: 0.5;
+  transform: scale(0.95);
 }
 
 .debt-card:hover {
@@ -257,10 +263,17 @@
   position: relative;
 }
 
-.btn-close-debt {
+.debt-header-actions-top {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.btn-close-debt {
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -271,7 +284,8 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  z-index: 10;
+  width: 32px;
+  height: 32px;
 }
 
 .btn-close-debt:hover {
@@ -906,12 +920,12 @@
 
 .commitments-empty {
   text-align: center;
-  padding: 32px 0;
+  padding: 10px 0;
   color: var(--text-muted);
 }
 
 .commitments-empty p {
-  margin: 8px 0;
+  margin: 0;
 }
 
 .commitments-empty .empty-subtitle {
@@ -1151,12 +1165,12 @@
 
 .call-history-empty {
   text-align: center;
-  padding: 32px 0;
+  padding: 10px 0;
   color: var(--text-muted);
 }
 
 .call-history-empty p {
-  margin: 8px 0;
+  margin: 0;
 }
 
 .call-history-empty .empty-subtitle {

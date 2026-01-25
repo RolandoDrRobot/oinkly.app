@@ -2,6 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   FaPlus, 
   FaEdit, 
@@ -26,8 +43,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
-import EditCommitmentModal from './EditCommitmentModal';
-import UpdateBalancesModal from './UpdateBalancesModal';
+import SortableDebtCard from '../components/SortableDebtCard';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -75,24 +91,63 @@ const Dashboard: React.FC = () => {
       return debt;
     });
     
-    // Sort by snowball method: smallest total debt first
-    // Total debt = totalLocal + totalDollars (converted to a common base)
-    // For simplicity, we'll use totalDollars as primary, then totalLocal
-    const sortedDebts = [...updatedDebts].sort((a, b) => {
-      // Calculate total in a common currency (using USD as base)
-      // For simplicity, we'll prioritize by totalDollars first, then totalLocal
-      const totalA = a.totalDollars + (a.totalLocal * 0.001); // Simple conversion approximation
-      const totalB = b.totalDollars + (b.totalLocal * 0.001);
-      return totalA - totalB; // Ascending order (smallest first
-    });
+    // Load saved order or use current order
+    const savedOrder = storage.getDebtsOrder();
+    let orderedDebts: Debt[];
     
-    setDebts(sortedDebts);
+    if (savedOrder && savedOrder.length === updatedDebts.length) {
+      // Use saved order
+      const debtMap = new Map(updatedDebts.map(debt => [debt.id, debt]));
+      orderedDebts = savedOrder
+        .map(id => debtMap.get(id))
+        .filter((debt): debt is Debt => debt !== undefined);
+      
+      // Add any new debts that aren't in the saved order
+      const existingIds = new Set(savedOrder);
+      const newDebts = updatedDebts.filter(debt => !existingIds.has(debt.id));
+      orderedDebts = [...orderedDebts, ...newDebts];
+    } else {
+      // No saved order, use current order
+      orderedDebts = updatedDebts;
+      // Save current order
+      storage.setDebtsOrder(orderedDebts.map(d => d.id));
+    }
+    
+    setDebts(orderedDebts);
   };
 
   const handleDelete = (id: string) => {
     if (window.confirm(t('debt.deleteConfirm'))) {
       storage.deleteDebt(id);
+      // Remove from order
+      const currentOrder = storage.getDebtsOrder() || debts.map(d => d.id);
+      const newOrder = currentOrder.filter(debtId => debtId !== id);
+      storage.setDebtsOrder(newOrder);
       loadDebts();
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setDebts((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // Save new order
+        storage.setDebtsOrder(newOrder.map(d => d.id));
+        
+        return newOrder;
+      });
     }
   };
 
@@ -417,49 +472,99 @@ const Dashboard: React.FC = () => {
               <p className="empty-subtitle">{t('dashboard.noDebtsSubtitle')}</p>
             </motion.div>
           ) : (
-            <motion.div
-              key="debts"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.3 }}
-              className="debts-container"
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {debts.map((debt, index) => {
-                const isExpanded = expandedDebts.has(debt.id);
-                return (
-                  <motion.div
-                    key={debt.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 * index }}
-                    whileHover={{ y: -2 }}
-                    className="debt-card"
-                    onClick={() => {
-                      if (!isExpanded) {
-                        toggleExpand(debt.id);
-                      }
-                    }}
-                  >
-                    <div className="debt-header">
-                      {isExpanded && (
-                        <motion.button
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="btn-close-debt"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand(debt.id);
-                          }}
-                          title={t('common.close')}
-                        >
-                          <Icon component={FaTimes} size={16} />
-                        </motion.button>
-                      )}
-                      <div className="debt-header-main">
-                        <div className="debt-header-info">
+              <SortableContext
+                items={debts.map(d => d.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <motion.div
+                  key="debts"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="debts-container"
+                >
+                  {debts.map((debt, index) => {
+                    const isExpanded = expandedDebts.has(debt.id);
+                    return (
+                      <SortableDebtCard key={debt.id} debt={debt} index={index}>
+                        {({ dragAttributes, dragListeners, isDragging }) => (
+                          <div
+                            className="debt-card"
+                            onClick={() => {
+                              if (!isExpanded) {
+                                toggleExpand(debt.id);
+                              }
+                            }}
+                          >
+                            <div className="debt-header">
+                              <div className="debt-header-actions-top">
+                                {isExpanded && (
+                                  <motion.button
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    className="btn-close-debt"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleExpand(debt.id);
+                                    }}
+                                    title={t('common.close')}
+                                  >
+                                    <Icon component={FaTimes} size={16} />
+                                  </motion.button>
+                                )}
+                                <div
+                                  {...dragAttributes}
+                                  {...dragListeners}
+                                  className="drag-handle"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    cursor: isDragging ? 'grabbing' : 'grab',
+                                    touchAction: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '6px',
+                                    background: 'var(--bg-tertiary)',
+                                    border: '1px solid var(--bg-tertiary)',
+                                    opacity: 0.7,
+                                    transition: 'all 0.2s',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.opacity = '1';
+                                    e.currentTarget.style.background = 'var(--overlay)';
+                                    e.currentTarget.style.borderColor = 'var(--accent-color)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.opacity = '0.7';
+                                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                    e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
+                                    <circle cx="3" cy="3" r="1.5" />
+                                    <circle cx="8" cy="3" r="1.5" />
+                                    <circle cx="13" cy="3" r="1.5" />
+                                    <circle cx="3" cy="8" r="1.5" />
+                                    <circle cx="8" cy="8" r="1.5" />
+                                    <circle cx="13" cy="8" r="1.5" />
+                                    <circle cx="3" cy="13" r="1.5" />
+                                    <circle cx="8" cy="13" r="1.5" />
+                                    <circle cx="13" cy="13" r="1.5" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div className="debt-header-main">
+                                <div className="debt-header-info">
                           {editingField?.debtId === debt.id && editingField?.field === 'name' ? (
                             <input
                               type="text"
@@ -1173,11 +1278,15 @@ const Dashboard: React.FC = () => {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
+                          </div>
+                        )}
+                      </SortableDebtCard>
+                    );
+                  })}
+                </motion.div>
+              </SortableContext>
+            </DndContext>
+            )}
         </AnimatePresence>
       </div>
 
