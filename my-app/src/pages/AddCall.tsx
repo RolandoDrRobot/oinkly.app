@@ -218,20 +218,23 @@ const AddCall: React.FC = () => {
   const canProceed = (): boolean => {
     const currentSteps = getSteps();
     const currentStepData = currentSteps[currentStep];
-    if (currentStepData.field) {
-      const value = formData[currentStepData.field];
-      if (currentStepData.type === 'date') {
-        return value !== undefined && value !== '' && value !== null;
-      }
-      if (currentStepData.type === 'textarea') {
-        return value !== undefined && value !== '' && value !== null;
-      }
-      if (currentStepData.type === 'number') {
-        return value !== undefined && value !== null && !isNaN(Number(value)) && Number(value) >= 0;
-      }
+    
+    // If step doesn't have a field (like welcome step), allow proceeding
+    if (!currentStepData.field) {
+      return true;
+    }
+    
+    const value = formData[currentStepData.field];
+    if (currentStepData.type === 'date') {
       return value !== undefined && value !== '' && value !== null;
     }
-    return false;
+    if (currentStepData.type === 'textarea') {
+      return value !== undefined && value !== '' && value !== null;
+    }
+    if (currentStepData.type === 'number') {
+      return value !== undefined && value !== null && !isNaN(Number(value)) && Number(value) >= 0;
+    }
+    return value !== undefined && value !== '' && value !== null;
   };
 
   useEffect(() => {
