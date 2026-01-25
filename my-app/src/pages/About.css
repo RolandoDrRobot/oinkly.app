@@ -124,7 +124,7 @@
 
 .step-card {
   background: var(--bg-primary);
-  padding: 24px;
+  padding: 0;
   border-radius: 12px;
   border: 2px solid var(--bg-tertiary);
   position: relative;
@@ -137,19 +137,7 @@
 }
 
 .step-number {
-  position: absolute;
-  top: -16px;
-  left: 24px;
-  width: 32px;
-  height: 32px;
-  background: var(--accent-color);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
+  display: none;
 }
 
 .step-icon {
@@ -181,7 +169,6 @@
 
 .tip-card {
   background: var(--bg-primary);
-  padding: 24px;
   border-radius: 12px;
   border-left: 4px solid var(--accent-color);
 }
@@ -209,7 +196,6 @@
 
 .philosophy-card {
   background: var(--bg-primary);
-  padding: 24px;
   border-radius: 12px;
   border: 1px solid var(--bg-tertiary);
 }
@@ -277,8 +263,4 @@
     grid-template-columns: 1fr;
   }
 
-  .step-card,
-  .tip-card {
-    padding: 20px;
-  }
 }
