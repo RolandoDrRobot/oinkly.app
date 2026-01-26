@@ -102,3 +102,44 @@
 .btn-primary:active {
   transform: scale(0.98);
 }
+
+/* Language Selector */
+.language-selector {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  background: var(--color-bg-card);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.lang-option {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 4px 8px;
+  font-family: "DynaPuff", system-ui;
+}
+
+.lang-option:hover {
+  color: var(--color-text-primary);
+}
+
+.lang-option.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.lang-separator {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  user-select: none;
+}

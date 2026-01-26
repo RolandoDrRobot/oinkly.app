@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -15,16 +15,29 @@ import {
   FaInfoCircle
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { storage } from '../utils/storage';
 import './About.css';
+import './Landing.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
 };
 
 const Landing: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
+  const [language, setLanguage] = useState<string>(storage.getLanguage());
+
+  useEffect(() => {
+    setLanguage(storage.getLanguage());
+  }, []);
+
+  const handleLanguageChange = (lang: string) => {
+    storage.setLanguage(lang);
+    i18n.changeLanguage(lang);
+    setLanguage(lang);
+  };
 
   const handleGetStarted = () => {
     // Auto-login with default user
@@ -102,6 +115,23 @@ const Landing: React.FC = () => {
 
   return (
     <div className="about-page">
+      {/* Language Selector */}
+      <div className="language-selector">
+        <button
+          className={`lang-option ${language === 'es' ? 'active' : ''}`}
+          onClick={() => handleLanguageChange('es')}
+        >
+          ESP
+        </button>
+        <span className="lang-separator">|</span>
+        <button
+          className={`lang-option ${language === 'en' ? 'active' : ''}`}
+          onClick={() => handleLanguageChange('en')}
+        >
+          ENG
+        </button>
+      </div>
+
       {isAuthenticated ? (
         <motion.header
           initial={{ opacity: 0, y: -20 }}
