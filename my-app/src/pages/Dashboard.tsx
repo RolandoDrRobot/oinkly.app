@@ -67,9 +67,11 @@ const Dashboard: React.FC = () => {
   }, []);
 
   // Calculate inOrder based on payment commitments
+  // Returns true if no pending/overdue commitments (shows "No compromisos")
+  // Returns false if there are pending/overdue commitments (shows "Compromiso pendiente")
   const calculateInOrder = (debt: Debt): boolean => {
     if (!debt.commitments || debt.commitments.length === 0) {
-      // No commitments means debt is in order
+      // No commitments means "No compromisos"
       return true;
     }
 
@@ -79,7 +81,7 @@ const Dashboard: React.FC = () => {
     // Check if there are any pending or overdue commitments
     const hasPendingOrOverdue = debt.commitments.some(commitment => {
       if (commitment.status === 'completed') {
-        return false; // Completed commitments don't affect inOrder
+        return false; // Completed commitments don't affect status
       }
 
       const commitmentDate = new Date(commitment.date);
@@ -87,11 +89,11 @@ const Dashboard: React.FC = () => {
       const diffTime = commitmentDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      // If commitment is overdue (past due) or pending (not completed), debt is not in order
+      // If commitment is overdue (past due) or pending (not completed), shows "Compromiso pendiente"
       return diffDays < 0 || commitment.status === 'pending';
     });
 
-    // Debt is in order if there are no pending or overdue commitments
+    // Returns true if no pending/overdue (shows "No compromisos"), false otherwise (shows "Compromiso pendiente")
     return !hasPendingOrOverdue;
   };
 
@@ -1211,24 +1213,30 @@ const Dashboard: React.FC = () => {
                           </div>
 
                           <div className="debt-task">
-                            <label className="task-checkbox" onClick={(e) => e.stopPropagation()}>
-                              <input
-                                type="checkbox"
-                                checked={debt.hasCallTask}
-                                onChange={() => handleToggleCallTask(debt)}
-                              />
+                            <motion.button
+                              className={`task-button ${debt.hasCallTask ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleCallTask(debt);
+                              }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <Icon component={FaPhone} size={16} />
                               <span>{t('dashboard.callBank')}</span>
-                            </label>
-                            {debt.hasCallTask && (
-                              <label className="task-checkbox" onClick={(e) => e.stopPropagation()}>
-                                <input
-                                  type="checkbox"
-                                  checked={debt.callCompleted}
-                                  onChange={() => handleToggleCallCompleted(debt)}
-                                />
-                                <span className={debt.callCompleted ? 'completed' : ''}>{t('common.completed')}</span>
-                              </label>
-                            )}
+                            </motion.button>
+                            <motion.button
+                              className={`task-button ${debt.callCompleted ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleCallCompleted(debt);
+                              }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <Icon component={FaCheck} size={16} />
+                              <span>{t('common.debtReviewed')}</span>
+                            </motion.button>
                           </div>
                         </motion.div>
                       )}
