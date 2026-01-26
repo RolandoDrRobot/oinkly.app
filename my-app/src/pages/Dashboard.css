@@ -710,6 +710,11 @@
   gap: 6px;
 }
 
+.btn-add-commitment svg {
+  fill: #f4e3c5;
+  stroke: #f4e3c5;
+}
+
 .btn-add-commitment:hover {
   background: var(--primary-bright);
   transform: translateY(-1px);
@@ -1062,7 +1067,7 @@
 
 .modal-actions .btn-submit {
   background: var(--primary);
-  color: white;
+  color: var(--text-primary);
 }
 
 .modal-actions .btn-submit:hover {

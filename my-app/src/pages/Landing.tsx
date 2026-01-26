@@ -194,7 +194,11 @@ const Landing: React.FC = () => {
             {currentStepData.id === 'welcome' && (
               <div className="welcome-step">
                 <div className="welcome-icon-wrapper">
-                  <Icon component={FaPiggyBank} className="welcome-icon" size={80} />
+                  <img 
+                    src={`${process.env.PUBLIC_URL}/logo.png`} 
+                    alt="Oinkly Logo" 
+                    className="welcome-logo"
+                  />
                 </div>
                 <h1 className="step-title-large">{currentStepData.title}</h1>
                 <p className="step-subtitle-large">{currentStepData.subtitle}</p>

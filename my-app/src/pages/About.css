@@ -223,7 +223,7 @@
 
 .btn-primary {
   background: var(--accent-color);
-  color: white;
+  color: var(--text-primary);
   
   padding: 16px 32px;
   font-size: 18px;
