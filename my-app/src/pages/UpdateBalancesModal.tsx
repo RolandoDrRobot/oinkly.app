@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
+import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators, getCurrencyForField } from '../utils/currencyFormatter';
 
 const getCurrencyName = (code: string): string => {
   const currencyNames: { [key: string]: string } = {
@@ -55,6 +56,7 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
     feeToUpdate: debt.feeToUpdate,
     feeToUpdateDollars: debt.feeToUpdateDollars,
   });
+  const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +77,47 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
     storage.saveDebt(updatedDebt);
     onSave();
     onClose();
+  };
+
+  const handleCurrencyInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, currency: string) => {
+    const inputValue = e.target.value;
+    
+    // Remove currency prefix and spaces if present
+    let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
+    
+    // Remove all thousand separators (commas) to get raw numeric string
+    cleanedValue = cleanedValue.replace(/,/g, '');
+    
+    // Extract only numbers and decimal point
+    const numericString = cleanedValue.replace(/[^\d.]/g, '');
+    
+    // Format with thousand separators
+    const formattedNumber = formatNumberWithSeparators(numericString);
+    
+    // Store the display value (with currency prefix and formatted number)
+    const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+    setCurrencyDisplayValues(prev => ({
+      ...prev,
+      [field]: displayValue
+    }));
+    
+    // Parse and store numeric value (always as number)
+    const numericValue = numericString ? parseFloat(numericString) : 0;
+    const finalValue = isNaN(numericValue) ? 0 : numericValue;
+    
+    setFormData(prev => ({ ...prev, [field]: finalValue }));
+  };
+
+  const getCurrencyInputValue = (field: string, currency: string): string => {
+    // Use stored display value if available
+    if (currencyDisplayValues[field] !== undefined) {
+      return currencyDisplayValues[field];
+    }
+    
+    // Otherwise format from numeric value
+    const value = formData[field as keyof typeof formData];
+    if (value === undefined || value === null || value === 0) return '';
+    return formatCurrencyInput(value, currency);
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -161,10 +204,9 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             <div className="form-group">
               <label>{t('updateBalances.totalDebtLocal')} ({storage.getLocalCurrency()})</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.totalLocal}
-                onChange={(e) => setFormData({ ...formData, totalLocal: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('totalLocal', storage.getLocalCurrency())}
+                onChange={(e) => handleCurrencyInputChange(e, 'totalLocal', storage.getLocalCurrency())}
                 placeholder="0.00"
                 required
               />
@@ -173,10 +215,9 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             <div className="form-group">
               <label>{t('updateBalances.totalDebtDollar')}</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.totalDollars}
-                onChange={(e) => setFormData({ ...formData, totalDollars: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('totalDollars', 'USD')}
+                onChange={(e) => handleCurrencyInputChange(e, 'totalDollars', 'USD')}
                 placeholder="0.00"
                 required
               />
@@ -185,10 +226,9 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             <div className="form-group">
               <label>{t('updateBalances.amountToUpdateLocal')} ({storage.getLocalCurrency()})</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.feeToUpdate}
-                onChange={(e) => setFormData({ ...formData, feeToUpdate: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('feeToUpdate', storage.getLocalCurrency())}
+                onChange={(e) => handleCurrencyInputChange(e, 'feeToUpdate', storage.getLocalCurrency())}
                 placeholder="0.00"
                 required
               />
@@ -197,10 +237,9 @@ const UpdateBalancesModal: React.FC<UpdateBalancesModalProps> = ({
             <div className="form-group">
               <label>{t('updateBalances.amountToUpdateDollar')}</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.feeToUpdateDollars}
-                onChange={(e) => setFormData({ ...formData, feeToUpdateDollars: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('feeToUpdateDollars', 'USD')}
+                onChange={(e) => handleCurrencyInputChange(e, 'feeToUpdateDollars', 'USD')}
                 placeholder="0.00"
                 required
               />

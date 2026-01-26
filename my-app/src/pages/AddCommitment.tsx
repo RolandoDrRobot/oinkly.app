@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
+import { formatCurrencyInput, parseCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
 const getCurrencyName = (code: string): string => {
@@ -64,6 +65,7 @@ const AddCommitment: React.FC = () => {
   const [formData, setFormData] = useState<StepData>({});
   const [debt, setDebt] = useState<Debt | null>(null);
   const [commitment, setCommitment] = useState<PaymentCommitment | null>(null);
+  const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
   const isEditing = !!commitmentId;
 
   useEffect(() => {
@@ -181,6 +183,59 @@ const AddCommitment: React.FC = () => {
     if (step.field) {
       setFormData({ ...formData, [step.field]: value });
     }
+  };
+
+  const handleCurrencyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const step = steps[currentStep];
+    if (step.field && step.type === 'number' && debt) {
+      const currency = getCurrencyForField(step.id, debt.localCurrency);
+      const inputValue = e.target.value;
+      
+      // Remove currency prefix and spaces if present
+      let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
+      
+      // Remove all thousand separators (commas) to get raw numeric string
+      cleanedValue = cleanedValue.replace(/,/g, '');
+      
+      // Extract only numbers and decimal point
+      const numericString = cleanedValue.replace(/[^\d.]/g, '');
+      
+      // Format with thousand separators
+      const formattedNumber = formatNumberWithSeparators(numericString);
+      
+      // Store the display value (with currency prefix and formatted number)
+      const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+      setCurrencyDisplayValues(prev => ({
+        ...prev,
+        [step.field!]: displayValue
+      }));
+      
+      // Parse and store numeric value (always as number)
+      const numericValue = numericString ? parseFloat(numericString) : 0;
+      const finalValue = isNaN(numericValue) ? 0 : numericValue;
+      setFormData({ ...formData, [step.field]: finalValue });
+    } else {
+      handleInputChange(e.target.value);
+    }
+  };
+
+  const getCurrencyInputValue = (): string => {
+    const step = steps[currentStep];
+    if (step.field && step.type === 'number' && debt) {
+      const fieldKey = step.field;
+      // Use stored display value if available
+      if (currencyDisplayValues[fieldKey] !== undefined) {
+        return currencyDisplayValues[fieldKey];
+      }
+      // Otherwise format from numeric value
+      const value = formData[fieldKey];
+      if (value === undefined || value === null || (typeof value === 'number' && (isNaN(value) || value === 0))) return '';
+      if (typeof value === 'number') {
+        const currency = getCurrencyForField(step.id, debt.localCurrency);
+        return formatCurrencyInput(value, currency);
+      }
+    }
+    return '';
   };
 
   useEffect(() => {
@@ -359,16 +414,18 @@ const AddCommitment: React.FC = () => {
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.1 }}
-                    type={currentStepData.type || 'text'}
+                    type={currentStepData.type === 'number' ? 'text' : (currentStepData.type || 'text')}
                     placeholder={currentStepData.placeholder}
                     value={
-                      typeof formData[currentStepData.field] === 'number'
+                      currentStepData.type === 'number'
+                        ? getCurrencyInputValue()
+                        : typeof formData[currentStepData.field] === 'number'
                         ? formData[currentStepData.field]?.toString() || ''
                         : (formData[currentStepData.field] as string) || ''
                     }
                     onChange={(e) => {
                       if (currentStepData.type === 'number') {
-                        handleInputChange(parseFloat(e.target.value) || 0);
+                        handleCurrencyInputChange(e);
                       } else if (currentStepData.type === 'date') {
                         handleInputChange(e.target.value);
                       } else {

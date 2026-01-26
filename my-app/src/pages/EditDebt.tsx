@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { formatCurrencyInput, parseCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './EditDebt.css';
 
 // Type assertion helper for icons
@@ -17,6 +18,7 @@ const EditDebt: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Debt | null>(null);
+  const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (id) {
@@ -58,29 +60,72 @@ const EditDebt: React.FC = () => {
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const newValue = parseFloat(value) || 0;
+    const { name } = e.target;
+    const inputValue = e.target.value;
+    
+    if (!formData) return;
+    
+    const currency = getCurrencyForField(name, formData.localCurrency || storage.getLocalCurrency());
+    
+    // Remove currency prefix and spaces if present
+    let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
+    
+    // Remove all thousand separators (commas) to get raw numeric string
+    cleanedValue = cleanedValue.replace(/,/g, '');
+    
+    // Extract only numbers and decimal point
+    const numericString = cleanedValue.replace(/[^\d.]/g, '');
+    
+    // Format with thousand separators
+    const formattedNumber = formatNumberWithSeparators(numericString);
+    
+    // Store the display value (with currency prefix and formatted number)
+    const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+    setCurrencyDisplayValues(prev => ({
+      ...prev,
+      [name]: displayValue
+    }));
+    
+    // Parse and store numeric value (always as number)
+    const numericValue = numericString ? parseFloat(numericString) : 0;
+    const finalValue = isNaN(numericValue) ? 0 : numericValue;
+    
     const updated = {
-      ...formData!,
-      [name]: newValue,
+      ...formData,
+      [name]: finalValue,
     };
     
     // Calculate inOrder automatically if feeToUpdate or feeToUpdateDollars changed
     if (name === 'feeToUpdate' || name === 'feeToUpdateDollars') {
-      const feeToUpdate = name === 'feeToUpdate' ? newValue : (updated.feeToUpdate || 0);
-      const feeToUpdateDollars = name === 'feeToUpdateDollars' ? newValue : (updated.feeToUpdateDollars || 0);
+      const feeToUpdate = name === 'feeToUpdate' ? finalValue : (updated.feeToUpdate || 0);
+      const feeToUpdateDollars = name === 'feeToUpdateDollars' ? finalValue : (updated.feeToUpdateDollars || 0);
       updated.inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
     }
     
     // If total reaches 0, set corresponding fee to 0
-    if (name === 'totalLocal' && newValue === 0) {
+    if (name === 'totalLocal' && finalValue === 0) {
       updated.localFee = 0;
     }
-    if (name === 'totalDollars' && newValue === 0) {
+    if (name === 'totalDollars' && finalValue === 0) {
       updated.dollarFee = 0;
     }
     
     setFormData(updated);
+  };
+
+  const getCurrencyInputValue = (name: string): string => {
+    if (!formData) return '';
+    
+    // Use stored display value if available
+    if (currencyDisplayValues[name] !== undefined) {
+      return currencyDisplayValues[name];
+    }
+    
+    // Otherwise format from numeric value
+    const value = formData[name as keyof Debt];
+    if (value === undefined || value === null || typeof value !== 'number' || value === 0) return '';
+    const currency = getCurrencyForField(name, formData.localCurrency || storage.getLocalCurrency());
+    return formatCurrencyInput(value, currency);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -188,9 +233,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="localFee"
-              type="number"
-              step="0.01"
-              value={formData.localFee}
+              type="text"
+              value={getCurrencyInputValue('localFee')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.monthlyPaymentLocal')}
               required
@@ -200,9 +244,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="dollarFee"
-              type="number"
-              step="0.01"
-              value={formData.dollarFee}
+              type="text"
+              value={getCurrencyInputValue('dollarFee')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.monthlyPaymentDollar')}
               required
@@ -212,9 +255,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="totalLocal"
-              type="number"
-              step="0.01"
-              value={formData.totalLocal}
+              type="text"
+              value={getCurrencyInputValue('totalLocal')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.totalDebtLocal')}
               required
@@ -224,9 +266,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="totalDollars"
-              type="number"
-              step="0.01"
-              value={formData.totalDollars}
+              type="text"
+              value={getCurrencyInputValue('totalDollars')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.totalDebtDollar')}
               required
@@ -236,9 +277,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="feeToUpdate"
-              type="number"
-              step="0.01"
-              value={formData.feeToUpdate}
+              type="text"
+              value={getCurrencyInputValue('feeToUpdate')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.amountToUpdateLocal')}
               required
@@ -248,9 +288,8 @@ const EditDebt: React.FC = () => {
           <div className="form-group">
             <input
               name="feeToUpdateDollars"
-              type="number"
-              step="0.01"
-              value={formData.feeToUpdateDollars || 0}
+              type="text"
+              value={getCurrencyInputValue('feeToUpdateDollars')}
               onChange={handleNumberChange}
               placeholder={t('editDebt.amountToUpdateDollar')}
               required

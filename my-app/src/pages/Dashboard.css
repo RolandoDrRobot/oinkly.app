@@ -711,8 +711,8 @@
 .btn-add-commitment {
   border: 0;
   background: var(--primary);
-  
-  color: white;
+  border: 0;
+  color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;
@@ -1117,8 +1117,8 @@
 
 .btn-add-call {
   background: var(--primary);
-  
-  color: white;
+  color: var(--text-primary);
+  border: 0;
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;

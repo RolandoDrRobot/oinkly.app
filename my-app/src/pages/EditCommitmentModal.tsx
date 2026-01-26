@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
+import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators } from '../utils/currencyFormatter';
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -32,6 +33,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
     amountDollars: commitment.amountDollars,
     notes: commitment.notes || '',
   });
+  const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -67,6 +69,47 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
     storage.saveDebt(updatedDebt);
     onSave();
     onClose();
+  };
+
+  const handleCurrencyInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string, currency: string) => {
+    const inputValue = e.target.value;
+    
+    // Remove currency prefix and spaces if present
+    let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
+    
+    // Remove all thousand separators (commas) to get raw numeric string
+    cleanedValue = cleanedValue.replace(/,/g, '');
+    
+    // Extract only numbers and decimal point
+    const numericString = cleanedValue.replace(/[^\d.]/g, '');
+    
+    // Format with thousand separators
+    const formattedNumber = formatNumberWithSeparators(numericString);
+    
+    // Store the display value (with currency prefix and formatted number)
+    const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+    setCurrencyDisplayValues(prev => ({
+      ...prev,
+      [field]: displayValue
+    }));
+    
+    // Parse and store numeric value (always as number)
+    const numericValue = numericString ? parseFloat(numericString) : 0;
+    const finalValue = isNaN(numericValue) ? 0 : numericValue;
+    
+    setFormData(prev => ({ ...prev, [field]: finalValue }));
+  };
+
+  const getCurrencyInputValue = (field: string, currency: string): string => {
+    // Use stored display value if available
+    if (currencyDisplayValues[field] !== undefined) {
+      return currencyDisplayValues[field];
+    }
+    
+    // Otherwise format from numeric value
+    const value = formData[field as keyof typeof formData];
+    if (value === undefined || value === null || value === 0) return '';
+    return formatCurrencyInput(value, currency);
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -141,10 +184,9 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             <div className="form-group">
               <label>{t('editCommitment.amountLocal')} ({storage.getLocalCurrency()})</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.amountLocal}
-                onChange={(e) => setFormData({ ...formData, amountLocal: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('amountLocal', storage.getLocalCurrency())}
+                onChange={(e) => handleCurrencyInputChange(e, 'amountLocal', storage.getLocalCurrency())}
                 placeholder="0.00"
                 required
               />
@@ -153,10 +195,9 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
             <div className="form-group">
               <label>{t('editCommitment.amountDollar')}</label>
               <input
-                type="number"
-                step="0.01"
-                value={formData.amountDollars}
-                onChange={(e) => setFormData({ ...formData, amountDollars: parseFloat(e.target.value) || 0 })}
+                type="text"
+                value={getCurrencyInputValue('amountDollars', 'USD')}
+                onChange={(e) => handleCurrencyInputChange(e, 'amountDollars', 'USD')}
                 placeholder="0.00"
                 required
               />
