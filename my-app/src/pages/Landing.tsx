@@ -23,8 +23,14 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 
 const Landing: React.FC = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    // Auto-login with default user
+    login('rolando@gmail.com', 'Rolo');
+    navigate('/dashboard');
+  };
 
   const steps = [
     {
@@ -243,7 +249,7 @@ const Landing: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="btn-primary"
-            onClick={() => isAuthenticated ? navigate('/dashboard') : navigate('/login')}
+            onClick={() => isAuthenticated ? navigate('/dashboard') : handleGetStarted()}
           >
             {isAuthenticated ? t('about.backToDashboard') : t('landing.getStarted')}
           </motion.button>

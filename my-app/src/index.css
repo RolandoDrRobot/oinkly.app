@@ -6,89 +6,21 @@
   box-sizing: border-box;
 }
 
-/* Color Schemes - Simplified palette */
-:root[data-color-scheme="teal"] {
-  --primary: #00df81;
-  --primary-medium: #00df81;
-  --primary-bright: #00df81;
-  --dark-green: #01634c;
-  --error: #DC2626;
-  --error-light: rgba(220, 38, 38, 0.1);
-  --primary-overlay: rgba(0, 223, 129, 0.1);
-  --primary-overlay-light: rgba(0, 223, 129, 0.05);
-  --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-}
-
-:root[data-color-scheme="blue"] {
-  --primary: #00df81;
-  --primary-medium: #00df81;
-  --primary-bright: #00df81;
-  --dark-green: #01634c;
-  --error: #DC2626;
-  --error-light: rgba(220, 38, 38, 0.1);
-  --primary-overlay: rgba(0, 223, 129, 0.1);
-  --primary-overlay-light: rgba(0, 223, 129, 0.05);
-  --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-}
-
-:root[data-color-scheme="purple"] {
-  --primary: #00df81;
-  --primary-medium: #00df81;
-  --primary-bright: #00df81;
-  --dark-green: #01634c;
-  --error: #DC2626;
-  --error-light: rgba(220, 38, 38, 0.1);
-  --primary-overlay: rgba(0, 223, 129, 0.1);
-  --primary-overlay-light: rgba(0, 223, 129, 0.05);
-  --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-}
-
+/* Color Schemes - Duolingo Inspired */
+:root[data-color-scheme="teal"],
+:root[data-color-scheme="blue"],
+:root[data-color-scheme="purple"],
 :root[data-color-scheme="green"] {
-  --primary: #00df81;
-  --primary-medium: #00df81;
-  --primary-bright: #00df81;
-  --dark-green: #01634c;
-  --error: #DC2626;
+  --primary: #569a3c;
+  --primary-medium: #569a3c;
+  --primary-bright: #6ab04c;
+  --dark-green: #538e37;
+  --error: #dc2626;
   --error-light: rgba(220, 38, 38, 0.1);
-  --primary-overlay: rgba(0, 223, 129, 0.1);
-  --primary-overlay-light: rgba(0, 223, 129, 0.05);
-  --primary-overlay-medium: rgba(0, 223, 129, 0.2);
-  --primary-bright-overlay: rgba(0, 223, 129, 0.1);
-}
-
-/* Dark Mode - Simplified palette */
-:root[data-theme="dark"] {
-  --dark-section: #01634c;
-  --dark-card: #014a3a;
-  --dark-bg: #041715;
-  --text-primary: #FFFFFF;
-  --text-secondary: #FFFFFF;
-  --text-muted: #FFFFFF;
-  --overlay: rgba(0, 0, 0, 0.1);
-  --overlay-light: rgba(0, 0, 0, 0.05);
-  --overlay-medium: rgba(0, 0, 0, 0.08);
-  --shadow: rgba(0, 0, 0, 0.2);
-  --shadow-medium: rgba(0, 0, 0, 0.3);
-  --shadow-dark: rgba(0, 0, 0, 0.4);
-}
-
-/* Light Mode - Simplified palette */
-:root[data-theme="light"] {
-  --dark-section: #01634c;
-  --dark-card: #014a3a;
-  --dark-bg: #041715;
-  --text-primary: #FFFFFF;
-  --text-secondary: #FFFFFF;
-  --text-muted: #FFFFFF;
-  --overlay: rgba(0, 0, 0, 0.05);
-  --overlay-light: rgba(0, 0, 0, 0.02);
-  --overlay-medium: rgba(0, 0, 0, 0.08);
-  --shadow: rgba(0, 0, 0, 0.15);
-  --shadow-medium: rgba(0, 0, 0, 0.25);
-  --shadow-dark: rgba(0, 0, 0, 0.35);
+  --primary-overlay: rgba(86, 154, 60, 0.1);
+  --primary-overlay-light: rgba(86, 154, 60, 0.05);
+  --primary-overlay-medium: rgba(86, 154, 60, 0.2);
+  --primary-bright-overlay: rgba(106, 176, 76, 0.1);
 }
 
 body {
@@ -102,8 +34,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100%;
-  background-color: var(--dark-bg);
-  color: var(--text-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 

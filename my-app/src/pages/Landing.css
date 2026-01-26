@@ -1,6 +1,6 @@
 .landing {
   min-height: 100vh;
-  background: var(--dark-card, #014a3a);
+  background: var(--color-bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +84,8 @@
   border: 0;
   width: 100%;
   padding: 16px;
-  background: var(--primary);
-  color: var(--dark-bg);
+  background: var(--color-primary);
+  color: white;
   border-radius: 6px;
   font-size: 16px;
   font-weight: 500;
@@ -95,7 +95,7 @@
 }
 
 .btn-primary:hover {
-  background: var(--primary-bright);
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
 }
 

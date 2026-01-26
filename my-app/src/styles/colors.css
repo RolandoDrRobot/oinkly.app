@@ -1,44 +1,88 @@
 /* 
- * Oinkly Color Standard
+ * Oinkly Color Standard - Duolingo Inspired
  * 
  * This file defines the standard color palette for the entire application.
  * All components should use these CSS variables for consistency.
  * 
- * Color Palette:
- * - Darkest: #041715 (main background with subtle green tint)
- * - Medium: #01634c (sections/cards)
- * - Dark Card: #014a3a (cards, containers)
- * - Lightest/Accent: #00df81 (primary actions, highlights)
- * - Text: #FFFFFF (white)
+ * Brand Colors:
+ * - Green Brand: #569a3c (primary actions)
+ * - Green Dark: #538e37 (darker green)
+ * - Pink Pig: #ffbca1 (light pink accents)
+ * - Pink Dark: #f89774 (darker pink)
+ * - Pink Strong: #f89774 (strong pink)
+ * - Yellow: #f4c032 (highlights, success)
+ * - Dark Text: #343305 (text on light backgrounds)
+ * - Paper: #f4e3c5 (light mode background)
  */
 
-/* Primary Colors */
-:root {
+/* Light Mode Palette - Duolingo Style */
+:root[data-theme="light"] {
   /* Background Colors */
-  --color-bg-primary: #041715;      /* Main app background (darkest with subtle green tint) */
-  --color-bg-section: #01634c;      /* Section backgrounds (medium) */
-  --color-bg-card: #014a3a;         /* Card/container backgrounds (dark card) */
+  --color-bg-primary: #f4e3c5;        /* Paper background (main) */
+  --color-bg-section: #ffffff;        /* White sections/cards */
+  --color-bg-card: #ffffff;           /* White cards */
   
   /* Accent/Primary Colors */
-  --color-primary: #00df81;         /* Primary actions, buttons, highlights */
-  --color-primary-hover: #00df81;    /* Primary hover state (same as primary) */
+  --color-primary: #569a3c;           /* Green brand (primary buttons) */
+  --color-primary-hover: #538e37;     /* Darker green (hover) */
+  --color-primary-dark: #538e37;      /* Darker green variant */
+  
+  /* Accent Colors */
+  --color-accent-yellow: #f4c032;      /* Yellow for highlights */
+  --color-accent-pink: #ffbca1;        /* Light pink accents */
+  --color-accent-pink-dark: #f89774;   /* Darker pink */
   
   /* Text Colors */
-  --color-text-primary: #FFFFFF;     /* Main text color */
-  --color-text-secondary: #FFFFFF;   /* Secondary text */
-  --color-text-muted: #FFFFFF;       /* Muted/disabled text */
+  --color-text-primary: #343305;       /* Dark text (main) */
+  --color-text-secondary: #343305;     /* Dark text (secondary) */
+  --color-text-muted: #6b6b4d;        /* Muted dark text */
   
   /* Status Colors */
-  --color-error: #DC2626;            /* Error states */
-  --color-error-light: rgba(220, 38, 38, 0.1); /* Error background */
+  --color-error: #dc2626;              /* Error states */
+  --color-error-light: rgba(220, 38, 38, 0.1);
   
   /* Overlay Colors */
-  --color-overlay: rgba(0, 0, 0, 0.1);
-  --color-overlay-light: rgba(0, 0, 0, 0.05);
-  --color-overlay-medium: rgba(0, 0, 0, 0.08);
-  --color-primary-overlay: rgba(0, 223, 129, 0.1);
-  --color-primary-overlay-light: rgba(0, 223, 129, 0.05);
-  --color-primary-overlay-medium: rgba(0, 223, 129, 0.2);
+  --color-overlay: rgba(52, 51, 5, 0.05);
+  --color-overlay-light: rgba(52, 51, 5, 0.02);
+  --color-overlay-medium: rgba(52, 51, 5, 0.08);
+  --color-primary-overlay: rgba(86, 154, 60, 0.1);
+  --color-primary-overlay-light: rgba(86, 154, 60, 0.05);
+  --color-primary-overlay-medium: rgba(86, 154, 60, 0.2);
+}
+
+/* Dark Mode Palette - Duolingo Style */
+:root[data-theme="dark"] {
+  /* Background Colors */
+  --color-bg-primary: #1a1a0f;        /* Very dark green-tinted background */
+  --color-bg-section: #2a2a1a;       /* Darker sections */
+  --color-bg-card: #252515;           /* Dark cards */
+  
+  /* Accent/Primary Colors */
+  --color-primary: #569a3c;           /* Green brand (primary buttons) */
+  --color-primary-hover: #6ab04c;      /* Lighter green (hover) */
+  --color-primary-dark: #538e37;      /* Darker green variant */
+  
+  /* Accent Colors */
+  --color-accent-yellow: #f4c032;      /* Yellow for highlights */
+  --color-accent-pink: #ffbca1;        /* Light pink accents */
+  --color-accent-pink-dark: #f89774;   /* Darker pink */
+  
+  /* Text Colors */
+  --color-text-primary: #f4e3c5;      /* Paper color for text */
+  --color-text-secondary: #f4e3c5;    /* Paper color (secondary) */
+  --color-text-muted: #d4c4a5;        /* Muted light text */
+  
+  /* Status Colors */
+  --color-error: #ff6b6b;              /* Lighter error for dark mode */
+  --color-error-light: rgba(255, 107, 107, 0.15);
+  
+  /* Overlay Colors */
+  --color-overlay: rgba(0, 0, 0, 0.2);
+  --color-overlay-light: rgba(0, 0, 0, 0.1);
+  --color-overlay-medium: rgba(0, 0, 0, 0.3);
+  --color-primary-overlay: rgba(86, 154, 60, 0.2);
+  --color-primary-overlay-light: rgba(86, 154, 60, 0.1);
+  --color-primary-overlay-medium: rgba(86, 154, 60, 0.3);
 }
 
 /* Legacy variable mappings for backward compatibility */
@@ -48,8 +92,8 @@
 :root[data-color-scheme="green"] {
   --primary: var(--color-primary);
   --primary-medium: var(--color-primary);
-  --primary-bright: var(--color-primary);
-  --dark-green: var(--color-bg-section);
+  --primary-bright: var(--color-primary-hover);
+  --dark-green: var(--color-primary-dark);
   --error: var(--color-error);
   --error-light: var(--color-error-light);
   --primary-overlay: var(--color-primary-overlay);
@@ -57,6 +101,7 @@
   --primary-overlay-medium: var(--color-primary-overlay-medium);
 }
 
+/* Map legacy variables to new color system */
 :root[data-theme="dark"],
 :root[data-theme="light"] {
   --dark-section: var(--color-bg-section);
@@ -68,7 +113,7 @@
   --overlay: var(--color-overlay);
   --overlay-light: var(--color-overlay-light);
   --overlay-medium: var(--color-overlay-medium);
-  --shadow: rgba(0, 0, 0, 0.2);
-  --shadow-medium: rgba(0, 0, 0, 0.3);
-  --shadow-dark: rgba(0, 0, 0, 0.4);
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.2);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
 }
