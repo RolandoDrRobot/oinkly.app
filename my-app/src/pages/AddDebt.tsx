@@ -62,8 +62,6 @@ interface StepData {
   dollarFee?: number;
   totalLocal?: number;
   totalDollars?: number;
-  feeToUpdate?: number;
-  feeToUpdateDollars?: number;
   currentPlan?: string;
   hasCallTask?: boolean;
 }
@@ -159,24 +157,6 @@ const AddDebt: React.FC = () => {
       subtitle: t('addDebt.totalDebtDollarSubtitle'),
       icon: FaDollarSign,
       field: 'totalDollars' as keyof StepData,
-      placeholder: '0.00',
-      type: 'number',
-    },
-    {
-      id: 'feeToUpdate',
-      title: t('addDebt.amountToUpdate'),
-      subtitle: t('addDebt.amountToUpdateSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
-      icon: FaChartLine,
-      field: 'feeToUpdate' as keyof StepData,
-      placeholder: '0.00',
-      type: 'number',
-    },
-    {
-      id: 'feeToUpdateDollars',
-      title: t('addDebt.amountToUpdateDollar'),
-      subtitle: t('addDebt.amountToUpdateDollarSubtitle'),
-      icon: FaDollarSign,
-      field: 'feeToUpdateDollars' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
     },
@@ -300,10 +280,6 @@ const AddDebt: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
-        const feeToUpdate = formData.feeToUpdate || 0;
-        const feeToUpdateDollars = formData.feeToUpdateDollars || 0;
-        const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
-        
         const newDebt: Debt = {
           id: Date.now().toString(),
           name: formData.name || '',
@@ -313,9 +289,9 @@ const AddDebt: React.FC = () => {
           dollarFee: formData.dollarFee || 0,
           totalLocal: formData.totalLocal || 0,
           totalDollars: formData.totalDollars || 0,
-          feeToUpdate: feeToUpdate,
-          feeToUpdateDollars: feeToUpdateDollars,
-          inOrder: inOrder,
+          feeToUpdate: 0,
+          feeToUpdateDollars: 0,
+          inOrder: true, // Default to true, will be calculated based on commitments
           currentPlan: formData.currentPlan || '',
           bankName: formData.bankName || '',
           bankPhone: formData.bankPhone || '',

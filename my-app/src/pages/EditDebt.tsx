@@ -95,12 +95,7 @@ const EditDebt: React.FC = () => {
       [name]: finalValue,
     };
     
-    // Calculate inOrder automatically if feeToUpdate or feeToUpdateDollars changed
-    if (name === 'feeToUpdate' || name === 'feeToUpdateDollars') {
-      const feeToUpdate = name === 'feeToUpdate' ? finalValue : (updated.feeToUpdate || 0);
-      const feeToUpdateDollars = name === 'feeToUpdateDollars' ? finalValue : (updated.feeToUpdateDollars || 0);
-      updated.inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
-    }
+    // inOrder is now calculated based on commitments only, not feeToUpdate
     
     // If total reaches 0, set corresponding fee to 0
     if (name === 'totalLocal' && finalValue === 0) {
@@ -131,10 +126,6 @@ const EditDebt: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) {
-      const feeToUpdate = formData.feeToUpdate || 0;
-      const feeToUpdateDollars = formData.feeToUpdateDollars || 0;
-      const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
-      
       // If total reaches 0, set corresponding fee to 0
       const finalData = { ...formData };
       if (finalData.totalLocal === 0) {
@@ -147,8 +138,9 @@ const EditDebt: React.FC = () => {
       storage.saveDebt({
         ...finalData,
         localCurrency: storage.getLocalCurrency(), // Use currency from preferences
-        feeToUpdateDollars: feeToUpdateDollars,
-        inOrder: inOrder,
+        feeToUpdate: 0,
+        feeToUpdateDollars: 0,
+        // inOrder will be calculated based on commitments
         updatedAt: new Date().toISOString(),
       });
       navigate('/dashboard');
@@ -274,27 +266,6 @@ const EditDebt: React.FC = () => {
             />
           </div>
 
-          <div className="form-group">
-            <input
-              name="feeToUpdate"
-              type="text"
-              value={getCurrencyInputValue('feeToUpdate')}
-              onChange={handleNumberChange}
-              placeholder={t('editDebt.amountToUpdateLocal')}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <input
-              name="feeToUpdateDollars"
-              type="text"
-              value={getCurrencyInputValue('feeToUpdateDollars')}
-              onChange={handleNumberChange}
-              placeholder={t('editDebt.amountToUpdateDollar')}
-              required
-            />
-          </div>
 
           <div className="form-group">
             <input

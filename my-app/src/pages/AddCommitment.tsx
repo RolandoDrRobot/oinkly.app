@@ -310,8 +310,9 @@ const AddCommitment: React.FC = () => {
           }
         }
 
-        // Recalculate inOrder
-        updatedDebt.inOrder = (updatedDebt.feeToUpdate || 0) === 0 && (updatedDebt.feeToUpdateDollars || 0) === 0;
+        // inOrder is now calculated based on commitments only, not feeToUpdate
+        updatedDebt.feeToUpdate = 0;
+        updatedDebt.feeToUpdateDollars = 0;
 
         storage.saveDebt(updatedDebt);
         navigate('/dashboard');

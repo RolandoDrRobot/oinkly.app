@@ -116,8 +116,8 @@ export const exportAllDataToCSV = (): void => {
       escapeCSV(debt.dollarFee),
       escapeCSV(debt.totalLocal),
       escapeCSV(debt.totalDollars),
-      escapeCSV(debt.feeToUpdate),
-      escapeCSV(debt.feeToUpdateDollars),
+      escapeCSV(0), // feeToUpdate - deprecated, always 0
+      escapeCSV(0), // feeToUpdateDollars - deprecated, always 0
       escapeCSV(debt.inOrder ? 'Yes' : 'No'),
       escapeCSV(debt.currentPlan),
       escapeCSV(debt.hasCallTask ? 'Yes' : 'No'),

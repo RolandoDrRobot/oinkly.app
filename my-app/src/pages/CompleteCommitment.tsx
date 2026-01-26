@@ -46,9 +46,6 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 interface StepData {
   totalLocal?: number;
   totalDollars?: number;
-  feeToUpdate?: number;
-  feeToUpdateDollars?: number;
-  updateBalances?: boolean;
 }
 
 const CompleteCommitment: React.FC = () => {
@@ -72,9 +69,6 @@ const CompleteCommitment: React.FC = () => {
           setFormData({
             totalLocal: foundDebt.totalLocal,
             totalDollars: foundDebt.totalDollars,
-            feeToUpdate: foundDebt.feeToUpdate,
-            feeToUpdateDollars: foundDebt.feeToUpdateDollars,
-            updateBalances: false,
           });
         } else {
           navigate('/dashboard');
@@ -94,7 +88,7 @@ const CompleteCommitment: React.FC = () => {
     placeholder?: string;
     type?: string;
   }> => {
-    const baseSteps = [
+    return [
       {
         id: 'welcome',
         title: t('completeCommitment.title'),
@@ -102,64 +96,23 @@ const CompleteCommitment: React.FC = () => {
         icon: FaCheckCircle,
       },
       {
-        id: 'updateBalances',
-        title: t('completeCommitment.updateBalances'),
-        subtitle: t('completeCommitment.updateBalancesSubtitle'),
-        icon: FaChartLine,
-        type: 'boolean',
+        id: 'totalLocal',
+        title: t('completeCommitment.totalDebtLocal'),
+        subtitle: t('completeCommitment.totalDebtLocalSubtitle', { currency: debt ? getCurrencyName(debt.localCurrency) : getCurrencyName(storage.getLocalCurrency()) }),
+        icon: FaMoneyBill,
+        field: 'totalLocal' as keyof StepData,
+        type: 'number',
+        placeholder: '0.00',
       },
-    ];
-
-    if (formData.updateBalances === true) {
-      return [
-        ...baseSteps,
-        {
-          id: 'totalLocal',
-          title: t('completeCommitment.totalDebtLocal'),
-          subtitle: t('completeCommitment.totalDebtLocalSubtitle', { currency: debt ? getCurrencyName(debt.localCurrency) : getCurrencyName(storage.getLocalCurrency()) }),
-          icon: FaMoneyBill,
-          field: 'totalLocal' as keyof StepData,
-          type: 'number',
-          placeholder: '0.00',
-        },
-        {
-          id: 'totalDollars',
-          title: t('completeCommitment.totalDebtDollar'),
-          subtitle: t('completeCommitment.totalDebtDollarSubtitle'),
-          icon: FaDollarSign,
-          field: 'totalDollars' as keyof StepData,
-          type: 'number',
-          placeholder: '0.00',
-        },
-        {
-          id: 'feeToUpdate',
-          title: t('completeCommitment.amountToUpdateLocal'),
-          subtitle: t('completeCommitment.amountToUpdateLocalSubtitle', { currency: debt ? getCurrencyName(debt.localCurrency) : getCurrencyName(storage.getLocalCurrency()) }),
-          icon: FaMoneyBill,
-          field: 'feeToUpdate' as keyof StepData,
-          type: 'number',
-          placeholder: '0.00',
-        },
-        {
-          id: 'feeToUpdateDollars',
-          title: t('completeCommitment.amountToUpdateDollar'),
-          subtitle: t('completeCommitment.amountToUpdateDollarSubtitle'),
-          icon: FaDollarSign,
-          field: 'feeToUpdateDollars' as keyof StepData,
-          type: 'number',
-          placeholder: '0.00',
-        },
-        {
-          id: 'complete',
-          title: t('common.allDone'),
-          subtitle: t('completeCommitment.success'),
-          icon: FaGift,
-        },
-      ];
-    }
-
-    return [
-      ...baseSteps,
+      {
+        id: 'totalDollars',
+        title: t('completeCommitment.totalDebtDollar'),
+        subtitle: t('completeCommitment.totalDebtDollarSubtitle'),
+        icon: FaDollarSign,
+        field: 'totalDollars' as keyof StepData,
+        type: 'number',
+        placeholder: '0.00',
+      },
       {
         id: 'complete',
         title: t('common.allDone'),
@@ -183,25 +136,6 @@ const CompleteCommitment: React.FC = () => {
     }
   };
 
-  const handleBooleanSelect = (value: boolean) => {
-    setFormData(prev => ({ ...prev, updateBalances: value }));
-  };
-
-  useEffect(() => {
-    if (formData.updateBalances === true && currentStep === 1) {
-      // User selected "Yes", go to totalLocal (index 2)
-      setTimeout(() => {
-        setCurrentStep(2);
-      }, 300);
-    } else if (formData.updateBalances === false && currentStep === 1) {
-      // User selected "No", go to complete
-      const steps = getSteps();
-      setTimeout(() => {
-        setCurrentStep(steps.length - 1);
-      }, 300);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.updateBalances, currentStep]);
 
   const handleInputChange = (value: any) => {
     const currentSteps = getSteps();
@@ -301,19 +235,17 @@ const CompleteCommitment: React.FC = () => {
           updatedDebt.dollarFee = 0;
         }
 
-        // Update balances if user chose to (overrides automatic subtraction)
-        if (formData.updateBalances === true) {
-          const inOrder = (formData.feeToUpdate || 0) === 0 && (formData.feeToUpdateDollars || 0) === 0;
-          const finalTotalLocal = formData.totalLocal || 0;
-          const finalTotalDollars = formData.totalDollars || 0;
+        // Update balances if user provided new totals
+        if (formData.totalLocal !== undefined || formData.totalDollars !== undefined) {
+          const finalTotalLocal = formData.totalLocal !== undefined ? formData.totalLocal : updatedDebt.totalLocal;
+          const finalTotalDollars = formData.totalDollars !== undefined ? formData.totalDollars : updatedDebt.totalDollars;
           
           updatedDebt = {
             ...updatedDebt,
             totalLocal: finalTotalLocal,
             totalDollars: finalTotalDollars,
-            feeToUpdate: formData.feeToUpdate || 0,
-            feeToUpdateDollars: formData.feeToUpdateDollars || 0,
-            inOrder: inOrder,
+            feeToUpdate: 0,
+            feeToUpdateDollars: 0,
           };
 
           // If total reaches 0, set corresponding fee to 0
@@ -324,8 +256,9 @@ const CompleteCommitment: React.FC = () => {
             updatedDebt.dollarFee = 0;
           }
         } else {
-          // Recalculate inOrder after automatic subtraction
-          updatedDebt.inOrder = (updatedDebt.feeToUpdate || 0) === 0 && (updatedDebt.feeToUpdateDollars || 0) === 0;
+          // Set feeToUpdate to 0 (no longer used)
+          updatedDebt.feeToUpdate = 0;
+          updatedDebt.feeToUpdateDollars = 0;
         }
 
         storage.saveDebt(updatedDebt);
@@ -334,7 +267,7 @@ const CompleteCommitment: React.FC = () => {
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, formData.updateBalances, formData.totalLocal, formData.totalDollars, formData.feeToUpdate, formData.feeToUpdateDollars]);
+  }, [currentStep, formData.totalLocal, formData.totalDollars]);
 
 
   if (!debt || !commitment) {
@@ -403,34 +336,7 @@ const CompleteCommitment: React.FC = () => {
           )}
 
           <div className="step-input">
-            {currentStepData.type === 'boolean' ? (
-              <div className="boolean-options">
-                <motion.button
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="boolean-button yes"
-                  onClick={() => handleBooleanSelect(true)}
-                >
-                  <Icon component={FaCheckCircle} className="boolean-icon" size={32} />
-                  <span>{t('common.yes')}</span>
-                </motion.button>
-                <motion.button
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="boolean-button no"
-                  onClick={() => handleBooleanSelect(false)}
-                >
-                  <Icon component={FaCheckCircle} className="boolean-icon" size={32} />
-                  <span>{t('common.no')}</span>
-                </motion.button>
-              </div>
-            ) : currentStepData.field && currentStepData.type === 'number' ? (
+            {currentStepData.field && currentStepData.type === 'number' ? (
               <motion.input
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

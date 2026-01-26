@@ -68,28 +68,12 @@ const Dashboard: React.FC = () => {
 
   const loadDebts = () => {
     const allDebts = storage.getDebts();
-    // Update inOrder for all debts based on feeToUpdate and feeToUpdateDollars
-    // Also ensure feeToUpdateDollars exists for old debts
+    // Ensure commitments and callHistory arrays exist
     const updatedDebts = allDebts.map(debt => {
-      const feeToUpdate = debt.feeToUpdate || 0;
-      const feeToUpdateDollars = debt.feeToUpdateDollars ?? 0;
-      const inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
-      
       // Ensure commitments and callHistory arrays exist
       if (!debt.commitments) debt.commitments = [];
       if (!debt.callHistory) debt.callHistory = [];
       
-      // Update if inOrder changed or feeToUpdateDollars is missing
-      if (debt.inOrder !== inOrder || debt.feeToUpdateDollars === undefined) {
-        const updated = { 
-          ...debt, 
-          feeToUpdateDollars: feeToUpdateDollars,
-          inOrder, 
-          updatedAt: new Date().toISOString() 
-        };
-        storage.saveDebt(updated);
-        return updated;
-      }
       return debt;
     });
     
@@ -190,7 +174,7 @@ const Dashboard: React.FC = () => {
     let newValue: string | number = editValue;
     
     // Convert to number if it's a numeric field
-    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars', 'feeToUpdate', 'feeToUpdateDollars'];
+    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars'];
     if (numericFields.includes(field)) {
       newValue = parseFloat(editValue) || 0;
     }
@@ -201,10 +185,7 @@ const Dashboard: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
     
-    // Calculate inOrder automatically based on feeToUpdate and feeToUpdateDollars
-    const feeToUpdate = field === 'feeToUpdate' ? (newValue as number) : (updated.feeToUpdate || 0);
-    const feeToUpdateDollars = field === 'feeToUpdateDollars' ? (newValue as number) : (updated.feeToUpdateDollars || 0);
-    updated.inOrder = feeToUpdate === 0 && feeToUpdateDollars === 0;
+    // inOrder is now calculated based on commitments only, not feeToUpdate
     
     storage.saveDebt(updated);
     loadDebts();
@@ -328,8 +309,6 @@ const Dashboard: React.FC = () => {
       acc.totalDollars += debt.totalDollars || 0;
       acc.monthlyLocal += debt.localFee || 0;
       acc.monthlyDollars += debt.dollarFee || 0;
-      acc.toUpdate += debt.feeToUpdate || 0;
-      acc.toUpdateDollars += debt.feeToUpdateDollars || 0;
       
       return acc;
     }, {
@@ -337,8 +316,6 @@ const Dashboard: React.FC = () => {
       totalDollars: 0,
       monthlyLocal: 0,
       monthlyDollars: 0,
-      toUpdate: 0,
-      toUpdateDollars: 0,
     });
 
     return {
@@ -448,33 +425,6 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="summary-divider"></div>
-
-              <div className="summary-section">
-                <div className="summary-card-header">
-                  <Icon component={FaDollarSign} className="summary-icon" />
-                  <span className="summary-label">{t('dashboard.toUpdate')}</span>
-                </div>
-                <div className="summary-values">
-                  {totals.toUpdate > 0 && (
-                    <div className="summary-value">
-                      <span className="summary-currency">{totals.mostCommonCurrency}</span>
-                      <span className="summary-amount">{formatCurrency(totals.toUpdate, totals.mostCommonCurrency)}</span>
-                    </div>
-                  )}
-                  {totals.toUpdateDollars > 0 && (
-                    <div className="summary-value">
-                      <span className="summary-currency">USD</span>
-                      <span className="summary-amount">{formatCurrency(totals.toUpdateDollars, 'USD')}</span>
-                    </div>
-                  )}
-                  {totals.toUpdate === 0 && totals.toUpdateDollars === 0 && (
-                    <div className="summary-value-main">
-                      <span className="summary-amount-large">{t('dashboard.allUpToDate')}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
           </motion.div>
         )}
@@ -829,74 +779,6 @@ const Dashboard: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              {(debt.feeToUpdate > 0 || debt.feeToUpdateDollars > 0) && (
-                                <>
-                                  {debt.feeToUpdate > 0 && (
-                                    <div className="payment-item update-amount">
-                                      <span className="payment-label">{t('dashboard.toUpdate')} ({storage.getLocalCurrency()})</span>
-                                      {editingField?.debtId === debt.id && editingField?.field === 'feeToUpdate' ? (
-                                        <input
-                                          type="number"
-                                          step="0.01"
-                                          value={editValue}
-                                          onChange={(e) => setEditValue(e.target.value)}
-                                          onBlur={() => saveEdit(debt.id, 'feeToUpdate')}
-                                          onKeyDown={(e) => {
-                                            if (e.key === 'Enter') saveEdit(debt.id, 'feeToUpdate');
-                                            if (e.key === 'Escape') cancelEdit();
-                                          }}
-                                          onClick={(e) => e.stopPropagation()}
-                                          className="inline-edit-input"
-                                          autoFocus
-                                        />
-                                      ) : (
-                                        <span className="payment-value editable-field" onClick={(e) => {
-                                          e.stopPropagation();
-                                          startEditing(debt.id, 'feeToUpdate', debt.feeToUpdate, e);
-                                        }}>
-                                          {formatCurrency(debt.feeToUpdate, storage.getLocalCurrency())}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                  {debt.feeToUpdateDollars > 0 && (
-                                    <div className="payment-item update-amount">
-                                      <span className="payment-label">{t('dashboard.toUpdate')} (USD)</span>
-                                      {editingField?.debtId === debt.id && editingField?.field === 'feeToUpdateDollars' ? (
-                                        <input
-                                          type="number"
-                                          step="0.01"
-                                          value={editValue}
-                                          onChange={(e) => setEditValue(e.target.value)}
-                                          onBlur={() => saveEdit(debt.id, 'feeToUpdateDollars')}
-                                          onKeyDown={(e) => {
-                                            if (e.key === 'Enter') saveEdit(debt.id, 'feeToUpdateDollars');
-                                            if (e.key === 'Escape') cancelEdit();
-                                          }}
-                                          onClick={(e) => e.stopPropagation()}
-                                          className="inline-edit-input"
-                                          autoFocus
-                                        />
-                                      ) : (
-                                        <span className="payment-value editable-field" onClick={(e) => {
-                                          e.stopPropagation();
-                                          startEditing(debt.id, 'feeToUpdateDollars', debt.feeToUpdateDollars || 0, e);
-                                        }}>
-                                          {formatCurrency(debt.feeToUpdateDollars || 0, 'USD')}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                              {(debt.feeToUpdate === 0 && debt.feeToUpdateDollars === 0) && (
-                                <div className="payment-item update-amount" style={{ background: 'var(--overlay)', border: '1px solid var(--primary-bright)' }}>
-                                  <span className="payment-label">{t('dashboard.toUpdate')}</span>
-                                  <span className="payment-value" style={{ color: 'var(--primary-bright)' }}>
-                                    {t('dashboard.allUpToDate')}
-                                  </span>
-                                </div>
-                              )}
                             </div>
                           </div>
 
