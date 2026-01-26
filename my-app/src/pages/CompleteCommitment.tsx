@@ -17,16 +17,11 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
-interface StepData {
-  // No fields needed - totals are calculated automatically
-}
-
 const CompleteCommitment: React.FC = () => {
   const { t } = useTranslation();
   const { debtId, commitmentId } = useParams<{ debtId: string; commitmentId: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<StepData>({});
   const [debt, setDebt] = useState<Debt | null>(null);
   const [commitment, setCommitment] = useState<PaymentCommitment | null>(null);
 
@@ -38,7 +33,6 @@ const CompleteCommitment: React.FC = () => {
         const foundCommitment = foundDebt.commitments?.find(c => c.id === commitmentId);
         if (foundCommitment) {
           setCommitment(foundCommitment);
-          setFormData({});
         } else {
           navigate('/dashboard');
         }
@@ -53,8 +47,6 @@ const CompleteCommitment: React.FC = () => {
     title: string;
     subtitle?: string;
     icon?: IconType;
-    field?: keyof StepData;
-    placeholder?: string;
     type?: string;
   }> => {
     return [
