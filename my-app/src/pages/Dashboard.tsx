@@ -30,7 +30,6 @@ import {
   FaMoneyBillWave, 
   FaUser, 
   FaChartLine, 
-  FaDollarSign, 
   FaMoneyBill, 
   FaCalendarAlt, 
   FaExclamationTriangle, 
@@ -64,6 +63,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     loadDebts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Calculate inOrder based on payment commitments

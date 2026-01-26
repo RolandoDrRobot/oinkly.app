@@ -15,7 +15,7 @@ import {
 } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
-import { formatCurrencyInput, parseCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
+import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
 const getCurrencyName = (code: string): string => {

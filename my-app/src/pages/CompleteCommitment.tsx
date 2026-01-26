@@ -5,39 +5,13 @@ import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { 
   FaCheckCircle,
-  FaDollarSign,
-  FaMoneyBill,
-  FaChartLine,
   FaGift,
   FaArrowLeft
 } from 'react-icons/fa';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
-import { formatCurrencyInput, parseCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
-const getCurrencyName = (code: string): string => {
-  const currencyNames: { [key: string]: string } = {
-    'USD': 'US Dollar',
-    'MXN': 'Peso Mexicano',
-    'ARS': 'Peso Argentino',
-    'CLP': 'Peso Chileno',
-    'COP': 'Peso Colombiano',
-    'PEN': 'Sol Peruano',
-    'BRL': 'Real Brasileño',
-    'CRC': 'Colones',
-    'GTQ': 'Quetzal',
-    'PAB': 'Balboa',
-    'DOP': 'Peso Dominicano',
-    'VES': 'Bolívar',
-    'UYU': 'Peso Uruguayo',
-    'PYG': 'Guaraní',
-    'BOB': 'Boliviano',
-    'HNL': 'Lempira',
-    'NIO': 'Córdoba',
-  };
-  return currencyNames[code] || code;
-};
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
   return Component ? <Component {...props} /> : null;
@@ -55,7 +29,6 @@ const CompleteCommitment: React.FC = () => {
   const [formData, setFormData] = useState<StepData>({});
   const [debt, setDebt] = useState<Debt | null>(null);
   const [commitment, setCommitment] = useState<PaymentCommitment | null>(null);
-  const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (debtId && commitmentId) {
@@ -115,70 +88,6 @@ const CompleteCommitment: React.FC = () => {
   };
 
 
-  const handleInputChange = (value: any) => {
-    const currentSteps = getSteps();
-    const currentStepData = currentSteps[currentStep];
-    if (currentStepData.field) {
-      const field = currentStepData.field as keyof StepData;
-      setFormData(prev => ({ ...prev, [field]: value }));
-    }
-  };
-
-  const handleCurrencyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const currentSteps = getSteps();
-    const currentStepData = currentSteps[currentStep];
-    if (currentStepData.field && currentStepData.type === 'number' && debt) {
-      const currency = getCurrencyForField(currentStepData.id, debt.localCurrency);
-      const inputValue = e.target.value;
-      
-      // Remove currency prefix and spaces if present
-      let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
-      
-      // Remove all thousand separators (commas) to get raw numeric string
-      cleanedValue = cleanedValue.replace(/,/g, '');
-      
-      // Extract only numbers and decimal point
-      const numericString = cleanedValue.replace(/[^\d.]/g, '');
-      
-      // Format with thousand separators
-      const formattedNumber = formatNumberWithSeparators(numericString);
-      
-      // Store the display value (with currency prefix and formatted number)
-      const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
-      setCurrencyDisplayValues(prev => ({
-        ...prev,
-        [currentStepData.field!]: displayValue
-      }));
-      
-      // Parse and store numeric value (always as number)
-      const numericValue = numericString ? parseFloat(numericString) : 0;
-      const finalValue = isNaN(numericValue) ? 0 : numericValue;
-      const field = currentStepData.field as keyof StepData;
-      setFormData(prev => ({ ...prev, [field]: finalValue }));
-    } else {
-      handleInputChange(e.target.value);
-    }
-  };
-
-  const getCurrencyInputValue = (): string => {
-    const currentSteps = getSteps();
-    const currentStepData = currentSteps[currentStep];
-    if (currentStepData.field && currentStepData.type === 'number' && debt) {
-      const fieldKey = currentStepData.field;
-      // Use stored display value if available
-      if (currencyDisplayValues[fieldKey] !== undefined) {
-        return currencyDisplayValues[fieldKey];
-      }
-      // Otherwise format from numeric value
-      const value = formData[fieldKey as keyof StepData];
-      if (value === undefined || value === null || (typeof value === 'number' && (isNaN(value) || value === 0))) return '';
-      if (typeof value === 'number') {
-        const currency = getCurrencyForField(currentStepData.id, debt.localCurrency);
-        return formatCurrencyInput(value, currency);
-      }
-    }
-    return '';
-  };
 
   useEffect(() => {
     const currentSteps = getSteps();
