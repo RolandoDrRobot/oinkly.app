@@ -188,6 +188,15 @@
     "editCommitment": "Editar compromiso",
     "completedOn": "Completado:"
   },
+  "editCommitment": {
+    "title": "Editar Compromiso",
+    "date": "Fecha",
+    "amountLocal": "Monto (Local)",
+    "amountDollar": "Monto (USD)",
+    "notesOptional": "Notas (opcional)",
+    "notesPlaceholder": "Agregar notas...",
+    "cannotEditCompleted": "No puedes editar un compromiso completado. Si necesitas ajustar el total de la deuda, por favor edita la deuda directamente y crea un nuevo compromiso."
+  },
   "deleteCommitment": {
     "title": "Eliminar Compromiso",
     "subtitle": "¿Estás seguro de que quieres eliminar este compromiso?",

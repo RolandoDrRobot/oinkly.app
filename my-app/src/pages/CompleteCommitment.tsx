@@ -44,8 +44,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 };
 
 interface StepData {
-  totalLocal?: number;
-  totalDollars?: number;
+  // No fields needed - totals are calculated automatically
 }
 
 const CompleteCommitment: React.FC = () => {
@@ -66,10 +65,7 @@ const CompleteCommitment: React.FC = () => {
         const foundCommitment = foundDebt.commitments?.find(c => c.id === commitmentId);
         if (foundCommitment) {
           setCommitment(foundCommitment);
-          setFormData({
-            totalLocal: foundDebt.totalLocal,
-            totalDollars: foundDebt.totalDollars,
-          });
+          setFormData({});
         } else {
           navigate('/dashboard');
         }
@@ -94,24 +90,6 @@ const CompleteCommitment: React.FC = () => {
         title: t('completeCommitment.title'),
         subtitle: t('completeCommitment.subtitle'),
         icon: FaCheckCircle,
-      },
-      {
-        id: 'totalLocal',
-        title: t('completeCommitment.totalDebtLocal'),
-        subtitle: t('completeCommitment.totalDebtLocalSubtitle', { currency: debt ? getCurrencyName(debt.localCurrency) : getCurrencyName(storage.getLocalCurrency()) }),
-        icon: FaMoneyBill,
-        field: 'totalLocal' as keyof StepData,
-        type: 'number',
-        placeholder: '0.00',
-      },
-      {
-        id: 'totalDollars',
-        title: t('completeCommitment.totalDebtDollar'),
-        subtitle: t('completeCommitment.totalDebtDollarSubtitle'),
-        icon: FaDollarSign,
-        field: 'totalDollars' as keyof StepData,
-        type: 'number',
-        placeholder: '0.00',
       },
       {
         id: 'complete',
@@ -213,7 +191,7 @@ const CompleteCommitment: React.FC = () => {
           completedAt: new Date().toISOString(),
         };
 
-        // Handle debt total updates based on payment type
+        // Handle debt total updates based on payment type (automatic logic only)
         const paymentType = commitment.paymentType || 'partial';
         let newTotalLocal = debt.totalLocal || 0;
         let newTotalDollars = debt.totalDollars || 0;
@@ -238,14 +216,6 @@ const CompleteCommitment: React.FC = () => {
             // Partial payment: subtract amount from total
             newTotalDollars = Math.max(0, newTotalDollars - commitment.amountDollars);
           }
-        }
-
-        // If user manually updated totals in the workflow, use those instead
-        if (formData.totalLocal !== undefined) {
-          newTotalLocal = formData.totalLocal;
-        }
-        if (formData.totalDollars !== undefined) {
-          newTotalDollars = formData.totalDollars;
         }
 
         let updatedDebt: Debt = {
@@ -301,7 +271,7 @@ const CompleteCommitment: React.FC = () => {
       return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, formData.totalLocal, formData.totalDollars]);
+  }, [currentStep]);
 
 
   if (!debt || !commitment) {
@@ -369,21 +339,7 @@ const CompleteCommitment: React.FC = () => {
             </motion.p>
           )}
 
-          <div className="step-input">
-            {currentStepData.field && currentStepData.type === 'number' ? (
-              <motion.input
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                type="text"
-                placeholder={currentStepData.placeholder}
-                value={getCurrencyInputValue()}
-                onChange={handleCurrencyInputChange}
-                className="step-input-field"
-                autoFocus
-              />
-            ) : null}
-          </div>
+          {/* No input fields - totals are calculated automatically based on payment type */}
         </motion.div>
 
         <div className="step-actions">

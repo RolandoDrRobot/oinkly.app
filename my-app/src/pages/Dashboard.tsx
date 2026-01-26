@@ -957,18 +957,20 @@ const Dashboard: React.FC = () => {
                                       <div className="commitment-actions">
                                         {status !== 'completed' && (
                                           <>
-                                            <motion.button
-                                              whileHover={{ scale: 1.1 }}
-                                              whileTap={{ scale: 0.9 }}
-                                              className="btn-commitment-action"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(`/edit-commitment/${debt.id}/${commitment.id}`);
-                                              }}
-                                              title={t('commitment.editCommitment')}
-                                            >
-                                              <Icon component={FaEdit} size={14} />
-                                            </motion.button>
+                                            {commitment.status !== 'completed' && (
+                                              <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                className="btn-commitment-action"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/edit-commitment/${debt.id}/${commitment.id}`);
+                                                }}
+                                                title={t('commitment.editCommitment')}
+                                              >
+                                                <Icon component={FaEdit} size={14} />
+                                              </motion.button>
+                                            )}
                                             <motion.button
                                               whileHover={{ scale: 1.1 }}
                                               whileTap={{ scale: 0.9 }}

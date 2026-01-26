@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
-import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators } from '../utils/currencyFormatter';
+import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators, getCurrencyForField } from '../utils/currencyFormatter';
+import { FaCheckCircle } from 'react-icons/fa';
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -31,9 +32,14 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
     date: commitment.date.split('T')[0], // Extract date part from ISO string
     amountLocal: commitment.amountLocal,
     amountDollars: commitment.amountDollars,
+    paymentTypeLocal: commitment.paymentType || 'partial',
+    paymentTypeDollars: commitment.paymentType || 'partial',
     notes: commitment.notes || '',
   });
   const [currencyDisplayValues, setCurrencyDisplayValues] = useState<{ [key: string]: string }>({});
+  
+  // Only allow editing pending commitments
+  const isCompleted = commitment.status === 'completed';
 
   useEffect(() => {
     if (isOpen) {
@@ -41,30 +47,72 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
         date: commitment.date.split('T')[0],
         amountLocal: commitment.amountLocal,
         amountDollars: commitment.amountDollars,
+        paymentTypeLocal: commitment.paymentType || 'partial',
+        paymentTypeDollars: commitment.paymentType || 'partial',
         notes: commitment.notes || '',
       });
+      // Reset currency display values when modal opens
+      setCurrencyDisplayValues({});
     }
   }, [commitment, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Determine payment type
+    const paymentType = formData.paymentTypeLocal === formData.paymentTypeDollars 
+      ? formData.paymentTypeLocal 
+      : (formData.paymentTypeLocal || formData.paymentTypeDollars || commitment.paymentType || 'partial');
+    
     const updatedCommitment: PaymentCommitment = {
       ...commitment,
       date: new Date(formData.date).toISOString(),
       amountLocal: formData.amountLocal,
       amountDollars: formData.amountDollars,
+      paymentType: paymentType as 'partial' | 'full' | 'settlement',
       notes: formData.notes || undefined,
       updatedAt: new Date().toISOString(),
     };
 
-    const updatedDebt: Debt = {
+    // Update the commitment in the debt
+    let updatedDebt: Debt = {
       ...debt,
       commitments: debt.commitments?.map(c =>
         c.id === commitment.id ? updatedCommitment : c
       ),
       updatedAt: new Date().toISOString(),
     };
+
+    // Note: Pending commitments don't affect totals until they are completed.
+    // When a pending commitment is edited, we only update the commitment data.
+    // The totals will be updated when the commitment is completed.
+    
+    // However, we need to recalculate inOrder based on updated commitments
+    const calculateInOrder = (debt: Debt): boolean => {
+      if (!debt.commitments || debt.commitments.length === 0) {
+        return true;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const hasPendingOrOverdue = debt.commitments.some(c => {
+        if (c.status === 'completed') {
+          return false;
+        }
+
+        const commitmentDate = new Date(c.date);
+        commitmentDate.setHours(0, 0, 0, 0);
+        const diffTime = commitmentDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays < 0 || c.status === 'pending';
+      });
+
+      return !hasPendingOrOverdue;
+    };
+
+    updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
     storage.saveDebt(updatedDebt);
     onSave();
@@ -147,6 +195,49 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Block editing if commitment is completed
+  if (isCompleted) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="modal-overlay"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>{t('editCommitment.title')}</h2>
+              <button className="modal-close" onClick={onClose}>
+                <Icon component={FaTimes} />
+              </button>
+            </div>
+            <div style={{ padding: '24px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-primary)', fontSize: '16px', marginBottom: '16px' }}>
+                {t('editCommitment.cannotEditCompleted')}
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn-submit"
+                onClick={onClose}
+              >
+                {t('common.close')}
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       <motion.div
@@ -190,6 +281,44 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 placeholder="0.00"
                 required
               />
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeLocal === 'partial' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeLocal"
+                    checked={formData.paymentTypeLocal === 'partial'}
+                    onChange={() => setFormData(prev => ({ ...prev, paymentTypeLocal: 'partial' }))}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentPartial')}</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeLocal === 'full' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeLocal"
+                    checked={formData.paymentTypeLocal === 'full'}
+                    onChange={() => {
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        paymentTypeLocal: 'full',
+                        amountLocal: debt.totalLocal
+                      }));
+                    }}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentFull')}</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeLocal === 'settlement' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeLocal"
+                    checked={formData.paymentTypeLocal === 'settlement'}
+                    onChange={() => setFormData(prev => ({ ...prev, paymentTypeLocal: 'settlement' }))}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentSettlement')}</span>
+                </label>
+              </div>
             </div>
 
             <div className="form-group">
@@ -201,6 +330,44 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 placeholder="0.00"
                 required
               />
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeDollars === 'partial' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeDollars"
+                    checked={formData.paymentTypeDollars === 'partial'}
+                    onChange={() => setFormData(prev => ({ ...prev, paymentTypeDollars: 'partial' }))}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentPartial')}</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeDollars === 'full' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeDollars"
+                    checked={formData.paymentTypeDollars === 'full'}
+                    onChange={() => {
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        paymentTypeDollars: 'full',
+                        amountDollars: debt.totalDollars
+                      }));
+                    }}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentFull')}</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', borderRadius: '6px', background: formData.paymentTypeDollars === 'settlement' ? 'var(--primary-overlay)' : 'transparent' }}>
+                  <input
+                    type="radio"
+                    name="paymentTypeDollars"
+                    checked={formData.paymentTypeDollars === 'settlement'}
+                    onChange={() => setFormData(prev => ({ ...prev, paymentTypeDollars: 'settlement' }))}
+                    style={{ margin: 0 }}
+                  />
+                  <span style={{ fontSize: '14px' }}>{t('addCommitment.paymentSettlement')}</span>
+                </label>
+              </div>
             </div>
 
             <div className="form-group">

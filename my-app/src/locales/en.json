@@ -188,6 +188,15 @@
     "editCommitment": "Edit commitment",
     "completedOn": "Completed:"
   },
+  "editCommitment": {
+    "title": "Edit Commitment",
+    "date": "Date",
+    "amountLocal": "Amount (Local)",
+    "amountDollar": "Amount (USD)",
+    "notesOptional": "Notes (optional)",
+    "notesPlaceholder": "Add any notes...",
+    "cannotEditCompleted": "You cannot edit a completed commitment. If you need to adjust the debt total, please edit the debt directly and create a new commitment."
+  },
   "deleteCommitment": {
     "title": "Delete Commitment",
     "subtitle": "Are you sure you want to delete this commitment?",
