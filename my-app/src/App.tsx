@@ -15,7 +15,6 @@ import DeleteDebt from './pages/DeleteDebt';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import TermsAndConditions from './pages/TermsAndConditions';
-import About from './pages/About';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -125,11 +124,7 @@ const AppRoutes: React.FC = () => {
       />
       <Route
         path="/about"
-        element={
-          <ProtectedRoute>
-            <About />
-          </ProtectedRoute>
-        }
+        element={<Landing />}
       />
     </Routes>
   );
