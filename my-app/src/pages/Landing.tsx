@@ -13,7 +13,6 @@ import {
   FaCheckCircle,
   FaInfoCircle,
   FaRocket,
-  FaPiggyBank,
   FaArrowRight,
   FaStar
 } from 'react-icons/fa';
