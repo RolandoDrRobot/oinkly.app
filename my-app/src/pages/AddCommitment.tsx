@@ -50,11 +50,9 @@ interface StepData {
   date?: string;
   amountLocal?: number;
   amountDollars?: number;
+  paymentTypeLocal?: 'partial' | 'full' | 'settlement';
+  paymentTypeDollars?: 'partial' | 'full' | 'settlement';
   notes?: string;
-  setTotalLocal?: boolean;
-  subtractFromTotalLocal?: boolean;
-  setTotalDollars?: boolean;
-  subtractFromTotalDollars?: boolean;
 }
 
 const AddCommitment: React.FC = () => {
@@ -83,6 +81,8 @@ const AddCommitment: React.FC = () => {
               date: foundCommitment.date.split('T')[0],
               amountLocal: foundCommitment.amountLocal,
               amountDollars: foundCommitment.amountDollars,
+              paymentTypeLocal: foundCommitment.paymentType || 'partial',
+              paymentTypeDollars: foundCommitment.paymentType || 'partial',
               notes: foundCommitment.notes || '',
             });
           } else {
@@ -244,12 +244,18 @@ const AddCommitment: React.FC = () => {
         let updatedDebt: Debt = { ...debt };
 
         if (isEditing && commitment) {
+          // Determine payment type for editing
+          const paymentType = formData.paymentTypeLocal === formData.paymentTypeDollars 
+            ? formData.paymentTypeLocal 
+            : (formData.paymentTypeLocal || formData.paymentTypeDollars || commitment.paymentType || 'partial');
+          
           // Update existing commitment
           const updatedCommitment: PaymentCommitment = {
             ...commitment,
             date: new Date(formData.date || commitment.date).toISOString(),
             amountLocal: formData.amountLocal || 0,
             amountDollars: formData.amountDollars || 0,
+            paymentType: paymentType as 'partial' | 'full' | 'settlement',
             notes: formData.notes,
             updatedAt: new Date().toISOString(),
           };
@@ -263,6 +269,11 @@ const AddCommitment: React.FC = () => {
           };
         } else {
           // Create new commitment
+          // Determine payment type: if both currencies have same type, use that; otherwise use 'partial' as default
+          const paymentType = formData.paymentTypeLocal === formData.paymentTypeDollars 
+            ? formData.paymentTypeLocal 
+            : (formData.paymentTypeLocal || formData.paymentTypeDollars || 'partial');
+          
           const newCommitment: PaymentCommitment = {
             id: Date.now().toString(),
             debtId: debt.id,
@@ -270,6 +281,7 @@ const AddCommitment: React.FC = () => {
             amountLocal: formData.amountLocal || 0,
             amountDollars: formData.amountDollars || 0,
             status: 'pending',
+            paymentType: paymentType as 'partial' | 'full' | 'settlement',
             notes: formData.notes,
             createdAt: new Date().toISOString(),
           };
@@ -281,38 +293,36 @@ const AddCommitment: React.FC = () => {
           };
         }
 
-        // Handle total updates based on options
-        if (formData.setTotalLocal && formData.amountLocal !== undefined) {
-          updatedDebt.totalLocal = formData.amountLocal;
-          // If total reaches 0, set fee to 0
-          if (formData.amountLocal === 0) {
-            updatedDebt.localFee = 0;
-          }
-        } else if (formData.subtractFromTotalLocal && formData.amountLocal !== undefined) {
-          updatedDebt.totalLocal = Math.max(0, (updatedDebt.totalLocal || 0) - formData.amountLocal);
-          // If total reaches 0, set fee to 0
-          if (updatedDebt.totalLocal === 0) {
-            updatedDebt.localFee = 0;
-          }
-        }
+        // Note: Total updates are handled when the commitment is completed, not when created
 
-        if (formData.setTotalDollars && formData.amountDollars !== undefined) {
-          updatedDebt.totalDollars = formData.amountDollars;
-          // If total reaches 0, set fee to 0
-          if (formData.amountDollars === 0) {
-            updatedDebt.dollarFee = 0;
+        // Calculate inOrder based on commitments
+        const calculateInOrder = (debt: Debt): boolean => {
+          if (!debt.commitments || debt.commitments.length === 0) {
+            return true;
           }
-        } else if (formData.subtractFromTotalDollars && formData.amountDollars !== undefined) {
-          updatedDebt.totalDollars = Math.max(0, (updatedDebt.totalDollars || 0) - formData.amountDollars);
-          // If total reaches 0, set fee to 0
-          if (updatedDebt.totalDollars === 0) {
-            updatedDebt.dollarFee = 0;
-          }
-        }
 
-        // inOrder is now calculated based on commitments only, not feeToUpdate
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const hasPendingOrOverdue = debt.commitments.some(commitment => {
+            if (commitment.status === 'completed') {
+              return false;
+            }
+
+            const commitmentDate = new Date(commitment.date);
+            commitmentDate.setHours(0, 0, 0, 0);
+            const diffTime = commitmentDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays < 0 || commitment.status === 'pending';
+          });
+
+          return !hasPendingOrOverdue;
+        };
+
         updatedDebt.feeToUpdate = 0;
         updatedDebt.feeToUpdateDollars = 0;
+        updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
         storage.saveDebt(updatedDebt);
         navigate('/dashboard');
@@ -444,6 +454,7 @@ const AddCommitment: React.FC = () => {
                       className="commitment-options"
                       style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
                     >
+                      {/* Opción 1: Pago Parcial */}
                       <motion.label
                         whileHover={{ scale: 1.02, backgroundColor: 'var(--overlay)' }}
                         whileTap={{ scale: 0.98 }}
@@ -453,27 +464,21 @@ const AddCommitment: React.FC = () => {
                           alignItems: 'center',
                           gap: '12px',
                           padding: '14px 16px',
-                          background: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                          background: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'partial'
                             ? 'var(--primary-overlay)' 
                             : 'var(--bg-secondary)',
                           borderRadius: '8px',
                           cursor: 'pointer',
-                          border: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                          border: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'partial'
                             ? '2px solid var(--accent-color)' 
                             : '2px solid var(--bg-tertiary)',
                           transition: 'all 0.2s',
                         }}
                         onClick={() => {
-                          const field = currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars';
-                          const otherField = currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars';
-                          const amountField = currentStepData.currencyType === 'local' ? 'amountLocal' : 'amountDollars';
-                          const totalValue = currentStepData.currencyType === 'local' ? debt.totalLocal : debt.totalDollars;
-                          
+                          const field = currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars';
                           setFormData(prev => ({
                             ...prev,
-                            [field]: !prev[field],
-                            [otherField]: false, // Uncheck the other option
-                            [amountField]: !prev[field] ? totalValue : prev[amountField], // Auto-fill if checking
+                            [field]: prev[field] === 'partial' ? undefined : 'partial',
                           }));
                         }}
                       >
@@ -481,7 +486,7 @@ const AddCommitment: React.FC = () => {
                           component={FaCheckCircle} 
                           size={20}
                           style={{ 
-                            color: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] 
+                            color: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'partial'
                               ? 'var(--accent-color)' 
                               : 'var(--text-muted)',
                             transition: 'color 0.2s',
@@ -490,18 +495,13 @@ const AddCommitment: React.FC = () => {
                         <span style={{ 
                           color: 'var(--text-primary)', 
                           fontSize: '14px',
-                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars'] ? 500 : 400,
+                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'partial' ? 500 : 400,
                         }}>
-                          {t('addCommitment.setTotal', { 
-                            currency: currentStepData.currencyType === 'local' 
-                              ? getCurrencyName(debt.localCurrency) 
-                              : 'USD',
-                            total: currentStepData.currencyType === 'local' 
-                              ? debt.totalLocal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                              : debt.totalDollars.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                          })}
+                          {t('addCommitment.paymentPartial')}
                         </span>
                       </motion.label>
+                      
+                      {/* Opción 2: Pago Total */}
                       <motion.label
                         whileHover={{ scale: 1.02, backgroundColor: 'var(--overlay)' }}
                         whileTap={{ scale: 0.98 }}
@@ -511,23 +511,24 @@ const AddCommitment: React.FC = () => {
                           alignItems: 'center',
                           gap: '12px',
                           padding: '14px 16px',
-                          background: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                          background: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'full'
                             ? 'var(--primary-overlay)' 
                             : 'var(--bg-secondary)',
                           borderRadius: '8px',
                           cursor: 'pointer',
-                          border: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                          border: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'full'
                             ? '2px solid var(--accent-color)' 
                             : '2px solid var(--bg-tertiary)',
                           transition: 'all 0.2s',
                         }}
                         onClick={() => {
-                          const field = currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars';
-                          const otherField = currentStepData.currencyType === 'local' ? 'setTotalLocal' : 'setTotalDollars';
+                          const field = currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars';
+                          const amountField = currentStepData.currencyType === 'local' ? 'amountLocal' : 'amountDollars';
+                          const totalValue = currentStepData.currencyType === 'local' ? debt.totalLocal : debt.totalDollars;
                           setFormData(prev => ({
                             ...prev,
-                            [field]: !prev[field],
-                            [otherField]: false, // Uncheck the other option
+                            [field]: prev[field] === 'full' ? undefined : 'full',
+                            [amountField]: prev[field] === 'full' ? prev[amountField] : totalValue, // Auto-fill total if selecting full
                           }));
                         }}
                       >
@@ -535,7 +536,7 @@ const AddCommitment: React.FC = () => {
                           component={FaCheckCircle} 
                           size={20}
                           style={{ 
-                            color: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] 
+                            color: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'full'
                               ? 'var(--accent-color)' 
                               : 'var(--text-muted)',
                             transition: 'color 0.2s',
@@ -544,13 +545,56 @@ const AddCommitment: React.FC = () => {
                         <span style={{ 
                           color: 'var(--text-primary)', 
                           fontSize: '14px',
-                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'subtractFromTotalLocal' : 'subtractFromTotalDollars'] ? 500 : 400,
+                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'full' ? 500 : 400,
                         }}>
-                          {t('addCommitment.subtractFromTotal', { 
-                            currency: currentStepData.currencyType === 'local' 
-                              ? getCurrencyName(debt.localCurrency) 
-                              : 'USD'
-                          })}
+                          {t('addCommitment.paymentFull')}
+                        </span>
+                      </motion.label>
+                      
+                      {/* Opción 3: Negociación/Perdón */}
+                      <motion.label
+                        whileHover={{ scale: 1.02, backgroundColor: 'var(--overlay)' }}
+                        whileTap={{ scale: 0.98 }}
+                        className="commitment-option"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '14px 16px',
+                          background: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'settlement'
+                            ? 'var(--primary-overlay)' 
+                            : 'var(--bg-secondary)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          border: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'settlement'
+                            ? '2px solid var(--accent-color)' 
+                            : '2px solid var(--bg-tertiary)',
+                          transition: 'all 0.2s',
+                        }}
+                        onClick={() => {
+                          const field = currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars';
+                          setFormData(prev => ({
+                            ...prev,
+                            [field]: prev[field] === 'settlement' ? undefined : 'settlement',
+                          }));
+                        }}
+                      >
+                        <Icon 
+                          component={FaCheckCircle} 
+                          size={20}
+                          style={{ 
+                            color: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'settlement'
+                              ? 'var(--accent-color)' 
+                              : 'var(--text-muted)',
+                            transition: 'color 0.2s',
+                          }}
+                        />
+                        <span style={{ 
+                          color: 'var(--text-primary)', 
+                          fontSize: '14px',
+                          fontWeight: formData[currentStepData.currencyType === 'local' ? 'paymentTypeLocal' : 'paymentTypeDollars'] === 'settlement' ? 500 : 400,
+                        }}>
+                          {t('addCommitment.paymentSettlement')}
                         </span>
                       </motion.label>
                     </motion.div>

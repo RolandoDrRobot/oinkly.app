@@ -5,6 +5,7 @@ export interface PaymentCommitment {
   amountLocal: number;
   amountDollars: number;
   status: 'pending' | 'completed' | 'overdue';
+  paymentType?: 'partial' | 'full' | 'settlement'; // partial: pago parcial, full: pago total, settlement: negociación/perdón
   notes?: string;
   createdAt: string;
   updatedAt?: string;

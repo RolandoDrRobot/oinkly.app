@@ -66,13 +66,56 @@ const Dashboard: React.FC = () => {
     loadDebts();
   }, []);
 
+  // Calculate inOrder based on payment commitments
+  const calculateInOrder = (debt: Debt): boolean => {
+    if (!debt.commitments || debt.commitments.length === 0) {
+      // No commitments means debt is in order
+      return true;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if there are any pending or overdue commitments
+    const hasPendingOrOverdue = debt.commitments.some(commitment => {
+      if (commitment.status === 'completed') {
+        return false; // Completed commitments don't affect inOrder
+      }
+
+      const commitmentDate = new Date(commitment.date);
+      commitmentDate.setHours(0, 0, 0, 0);
+      const diffTime = commitmentDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // If commitment is overdue (past due) or pending (not completed), debt is not in order
+      return diffDays < 0 || commitment.status === 'pending';
+    });
+
+    // Debt is in order if there are no pending or overdue commitments
+    return !hasPendingOrOverdue;
+  };
+
   const loadDebts = () => {
     const allDebts = storage.getDebts();
-    // Ensure commitments and callHistory arrays exist
+    // Ensure commitments and callHistory arrays exist, and calculate inOrder
     const updatedDebts = allDebts.map(debt => {
       // Ensure commitments and callHistory arrays exist
       if (!debt.commitments) debt.commitments = [];
       if (!debt.callHistory) debt.callHistory = [];
+      
+      // Calculate inOrder based on commitments
+      const calculatedInOrder = calculateInOrder(debt);
+      
+      // Update debt if inOrder changed
+      if (debt.inOrder !== calculatedInOrder) {
+        const updated = {
+          ...debt,
+          inOrder: calculatedInOrder,
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updated);
+        return updated;
+      }
       
       return debt;
     });

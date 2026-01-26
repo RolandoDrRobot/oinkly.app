@@ -213,9 +213,40 @@ const CompleteCommitment: React.FC = () => {
           completedAt: new Date().toISOString(),
         };
 
-        // Automatically subtract commitment amounts from debt totals
-        let newTotalLocal = Math.max(0, (debt.totalLocal || 0) - (commitment.amountLocal || 0));
-        let newTotalDollars = Math.max(0, (debt.totalDollars || 0) - (commitment.amountDollars || 0));
+        // Handle debt total updates based on payment type
+        const paymentType = commitment.paymentType || 'partial';
+        let newTotalLocal = debt.totalLocal || 0;
+        let newTotalDollars = debt.totalDollars || 0;
+
+        // Handle local currency
+        if (commitment.amountLocal > 0) {
+          if (paymentType === 'full' || paymentType === 'settlement') {
+            // Full payment or settlement: set total to 0
+            newTotalLocal = 0;
+          } else {
+            // Partial payment: subtract amount from total
+            newTotalLocal = Math.max(0, newTotalLocal - commitment.amountLocal);
+          }
+        }
+
+        // Handle dollars
+        if (commitment.amountDollars > 0) {
+          if (paymentType === 'full' || paymentType === 'settlement') {
+            // Full payment or settlement: set total to 0
+            newTotalDollars = 0;
+          } else {
+            // Partial payment: subtract amount from total
+            newTotalDollars = Math.max(0, newTotalDollars - commitment.amountDollars);
+          }
+        }
+
+        // If user manually updated totals in the workflow, use those instead
+        if (formData.totalLocal !== undefined) {
+          newTotalLocal = formData.totalLocal;
+        }
+        if (formData.totalDollars !== undefined) {
+          newTotalDollars = formData.totalDollars;
+        }
 
         let updatedDebt: Debt = {
           ...debt,
@@ -224,6 +255,8 @@ const CompleteCommitment: React.FC = () => {
           ),
           totalLocal: newTotalLocal,
           totalDollars: newTotalDollars,
+          feeToUpdate: 0,
+          feeToUpdateDollars: 0,
           updatedAt: new Date().toISOString(),
         };
 
@@ -235,31 +268,32 @@ const CompleteCommitment: React.FC = () => {
           updatedDebt.dollarFee = 0;
         }
 
-        // Update balances if user provided new totals
-        if (formData.totalLocal !== undefined || formData.totalDollars !== undefined) {
-          const finalTotalLocal = formData.totalLocal !== undefined ? formData.totalLocal : updatedDebt.totalLocal;
-          const finalTotalDollars = formData.totalDollars !== undefined ? formData.totalDollars : updatedDebt.totalDollars;
-          
-          updatedDebt = {
-            ...updatedDebt,
-            totalLocal: finalTotalLocal,
-            totalDollars: finalTotalDollars,
-            feeToUpdate: 0,
-            feeToUpdateDollars: 0,
-          };
+        // Calculate inOrder based on commitments
+        const calculateInOrder = (debt: Debt): boolean => {
+          if (!debt.commitments || debt.commitments.length === 0) {
+            return true;
+          }
 
-          // If total reaches 0, set corresponding fee to 0
-          if (finalTotalLocal === 0) {
-            updatedDebt.localFee = 0;
-          }
-          if (finalTotalDollars === 0) {
-            updatedDebt.dollarFee = 0;
-          }
-        } else {
-          // Set feeToUpdate to 0 (no longer used)
-          updatedDebt.feeToUpdate = 0;
-          updatedDebt.feeToUpdateDollars = 0;
-        }
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const hasPendingOrOverdue = debt.commitments.some(commitment => {
+            if (commitment.status === 'completed') {
+              return false;
+            }
+
+            const commitmentDate = new Date(commitment.date);
+            commitmentDate.setHours(0, 0, 0, 0);
+            const diffTime = commitmentDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays < 0 || commitment.status === 'pending';
+          });
+
+          return !hasPendingOrOverdue;
+        };
+
+        updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
         storage.saveDebt(updatedDebt);
         navigate('/dashboard');
