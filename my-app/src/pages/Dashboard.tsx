@@ -363,7 +363,12 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <div>
+          <div className="header-title-wrapper">
+            <img 
+              src={`${process.env.PUBLIC_URL}/logo.png`} 
+              alt="Oinkly Logo" 
+              className="header-logo"
+            />
             <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
