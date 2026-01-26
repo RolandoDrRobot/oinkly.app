@@ -79,6 +79,7 @@
 
 .form-group input::placeholder {
   color: var(--text-muted);
+  opacity: 0.5;
 }
 
 .checkbox-group {

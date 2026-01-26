@@ -198,7 +198,8 @@
   border-radius: 50%;
   background: var(--primary);
   color: var(--dark-bg);
-  
+  border: 0;
+  color: var(--text-primary);
   font-size: 24px;
   font-weight: 600;
   cursor: pointer;

@@ -50,3 +50,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Global placeholder styles - more subtle */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
