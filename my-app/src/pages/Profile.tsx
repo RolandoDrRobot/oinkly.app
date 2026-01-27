@@ -96,7 +96,14 @@ const Profile: React.FC = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="btn-action btn-logout"
-            onClick={logout}
+            onClick={async () => {
+              try {
+                await logout();
+                navigate('/');
+              } catch (error) {
+                console.error('Error during logout:', error);
+              }
+            }}
           >
             {t('profile.logout')}
           </motion.button>

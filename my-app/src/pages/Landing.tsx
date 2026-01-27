@@ -16,8 +16,10 @@ import {
   FaArrowRight,
   FaStar
 } from 'react-icons/fa';
+// Google icon will be displayed as text or we can use a simple icon
 import { useAuth } from '../context/AuthContext';
 import { storage } from '../utils/storage';
+import toast from 'react-hot-toast';
 import './Landing.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -26,7 +28,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 
 const Landing: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, loginWithGoogle, loading } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [language, setLanguage] = useState<string>(storage.getLanguage());
@@ -46,6 +48,19 @@ const Landing: React.FC = () => {
       login('rolando@gmail.com', 'Rolo');
     }
     navigate('/dashboard');
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      console.info('[Landing] handleGoogleLogin called, isAuthenticated:', isAuthenticated);
+      console.info('[Landing] Calling loginWithGoogle...');
+      await loginWithGoogle();
+      console.info('[Landing] loginWithGoogle completed, redirect should happen');
+      // The redirect will happen automatically via Supabase
+    } catch (error: any) {
+      console.error('[Landing] Error in handleGoogleLogin:', error);
+      toast.error(error.message || t('landing.googleLoginError') || 'Error al iniciar sesión con Google');
+    }
   };
 
   const handleNext = () => {
@@ -291,14 +306,33 @@ const Landing: React.FC = () => {
             {/* Action Button */}
             <div className="step-actions">
               {isLastStep ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn-primary btn-dashboard"
-                  onClick={handleGetStarted}
-                >
-                  {isAuthenticated ? t('about.backToDashboard') : t('landing.getStarted')}
-                </motion.button>
+                <div className="step-actions-final">
+                  {!isAuthenticated && (
+                    <>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="btn-primary btn-google"
+                        onClick={handleGoogleLogin}
+                        disabled={loading}
+                      >
+                        <span style={{ marginRight: '8px', fontSize: '18px' }}>G</span>
+                        {loading ? t('common.loading') : t('landing.signInWithGoogle')}
+                      </motion.button>
+                      <div className="divider">
+                        <span>{t('landing.or')}</span>
+                      </div>
+                    </>
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-primary btn-dashboard"
+                    onClick={handleGetStarted}
+                  >
+                    {isAuthenticated ? t('about.backToDashboard') : t('landing.getStarted')}
+                  </motion.button>
+                </div>
               ) : (
                 <motion.button
                   whileHover={{ scale: 1.05 }}

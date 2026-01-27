@@ -23,7 +23,10 @@
     "email": "Correo",
     "name": "Nombre",
     "getStarted": "Comenzar",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "or": "o",
+    "googleLoginError": "Error al iniciar sesión con Google. Por favor, intenta de nuevo."
   },
   "dashboard": {
     "title": "Oinkly",
