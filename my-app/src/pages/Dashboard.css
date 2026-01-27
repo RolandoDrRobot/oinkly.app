@@ -215,19 +215,60 @@
 
 .empty-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
   color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.empty-state-image {
+  width: 200px;
+  height: auto;
+  margin-bottom: 32px;
+  max-width: 100%;
 }
 
 .empty-state p {
   margin: 8px 0;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-primary);
+  font-weight: 500;
 }
 
 .empty-subtitle {
-  font-size: 14px !important;
+  font-size: 16px !important;
   color: var(--text-muted) !important;
+  margin-bottom: 32px !important;
+}
+
+.btn-add-first-debt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-family, "DynaPuff", system-ui);
+  margin-top: 8px;
+}
+
+.btn-add-first-debt:hover {
+  background: var(--primary-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(86, 154, 60, 0.3);
+}
+
+.btn-add-first-debt:active {
+  transform: translateY(0);
 }
 
 .debts-section-title {

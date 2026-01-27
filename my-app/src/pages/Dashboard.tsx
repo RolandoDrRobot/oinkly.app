@@ -492,8 +492,41 @@ const Dashboard: React.FC = () => {
               transition={{ delay: 0.3 }}
               className="empty-state"
             >
-              <p>{t('dashboard.noDebts')}</p>
-              <p className="empty-subtitle">{t('dashboard.noDebtsSubtitle')}</p>
+              <motion.img
+                src="/shopping.png"
+                alt="Empty state"
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                {t('dashboard.noDebts')}
+              </motion.p>
+              <motion.p
+                className="empty-subtitle"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                {t('dashboard.noDebtsSubtitle')}
+              </motion.p>
+              <motion.button
+                className="btn-add-first-debt"
+                onClick={() => navigate('/add-debt')}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Icon component={FaPlus} style={{ marginRight: '8px' }} />
+                {t('dashboard.addFirstDebt')}
+              </motion.button>
             </motion.div>
           ) : (
             <DndContext
