@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
@@ -19,13 +19,13 @@ import { Toaster } from './utils/notifications';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
-  // const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
       <Route
         path="/"
-        element={<Landing />}
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />}
       />
       <Route
         path="/dashboard"

@@ -33,7 +33,6 @@ import {
   FaMoneyBill, 
   FaCalendarAlt, 
   FaExclamationTriangle, 
-  FaStar,
   FaEye,
   FaEyeSlash,
   FaQuestionCircle,
@@ -727,15 +726,6 @@ const Dashboard: React.FC = () => {
               title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
             >
               <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-profile"
-              onClick={() => navigate('/about')}
-              title={t('about.title')}
-            >
-              <Icon component={FaStar} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
