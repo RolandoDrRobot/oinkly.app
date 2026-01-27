@@ -40,6 +40,7 @@ import {
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import './Dashboard.css';
 
@@ -224,6 +225,7 @@ const Dashboard: React.FC = () => {
       newValue = parseFloat(editValue) || 0;
     }
 
+    const oldValue = debt[field as keyof Debt] as number;
     const updated = {
       ...debt,
       [field]: newValue,
@@ -233,6 +235,12 @@ const Dashboard: React.FC = () => {
     // inOrder is now calculated based on commitments only, not feeToUpdate
     
     storage.saveDebt(updated);
+    
+    // Notify if overview-affecting fields changed (these affect totals automatically)
+    if (numericFields.includes(field) && oldValue !== newValue) {
+      notify.overviewUpdated();
+    }
+    
     loadDebts();
     setEditingField(null);
     setEditValue('');

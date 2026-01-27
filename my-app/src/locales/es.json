@@ -197,6 +197,15 @@
     "notesPlaceholder": "Agregar notas...",
     "cannotEditCompleted": "No puedes editar un compromiso completado. Si necesitas ajustar el total de la deuda, por favor edita la deuda directamente y crea un nuevo compromiso."
   },
+  "notifications": {
+    "debtTotalUpdated": "Total de deuda actualizado: {{debtName}} - {{currency}} {{amount}}",
+    "overviewUpdated": "Resumen actualizado automáticamente",
+    "debtStatusChanged": "Estado actualizado: {{debtName}} - {{status}}",
+    "commitmentAffectsStatus": "Estado de deuda recalculado: {{debtName}}",
+    "feeAutoReset": "Cuota mensual ajustada a 0: {{debtName}} ({{currency}})",
+    "inOrder": "al día",
+    "notInOrder": "con compromisos pendientes"
+  },
   "deleteCommitment": {
     "title": "Eliminar Compromiso",
     "subtitle": "¿Estás seguro de que quieres eliminar este compromiso?",

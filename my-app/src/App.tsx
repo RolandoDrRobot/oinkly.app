@@ -15,6 +15,7 @@ import DeleteDebt from './pages/DeleteDebt';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import TermsAndConditions from './pages/TermsAndConditions';
+import { Toaster } from './utils/notifications';
 import './App.css';
 
 const AppRoutes: React.FC = () => {
@@ -136,6 +137,7 @@ function App() {
       <AuthProvider>
         <Router>
           <AppRoutes />
+          <Toaster />
         </Router>
       </AuthProvider>
     </ThemeProvider>

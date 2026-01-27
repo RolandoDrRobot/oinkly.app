@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -60,6 +61,10 @@ const DeleteDebt: React.FC = () => {
         const currentOrder = storage.getDebtsOrder() || [];
         const newOrder = currentOrder.filter(id => id !== debt.id);
         storage.setDebtsOrder(newOrder);
+        
+        // Notify about automatic overview update (debt deletion affects totals)
+        notify.overviewUpdated();
+        
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

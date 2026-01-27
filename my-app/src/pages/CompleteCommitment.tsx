@@ -10,6 +10,8 @@ import {
 } from 'react-icons/fa';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
+import { formatCurrencyInput } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
 
@@ -164,9 +166,35 @@ const CompleteCommitment: React.FC = () => {
           return !hasPendingOrOverdue;
         };
 
+        const oldInOrder = debt.inOrder;
         updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
         storage.saveDebt(updatedDebt);
+        
+        // Notify about automatic changes
+        const localCurrency = debt.localCurrency || storage.getLocalCurrency();
+        const localChanged = newTotalLocal !== (debt.totalLocal || 0);
+        const dollarsChanged = newTotalDollars !== (debt.totalDollars || 0);
+        
+        if (localChanged || dollarsChanged) {
+          const amount = localChanged 
+            ? formatCurrencyInput(Math.abs(newTotalLocal - (debt.totalLocal || 0)), localCurrency)
+            : formatCurrencyInput(Math.abs(newTotalDollars - (debt.totalDollars || 0)), 'USD');
+          const currency = localChanged ? localCurrency : 'USD';
+          notify.debtTotalUpdated(debt.name, amount, currency);
+        }
+        
+        if (newTotalLocal === 0 && (debt.totalLocal || 0) > 0) {
+          notify.feeAutoReset(debt.name, localCurrency);
+        }
+        if (newTotalDollars === 0 && (debt.totalDollars || 0) > 0) {
+          notify.feeAutoReset(debt.name, 'USD');
+        }
+        
+        if (oldInOrder !== updatedDebt.inOrder) {
+          notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+        }
+        
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

@@ -16,6 +16,7 @@ import {
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
+import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
 const getCurrencyName = (code: string): string => {
@@ -322,9 +323,17 @@ const AddCommitment: React.FC = () => {
 
         updatedDebt.feeToUpdate = 0;
         updatedDebt.feeToUpdateDollars = 0;
+        
+        const oldInOrder = debt.inOrder;
         updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
         storage.saveDebt(updatedDebt);
+        
+        // Notify if status changed automatically
+        if (oldInOrder !== updatedDebt.inOrder) {
+          notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+        }
+        
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

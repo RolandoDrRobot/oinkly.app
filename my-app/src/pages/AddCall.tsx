@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 import { CallRecord, Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
 const getCurrencyName = (code: string): string => {
@@ -283,6 +284,33 @@ const AddCall: React.FC = () => {
 
           // Link commitment to call
           newCall.commitmentsCreated = [newCommitment.id];
+          
+          // Calculate inOrder to check if it changed
+          const calculateInOrder = (debt: Debt): boolean => {
+            if (!debt.commitments || debt.commitments.length === 0) {
+              return true;
+            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const hasPendingOrOverdue = debt.commitments.some(c => {
+              if (c.status === 'completed') return false;
+              const commitmentDate = new Date(c.date);
+              commitmentDate.setHours(0, 0, 0, 0);
+              const diffTime = commitmentDate.getTime() - today.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              return diffDays < 0 || c.status === 'pending';
+            });
+            return !hasPendingOrOverdue;
+          };
+          
+          const oldInOrder = debt.inOrder;
+          const newInOrder = calculateInOrder(updatedDebt);
+          updatedDebt.inOrder = newInOrder;
+          
+          // Notify if status changed automatically
+          if (oldInOrder !== newInOrder) {
+            notify.debtStatusChanged(debt.name, newInOrder);
+          }
         }
 
         storage.saveDebt(updatedDebt);

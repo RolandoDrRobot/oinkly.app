@@ -5,6 +5,7 @@ import { FaTimes } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
 import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators, getCurrencyForField } from '../utils/currencyFormatter';
+import { notify } from '../utils/notifications';
 import { FaCheckCircle } from 'react-icons/fa';
 
 // Type assertion helper for icons
@@ -112,9 +113,16 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
       return !hasPendingOrOverdue;
     };
 
+    const oldInOrder = debt.inOrder;
     updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
     storage.saveDebt(updatedDebt);
+    
+    // Notify if status changed automatically
+    if (oldInOrder !== updatedDebt.inOrder) {
+      notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+    }
+    
     onSave();
     onClose();
   };

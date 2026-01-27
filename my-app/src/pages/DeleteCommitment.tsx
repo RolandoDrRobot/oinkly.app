@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -62,12 +63,42 @@ const DeleteCommitment: React.FC = () => {
   useEffect(() => {
     if (currentStep === 1 && debt && commitment) {
       const timer = setTimeout(() => {
+        // Calculate inOrder before deletion
+        const calculateInOrder = (debt: Debt): boolean => {
+          if (!debt.commitments || debt.commitments.length === 0) {
+            return true;
+          }
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const hasPendingOrOverdue = debt.commitments.some(c => {
+            if (c.status === 'completed') return false;
+            const commitmentDate = new Date(c.date);
+            commitmentDate.setHours(0, 0, 0, 0);
+            const diffTime = commitmentDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays < 0 || c.status === 'pending';
+          });
+          return !hasPendingOrOverdue;
+        };
+        
+        const oldInOrder = calculateInOrder(debt);
+        
         const updatedDebt: Debt = {
           ...debt,
           commitments: debt.commitments?.filter(c => c.id !== commitment.id),
           updatedAt: new Date().toISOString(),
         };
+        
+        const newInOrder = calculateInOrder(updatedDebt);
+        updatedDebt.inOrder = newInOrder;
+        
         storage.saveDebt(updatedDebt);
+        
+        // Notify if status changed automatically
+        if (oldInOrder !== newInOrder) {
+          notify.debtStatusChanged(debt.name, newInOrder);
+        }
+        
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
