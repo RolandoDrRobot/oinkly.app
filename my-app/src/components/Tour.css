@@ -31,14 +31,21 @@
 }
 
 .react-joyride__beacon {
-  background: var(--primary, #569a3c) !important;
+  background: transparent !important;
 }
 
 .react-joyride__beacon__inner {
-  background: var(--primary, #569a3c) !important;
+  background-image: url('../../public/logo.png') !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
   border: 2px solid var(--primary, #569a3c) !important;
+  border-radius: 50% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .react-joyride__beacon__outer {
   border: 2px solid var(--primary, #569a3c) !important;
+  border-radius: 50% !important;
 }

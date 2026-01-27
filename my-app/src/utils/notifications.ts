@@ -4,9 +4,9 @@ import i18next from 'i18next';
 // Configure toast with Apple-style notifications
 export const toastConfig = {
   position: 'top-center' as const,
-  duration: 3000,
+  duration: 5000,
   style: {
-    background: 'var(--bg-secondary, #014a3a)',
+    background: 'var(--primary, #569a3c)',
     color: 'var(--text-primary, #f4e3c5)',
     borderRadius: '12px',
     padding: '12px 16px',
@@ -18,8 +18,8 @@ export const toastConfig = {
     fontFamily: 'var(--font-family, "DynaPuff", system-ui)',
   },
   iconTheme: {
-    primary: 'var(--primary, #569a3c)',
-    secondary: 'var(--text-primary, #f4e3c5)',
+    primary: 'var(--text-primary, #f4e3c5)',
+    secondary: 'var(--primary, #569a3c)',
   },
 };
 

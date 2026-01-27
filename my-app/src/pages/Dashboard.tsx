@@ -35,7 +35,7 @@ import {
   FaExclamationTriangle, 
   FaEye,
   FaEyeSlash,
-  FaQuestionCircle,
+  FaStar,
   FaMicrophone,
   FaMicrophoneSlash,
   FaPaperPlane
@@ -713,19 +713,19 @@ const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-profile"
-              onClick={() => setTourRun(true)}
-              title={t('tour.startTour')}
+              onClick={toggleHideAmounts}
+              title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
             >
-              <Icon component={FaQuestionCircle} />
+              <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-profile"
-              onClick={toggleHideAmounts}
-              title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
+              onClick={() => setTourRun(true)}
+              title={t('tour.startTour')}
             >
-              <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
+              <Icon component={FaStar} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
