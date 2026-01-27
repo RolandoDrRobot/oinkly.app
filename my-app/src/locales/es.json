@@ -207,6 +207,58 @@
     "inOrder": "al día",
     "notInOrder": "con compromisos pendientes"
   },
+  "tour": {
+    "startTour": "Iniciar Tour",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "skip": "Omitir",
+    "close": "Cerrar",
+    "last": "Finalizar",
+    "step1": {
+      "title": "Resumen General",
+      "content": "Aquí puedes ver tu deuda total y pagos mensuales de un vistazo. Esto te ayuda a entender tu situación financiera general."
+    },
+    "step2": {
+      "title": "Agregar Tu Primera Deuda",
+      "content": "Haz clic en este botón para agregar una nueva deuda. Ingresarás detalles como el banco, tipo de deuda, montos y cuotas mensuales."
+    },
+    "step3": {
+      "title": "Tus Deudas",
+      "content": "Cada tarjeta muestra una deuda con sus detalles. Puedes expandirla para ver compromisos de pago, historial de llamadas y gestionar la deuda. Arrastra y suelta las tarjetas para reordenarlas por prioridad."
+    },
+    "step4": {
+      "title": "Compromisos de Pago",
+      "content": "Crea compromisos de pago para rastrear acuerdos con tu banco. Puedes establecer pagos parciales, pagos completos o acuerdos. Cuando completas un compromiso, tus totales de deuda se actualizan automáticamente."
+    },
+    "step5": {
+      "title": "Registrar Llamadas",
+      "content": "Rastrea tu comunicación con los bancos registrando llamadas. También puedes crear compromisos de pago directamente desde un registro de llamada."
+    },
+    "step6": {
+      "title": "Completar Pagos",
+      "content": "Cuando completas un compromiso de pago, la app actualiza automáticamente tus totales de deuda según el tipo de pago (parcial, completo o acuerdo). Esto mantiene todo sincronizado."
+    },
+    "step7": {
+      "title": "Acciones Rápidas",
+      "content": "Usa estos botones para ocultar/mostrar montos, aprender sobre el método bola de nieve, o acceder a tu perfil y preferencias."
+    }
+  },
+  "aiAgent": {
+    "title": "Asistente de IA",
+    "welcome": "¡Hola! Soy tu asistente de IA. Puedo ayudarte a gestionar tus deudas. Prueba diciendo: 'Agregar una deuda', 'Muéstrame el resumen', 'Agregar un compromiso a [nombre de deuda]', o 'Registrar una llamada para [nombre de deuda]'. ¡También puedes escribir o usar comandos de voz!",
+    "placeholder": "Escribe o habla tu comando...",
+    "startListening": "Iniciar entrada de voz",
+    "stopListening": "Detener entrada de voz",
+    "navigating": "Navegando a {{route}}...",
+    "commitmentAdded": "Te ayudo a agregar ese compromiso. Abriendo el formulario ahora...",
+    "commitmentCompleted": "Te ayudo a completar ese compromiso. Abriendo el formulario ahora...",
+    "debtDeleted": "Te ayudo a eliminar esa deuda. Abriendo la confirmación ahora...",
+    "callRecorded": "Te ayudo a registrar esa llamada. Abriendo el formulario ahora...",
+    "amountsToggled": "Visibilidad de montos cambiada.",
+    "actionExecuted": "¡Listo! He ejecutado esa acción por ti.",
+    "notUnderstood": "No entendí bien eso. Prueba diciendo: 'Agregar una deuda', 'Mostrar resumen', 'Agregar compromiso a [nombre de deuda]', o 'Registrar llamada para [nombre de deuda]'.",
+    "overviewResponse": "Aquí está tu resumen financiero:\n\nDeuda Total:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nPagos Mensuales:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}"
+  },
   "deleteCommitment": {
     "title": "Eliminar Compromiso",
     "subtitle": "¿Estás seguro de que quieres eliminar este compromiso?",

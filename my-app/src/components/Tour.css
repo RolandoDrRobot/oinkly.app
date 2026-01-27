@@ -1,0 +1,44 @@
+/* Tour styles using app color palette */
+.react-joyride__tooltip {
+  background: var(--dark-card, #252515) !important;
+  border: 2px solid var(--primary, #569a3c) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.react-joyride__tooltip__header {
+  color: var(--text-primary, #f4e3c5) !important;
+}
+
+.react-joyride__tooltip__content {
+  color: var(--text-secondary, #f4e3c5) !important;
+}
+
+.react-joyride__button--primary {
+  background: var(--primary, #569a3c) !important;
+  color: var(--text-primary, #f4e3c5) !important;
+}
+
+.react-joyride__button--primary:hover {
+  background: var(--primary-bright, #6ab04c) !important;
+}
+
+.react-joyride__button--secondary {
+  color: var(--text-secondary, #f4e3c5) !important;
+}
+
+.react-joyride__button--skip {
+  color: var(--text-muted, #d4c4a5) !important;
+}
+
+.react-joyride__beacon {
+  background: var(--primary, #569a3c) !important;
+}
+
+.react-joyride__beacon__inner {
+  background: var(--primary, #569a3c) !important;
+  border: 2px solid var(--primary, #569a3c) !important;
+}
+
+.react-joyride__beacon__outer {
+  border: 2px solid var(--primary, #569a3c) !important;
+}

@@ -35,13 +35,17 @@ import {
   FaExclamationTriangle, 
   FaStar,
   FaEye,
-  FaEyeSlash
+  FaEyeSlash,
+  FaQuestionCircle,
+  FaRobot
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
+import Tour from '../components/Tour';
+import AIAgent, { AgentAction } from '../components/AIAgent';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -59,6 +63,8 @@ const Dashboard: React.FC = () => {
     const saved = localStorage.getItem('hideAmounts');
     return saved === 'true';
   });
+  const [tourRun, setTourRun] = useState(false);
+  const [aiAgentOpen, setAiAgentOpen] = useState(false);
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
@@ -353,6 +359,50 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('hideAmounts', String(newValue));
   };
 
+  const handleAIAction = (action: AgentAction) => {
+    switch (action.type) {
+      case 'navigate':
+        if (action.params?.route) {
+          navigate(action.params.route);
+        }
+        break;
+      case 'add_commitment':
+        if (action.params?.debtId) {
+          navigate(`/add-commitment/${action.params.debtId}`);
+        }
+        break;
+      case 'complete_commitment':
+        if (action.params?.debtId) {
+          const debt = debts.find(d => d.id === action.params?.debtId);
+          if (debt) {
+            const pendingCommitment = debt.commitments?.find(c => c.status === 'pending');
+            if (pendingCommitment) {
+              navigate(`/complete-commitment/${debt.id}/${pendingCommitment.id}`);
+            }
+          }
+        }
+        break;
+      case 'delete_debt':
+        if (action.params?.debtId) {
+          navigate(`/delete-debt/${action.params.debtId}`);
+        }
+        break;
+      case 'record_call':
+        if (action.params?.debtId) {
+          navigate(`/add-call/${action.params.debtId}`);
+        }
+        break;
+      case 'toggle_hide_amounts':
+        toggleHideAmounts();
+        break;
+      case 'show_info':
+        // Info is already shown in the chat
+        break;
+      default:
+        break;
+    }
+  };
+
   // Calculate totals
   const calculateTotals = () => {
     const localCurrency = storage.getLocalCurrency();
@@ -386,6 +436,13 @@ const Dashboard: React.FC = () => {
       transition={{ duration: 0.3 }}
       className="dashboard"
     >
+      <Tour run={tourRun} onComplete={() => setTourRun(false)} />
+      <AIAgent
+        debts={debts}
+        onAction={handleAIAction}
+        isOpen={aiAgentOpen}
+        onClose={() => setAiAgentOpen(false)}
+      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -402,6 +459,24 @@ const Dashboard: React.FC = () => {
             <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
+              onClick={() => setAiAgentOpen(true)}
+              title={t('aiAgent.title')}
+            >
+              <Icon component={FaRobot} />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
+              onClick={() => setTourRun(true)}
+              title={t('tour.startTour')}
+            >
+              <Icon component={FaQuestionCircle} />
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

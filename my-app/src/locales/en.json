@@ -207,6 +207,58 @@
     "inOrder": "up to date",
     "notInOrder": "with pending commitments"
   },
+  "tour": {
+    "startTour": "Start Tour",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "close": "Close",
+    "last": "Finish",
+    "step1": {
+      "title": "Overview Summary",
+      "content": "Here you can see your total debt and monthly payments at a glance. This helps you understand your overall financial situation."
+    },
+    "step2": {
+      "title": "Add Your First Debt",
+      "content": "Click this button to add a new debt. You'll enter details like the bank name, debt type, amounts, and monthly fees."
+    },
+    "step3": {
+      "title": "Your Debts",
+      "content": "Each card shows a debt with its details. You can expand it to see payment commitments, call history, and manage the debt. Drag and drop cards to reorder them by priority."
+    },
+    "step4": {
+      "title": "Payment Commitments",
+      "content": "Create payment commitments to track agreements with your bank. You can set partial payments, full payments, or settlements. When you complete a commitment, your debt totals update automatically."
+    },
+    "step5": {
+      "title": "Record Calls",
+      "content": "Track your communication with banks by recording calls. You can also create payment commitments directly from a call record."
+    },
+    "step6": {
+      "title": "Complete Payments",
+      "content": "When you complete a payment commitment, the app automatically updates your debt totals based on the payment type (partial, full, or settlement). This keeps everything in sync."
+    },
+    "step7": {
+      "title": "Quick Actions",
+      "content": "Use these buttons to hide/show amounts, learn about the debt snowball method, or access your profile and preferences."
+    }
+  },
+  "aiAgent": {
+    "title": "AI Assistant",
+    "welcome": "Hi! I'm your AI assistant. I can help you manage your debts. Try saying: 'Add a debt', 'Show me the overview', 'Add a commitment to [debt name]', or 'Record a call for [debt name]'. You can also type or use voice commands!",
+    "placeholder": "Type or speak your command...",
+    "startListening": "Start voice input",
+    "stopListening": "Stop voice input",
+    "navigating": "Navigating to {{route}}...",
+    "commitmentAdded": "I'll help you add that commitment. Opening the form now...",
+    "commitmentCompleted": "I'll help you complete that commitment. Opening the form now...",
+    "debtDeleted": "I'll help you delete that debt. Opening the confirmation now...",
+    "callRecorded": "I'll help you record that call. Opening the form now...",
+    "amountsToggled": "Toggled amount visibility.",
+    "actionExecuted": "Done! I've executed that action for you.",
+    "notUnderstood": "I didn't quite understand that. Try saying: 'Add a debt', 'Show overview', 'Add commitment to [debt name]', or 'Record call for [debt name]'.",
+    "overviewResponse": "Here's your financial overview:\n\nTotal Debt:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nMonthly Payments:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}"
+  },
   "deleteCommitment": {
     "title": "Delete Commitment",
     "subtitle": "Are you sure you want to delete this commitment?",
