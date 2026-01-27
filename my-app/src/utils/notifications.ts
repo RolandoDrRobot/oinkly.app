@@ -1,6 +1,11 @@
 import toast, { Toaster } from 'react-hot-toast';
 import i18next from 'i18next';
 
+// Type assertion helper for i18next.t with interpolation
+const t = (key: string, options?: any): string => {
+  return (i18next.t as any)(key, options);
+};
+
 // Configure toast with Apple-style notifications
 export const toastConfig = {
   position: 'top-center' as const,
@@ -27,33 +32,33 @@ export const toastConfig = {
 export const notify = {
   // When debt totals are automatically updated
   debtTotalUpdated: (debtName: string, amount: string, currency: string) => {
-    const message = i18next.t('notifications.debtTotalUpdated', { debtName, amount, currency });
+    const message = t('notifications.debtTotalUpdated', { debtName, amount, currency });
     toast.success(message, toastConfig);
   },
   
   // When overview totals change automatically
   overviewUpdated: () => {
-    const message = i18next.t('notifications.overviewUpdated');
+    const message = t('notifications.overviewUpdated');
     toast.success(message, toastConfig);
   },
   
   // When debt status (inOrder) changes automatically
   debtStatusChanged: (debtName: string, isInOrder: boolean) => {
     const statusKey = isInOrder ? 'notifications.inOrder' : 'notifications.notInOrder';
-    const status = i18next.t(statusKey);
-    const message = i18next.t('notifications.debtStatusChanged', { debtName, status });
+    const status = t(statusKey);
+    const message = t('notifications.debtStatusChanged', { debtName, status });
     toast.success(message, toastConfig);
   },
   
   // When commitment affects debt status
   commitmentAffectsStatus: (debtName: string) => {
-    const message = i18next.t('notifications.commitmentAffectsStatus', { debtName });
+    const message = t('notifications.commitmentAffectsStatus', { debtName });
     toast.success(message, toastConfig);
   },
   
   // When fee is automatically set to 0
   feeAutoReset: (debtName: string, currency: string) => {
-    const message = i18next.t('notifications.feeAutoReset', { debtName, currency });
+    const message = t('notifications.feeAutoReset', { debtName, currency });
     toast.success(message, toastConfig);
   },
 };
