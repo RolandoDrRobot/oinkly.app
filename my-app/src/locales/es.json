@@ -219,26 +219,30 @@
       "content": "Aquí puedes ver tu deuda total y pagos mensuales de un vistazo. Esto te ayuda a entender tu situación financiera general."
     },
     "step2": {
+      "title": "Asistente de IA",
+      "content": "¡Usa el Asistente de IA para controlar la app con comandos de voz o texto! Puedes crear o editar deudas, agregar compromisos de pago, completar compromisos, eliminar deudas, registrar llamadas, mostrar resumen, ocultar/mostrar montos y navegar a diferentes páginas. Solo escribe o habla tu comando de forma natural."
+    },
+    "step3": {
       "title": "Agregar Tu Primera Deuda",
       "content": "Haz clic en este botón para agregar una nueva deuda. Ingresarás detalles como el banco, tipo de deuda, montos y cuotas mensuales."
     },
-    "step3": {
+    "step4": {
       "title": "Tus Deudas",
       "content": "Cada tarjeta muestra una deuda con sus detalles. Puedes expandirla para ver compromisos de pago, historial de llamadas y gestionar la deuda. Arrastra y suelta las tarjetas para reordenarlas por prioridad."
     },
-    "step4": {
+    "step5": {
       "title": "Compromisos de Pago",
       "content": "Crea compromisos de pago para rastrear acuerdos con tu banco. Puedes establecer pagos parciales, pagos completos o acuerdos. Cuando completas un compromiso, tus totales de deuda se actualizan automáticamente."
     },
-    "step5": {
+    "step6": {
       "title": "Registrar Llamadas",
       "content": "Rastrea tu comunicación con los bancos registrando llamadas. También puedes crear compromisos de pago directamente desde un registro de llamada."
     },
-    "step6": {
+    "step7": {
       "title": "Completar Pagos",
       "content": "Cuando completas un compromiso de pago, la app actualiza automáticamente tus totales de deuda según el tipo de pago (parcial, completo o acuerdo). Esto mantiene todo sincronizado."
     },
-    "step7": {
+    "step8": {
       "title": "Acciones Rápidas",
       "content": "Usa estos botones para ocultar/mostrar montos, aprender sobre el método bola de nieve, o acceder a tu perfil y preferencias."
     }

@@ -219,26 +219,30 @@
       "content": "Here you can see your total debt and monthly payments at a glance. This helps you understand your overall financial situation."
     },
     "step2": {
+      "title": "AI Assistant",
+      "content": "Use the AI Assistant to control the app with voice or text commands! You can create or edit debts, add payment commitments, complete commitments, delete debts, record calls, show overview, toggle hide amounts, and navigate to different pages. Just type or speak your command naturally."
+    },
+    "step3": {
       "title": "Add Your First Debt",
       "content": "Click this button to add a new debt. You'll enter details like the bank name, debt type, amounts, and monthly fees."
     },
-    "step3": {
+    "step4": {
       "title": "Your Debts",
       "content": "Each card shows a debt with its details. You can expand it to see payment commitments, call history, and manage the debt. Drag and drop cards to reorder them by priority."
     },
-    "step4": {
+    "step5": {
       "title": "Payment Commitments",
       "content": "Create payment commitments to track agreements with your bank. You can set partial payments, full payments, or settlements. When you complete a commitment, your debt totals update automatically."
     },
-    "step5": {
+    "step6": {
       "title": "Record Calls",
       "content": "Track your communication with banks by recording calls. You can also create payment commitments directly from a call record."
     },
-    "step6": {
+    "step7": {
       "title": "Complete Payments",
       "content": "When you complete a payment commitment, the app automatically updates your debt totals based on the payment type (partial, full, or settlement). This keeps everything in sync."
     },
-    "step7": {
+    "step8": {
       "title": "Quick Actions",
       "content": "Use these buttons to hide/show amounts, learn about the debt snowball method, or access your profile and preferences."
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,9 @@ import {
   FaEye,
   FaEyeSlash,
   FaQuestionCircle,
-  FaRobot
+  FaMicrophone,
+  FaMicrophoneSlash,
+  FaPaperPlane
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment } from '../types';
@@ -45,8 +47,42 @@ import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import Tour from '../components/Tour';
-import AIAgent, { AgentAction } from '../components/AIAgent';
 import './Dashboard.css';
+
+// Extend Window interface for Speech Recognition
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onresult: ((this: SpeechRecognition, ev: any) => any) | null;
+  onerror: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
+}
+
+interface AgentAction {
+  type: 'add_debt' | 'add_commitment' | 'complete_commitment' | 'delete_debt' | 'edit_debt' | 'record_call' | 'navigate' | 'toggle_hide_amounts' | 'show_info' | 'calculate';
+  params?: {
+    debtId?: string;
+    debtName?: string;
+    amount?: number;
+    currency?: string;
+    date?: string;
+    notes?: string;
+    route?: string;
+    field?: string;
+    value?: any;
+  };
+}
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -54,7 +90,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 };
 
 const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [debts, setDebts] = useState<Debt[]>([]);
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
@@ -64,7 +100,11 @@ const Dashboard: React.FC = () => {
     return saved === 'true';
   });
   const [tourRun, setTourRun] = useState(false);
-  const [aiAgentOpen, setAiAgentOpen] = useState(false);
+  // AI Agent states
+  const [isListening, setIsListening] = useState(false);
+  const [aiInputText, setAiInputText] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
@@ -359,6 +399,138 @@ const Dashboard: React.FC = () => {
     localStorage.setItem('hideAmounts', String(newValue));
   };
 
+  // AI Agent functions
+  const calculateAITotals = () => {
+    const allDebts = storage.getDebts();
+    let totalLocal = 0;
+    let totalDollars = 0;
+    let monthlyLocal = 0;
+    let monthlyDollars = 0;
+    const currencyCount: { [key: string]: number } = {};
+
+    allDebts.forEach(debt => {
+      totalLocal += debt.totalLocal || 0;
+      totalDollars += debt.totalDollars || 0;
+      monthlyLocal += debt.localFee || 0;
+      monthlyDollars += debt.dollarFee || 0;
+      
+      const currency = debt.localCurrency || storage.getLocalCurrency();
+      currencyCount[currency] = (currencyCount[currency] || 0) + 1;
+    });
+
+    const mostCommonCurrency = Object.keys(currencyCount).reduce((a, b) =>
+      currencyCount[a] > currencyCount[b] ? a : b, storage.getLocalCurrency());
+
+    return {
+      totalLocal,
+      totalDollars,
+      monthlyLocal,
+      monthlyDollars,
+      mostCommonCurrency,
+    };
+  };
+
+  const parseAICommand = (text: string): AgentAction | null => {
+    const lowerText = text.toLowerCase().trim();
+
+    // Add debt
+    if (lowerText.includes('agregar deuda') || lowerText.includes('add debt') || lowerText.includes('nueva deuda') || lowerText.includes('new debt')) {
+      return { type: 'navigate', params: { route: '/add-debt' } };
+    }
+
+    // Show overview/info
+    if (lowerText.includes('resumen') || lowerText.includes('overview') || lowerText.includes('total') || lowerText.includes('cuánto debo') || lowerText.includes('how much')) {
+      const totals = calculateAITotals();
+      const response = t('aiAgent.overviewResponse', {
+        totalLocal: totals.totalLocal.toLocaleString(),
+        currency: totals.mostCommonCurrency,
+        totalDollars: totals.totalDollars.toLocaleString(),
+        monthlyLocal: totals.monthlyLocal.toLocaleString(),
+        monthlyDollars: totals.monthlyDollars.toLocaleString(),
+      });
+      return { type: 'show_info', params: { value: response } };
+    }
+
+    // Toggle hide amounts
+    if (lowerText.includes('ocultar montos') || lowerText.includes('hide amounts') || lowerText.includes('mostrar montos') || lowerText.includes('show amounts')) {
+      return { type: 'toggle_hide_amounts' };
+    }
+
+    // Navigate to about
+    if (lowerText.includes('sobre') || lowerText.includes('about') || lowerText.includes('método') || lowerText.includes('method')) {
+      return { type: 'navigate', params: { route: '/about' } };
+    }
+
+    // Navigate to profile
+    if (lowerText.includes('perfil') || lowerText.includes('profile')) {
+      return { type: 'navigate', params: { route: '/profile' } };
+    }
+
+    // Add commitment to a debt
+    const commitmentMatch = lowerText.match(/(?:agregar|add|crear|create).*?(?:compromiso|commitment).*?(?:para|to|de|for)?\s*(.+?)(?:\s+con|\s+with|\s+de|\s+of)?\s*(\d+)/i);
+    if (commitmentMatch) {
+      const debtName = commitmentMatch[1]?.trim();
+      const amount = parseFloat(commitmentMatch[2]);
+      const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
+      if (debt && amount) {
+        return {
+          type: 'add_commitment',
+          params: { debtId: debt.id, amount: amount },
+        };
+      }
+    }
+
+    // Complete commitment
+    if (lowerText.includes('completar compromiso') || lowerText.includes('complete commitment') || lowerText.includes('pago realizado') || lowerText.includes('payment made')) {
+      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)(?:\s+compromiso|\s+commitment)?/i);
+      if (debtMatch) {
+        const debtName = debtMatch[1]?.trim();
+        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
+        if (debt && debt.commitments && debt.commitments.length > 0) {
+          const pendingCommitment = debt.commitments.find(c => c.status === 'pending');
+          if (pendingCommitment) {
+            return {
+              type: 'complete_commitment',
+              params: { debtId: debt.id },
+            };
+          }
+        }
+      }
+    }
+
+    // Delete debt
+    if (lowerText.includes('eliminar deuda') || lowerText.includes('delete debt') || lowerText.includes('borrar deuda')) {
+      const debtMatch = lowerText.match(/(?:deuda|debt)?\s*(.+?)$/i);
+      if (debtMatch) {
+        const debtName = debtMatch[1]?.trim();
+        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
+        if (debt) {
+          return {
+            type: 'delete_debt',
+            params: { debtId: debt.id },
+          };
+        }
+      }
+    }
+
+    // Record call
+    if (lowerText.includes('registrar llamada') || lowerText.includes('record call') || lowerText.includes('llamada')) {
+      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)$/i);
+      if (debtMatch) {
+        const debtName = debtMatch[1]?.trim();
+        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
+        if (debt) {
+          return {
+            type: 'record_call',
+            params: { debtId: debt.id },
+          };
+        }
+      }
+    }
+
+    return null;
+  };
+
   const handleAIAction = (action: AgentAction) => {
     switch (action.type) {
       case 'navigate':
@@ -403,6 +575,91 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleAIUserInput = async (text: string) => {
+    if (!text.trim()) return;
+
+    setAiInputText('');
+    setIsProcessing(true);
+
+    // Parse and execute command
+    const action = parseAICommand(text);
+
+    if (action) {
+      handleAIAction(action);
+      setIsProcessing(false);
+    } else {
+      // No command recognized
+      setIsProcessing(false);
+    }
+  };
+
+  const initializeSpeechRecognition = useCallback(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = i18n.language === 'es' ? 'es-ES' : 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setAiInputText(transcript);
+        handleAIUserInput(transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
+
+  useEffect(() => {
+    initializeSpeechRecognition();
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [initializeSpeechRecognition]);
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+      }
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const handleAISubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (aiInputText.trim()) {
+      handleAIUserInput(aiInputText);
+    }
+  };
+
   // Calculate totals
   const calculateTotals = () => {
     const localCurrency = storage.getLocalCurrency();
@@ -437,12 +694,6 @@ const Dashboard: React.FC = () => {
       className="dashboard"
     >
       <Tour run={tourRun} onComplete={() => setTourRun(false)} />
-      <AIAgent
-        debts={debts}
-        onAction={handleAIAction}
-        isOpen={aiAgentOpen}
-        onClose={() => setAiAgentOpen(false)}
-      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -459,15 +710,6 @@ const Dashboard: React.FC = () => {
             <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-profile"
-              onClick={() => setAiAgentOpen(true)}
-              title={t('aiAgent.title')}
-            >
-              <Icon component={FaRobot} />
-            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -556,6 +798,46 @@ const Dashboard: React.FC = () => {
             </div>
           </motion.div>
         )}
+
+        {/* AI Agent Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="ai-agent-section"
+        >
+          <h3 className="ai-agent-section-title">{t('aiAgent.title')}</h3>
+          <form onSubmit={handleAISubmit} className="ai-agent-input-container">
+            <input
+              type="text"
+              value={aiInputText}
+              onChange={(e) => setAiInputText(e.target.value)}
+              placeholder={t('aiAgent.placeholder')}
+              className="ai-agent-input"
+              disabled={isProcessing}
+            />
+            <motion.button
+              type="submit"
+              className="ai-agent-send"
+              disabled={!aiInputText.trim() || isProcessing}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Icon component={FaPaperPlane} />
+            </motion.button>
+            <motion.button
+              type="button"
+              className={`ai-agent-mic ${isListening ? 'listening' : ''}`}
+              onClick={isListening ? stopListening : startListening}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
+              disabled={isProcessing}
+            >
+              <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
+            </motion.button>
+          </form>
+        </motion.div>
 
         <AnimatePresence mode="wait">
           {debts.length === 0 ? (
