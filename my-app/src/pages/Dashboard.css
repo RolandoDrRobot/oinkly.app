@@ -640,7 +640,39 @@
   gap: 16px;
   margin-bottom: 16px;
   padding-bottom: 16px;
-  
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.debt-actions-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+.btn-edit-debt {
+  background: var(--primary);
+  color: var(--text-primary);
+  border: 0;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-edit-debt:hover {
+  background: var(--primary-bright);
+  transform: translateY(-1px);
 }
 
 .debt-payments {
@@ -819,10 +851,16 @@
 .debt-commitments {
   margin-top: 16px;
   margin-bottom: 16px;
-  padding: 16px;
-  background: var(--dark-card, #014a3a);
-  border-radius: 8px;
-  
+  padding: 0;
+}
+
+.debt-commitments h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .commitments-header {
@@ -847,15 +885,17 @@
   background: var(--primary);
   border: 0;
   color: var(--text-primary);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .btn-add-commitment svg {
@@ -883,11 +923,12 @@
   border-radius: 6px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .commitment-item:hover {
   transform: translateX(6px);
-  
+  background: var(--overlay-light);
 }
 
 .commitment-info {
@@ -911,6 +952,33 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.commitment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.commitment-status.completed {
+  background: var(--overlay);
+  color: var(--primary-bright);
+}
+
+.commitment-status.pending {
+  background: var(--primary-overlay);
+  color: var(--primary);
+}
+
+.commitment-status.overdue {
+  background: var(--error-light);
+  color: var(--error);
 }
 
 .commitment-status-badge {
@@ -988,8 +1056,15 @@
 
 .commitment-amounts {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.commitment-amounts span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .commitment-amount {
@@ -1223,13 +1298,20 @@
 }
 
 /* Call History Section */
-.debt-call-history {
+.debt-call-history,
+.debt-calls {
   margin-top: 16px;
   margin-bottom: 16px;
-  padding: 16px;
-  background: var(--dark-card, #014a3a);
-  border-radius: 8px;
-  
+  padding: 0;
+}
+
+.debt-calls h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .call-history-header {
@@ -1253,20 +1335,28 @@
   background: var(--primary);
   color: var(--text-primary);
   border: 0;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .btn-add-call:hover {
   background: var(--primary-bright);
   transform: translateY(-1px);
+}
+
+.calls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .call-history-list {
@@ -1279,15 +1369,14 @@
   padding: 12px;
   background: var(--dark-card, #014a3a);
   border-radius: 6px;
-  
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .call-item:hover {
   transform: translateX(6px);
   background: var(--overlay-light);
-  
 }
 
 .call-date {

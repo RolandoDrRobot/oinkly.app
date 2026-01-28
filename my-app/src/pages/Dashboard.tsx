@@ -1564,45 +1564,6 @@ const Dashboard: React.FC = () => {
                                               </div>
                                             </div>
 
-                                            <div className="debt-actions-section">
-                                              <motion.button
-                                                className="btn-add-commitment"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  navigate(`/add-commitment/${debt.id}`);
-                                                }}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                              >
-                                                <Icon component={FaPlus} style={{ marginRight: '8px' }} />
-                                                {t('dashboard.addCommitment')}
-                                              </motion.button>
-                                              <motion.button
-                                                className="btn-add-call"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  navigate(`/add-call/${debt.id}`);
-                                                }}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                              >
-                                                <Icon component={FaPhone} style={{ marginRight: '8px' }} />
-                                                {t('dashboard.recordCall')}
-                                              </motion.button>
-                                              <motion.button
-                                                className="btn-edit-debt"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  navigate(`/edit-debt/${debt.id}`);
-                                                }}
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                              >
-                                                <Icon component={FaEdit} style={{ marginRight: '8px' }} />
-                                                {t('common.edit')}
-                                              </motion.button>
-                                            </div>
-
                                             {debt.commitments && debt.commitments.length > 0 && (
                                               <div className="debt-commitments">
                                                 <h4>{t('dashboard.paymentCommitments')}</h4>
@@ -1644,6 +1605,33 @@ const Dashboard: React.FC = () => {
                                                 </div>
                                               </div>
                                             )}
+
+                                            <div className="debt-actions-section">
+                                              <motion.button
+                                                className="btn-add-commitment"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/add-commitment/${debt.id}`);
+                                                }}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                              >
+                                                <Icon component={FaPlus} style={{ marginRight: '8px' }} />
+                                                {t('dashboard.addCommitment')}
+                                              </motion.button>
+                                              <motion.button
+                                                className="btn-add-call"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/add-call/${debt.id}`);
+                                                }}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                              >
+                                                <Icon component={FaPhone} style={{ marginRight: '8px' }} />
+                                                {t('dashboard.recordCall')}
+                                              </motion.button>
+                                            </div>
                                           </motion.div>
                                         )}
                                       </AnimatePresence>
