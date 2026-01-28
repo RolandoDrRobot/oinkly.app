@@ -98,7 +98,8 @@
     "value": "Valor",
     "totalFixedExpenses": "Total Gastos Fijos",
     "totalAssets": "Total Activos",
-    "totalIncomes": "Total Ingresos"
+    "totalIncomes": "Total Ingresos",
+    "netWorth": "Patrimonio Neto"
   },
   "addFixedExpense": {
     "title": "Nuevo Gasto Fijo",

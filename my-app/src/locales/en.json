@@ -98,7 +98,8 @@
     "value": "Value",
     "totalFixedExpenses": "Total Fixed Expenses",
     "totalAssets": "Total Assets",
-    "totalIncomes": "Total Income"
+    "totalIncomes": "Total Income",
+    "netWorth": "Net Worth"
   },
   "addFixedExpense": {
     "title": "New Fixed Expense",
