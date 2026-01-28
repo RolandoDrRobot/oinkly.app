@@ -7,6 +7,9 @@ const INCOMES_KEY = 'incomes';
 const USER_KEY = 'user';
 const IS_LOGGED_IN_KEY = 'isLoggedIn';
 const DEBTS_ORDER_KEY = 'debtsOrder';
+const FIXED_EXPENSES_ORDER_KEY = 'fixedExpensesOrder';
+const ASSETS_ORDER_KEY = 'assetsOrder';
+const INCOMES_ORDER_KEY = 'incomesOrder';
 
 export const storage = {
   // User management
@@ -208,5 +211,35 @@ export const storage = {
     const incomes = storage.getIncomes();
     const filtered = incomes.filter(i => i.id !== id);
     localStorage.setItem(INCOMES_KEY, JSON.stringify(filtered));
+  },
+
+  // Fixed Expenses order management
+  setFixedExpensesOrder: (order: string[]) => {
+    localStorage.setItem(FIXED_EXPENSES_ORDER_KEY, JSON.stringify(order));
+  },
+
+  getFixedExpensesOrder: (): string[] | null => {
+    const orderStr = localStorage.getItem(FIXED_EXPENSES_ORDER_KEY);
+    return orderStr ? JSON.parse(orderStr) : null;
+  },
+
+  // Assets order management
+  setAssetsOrder: (order: string[]) => {
+    localStorage.setItem(ASSETS_ORDER_KEY, JSON.stringify(order));
+  },
+
+  getAssetsOrder: (): string[] | null => {
+    const orderStr = localStorage.getItem(ASSETS_ORDER_KEY);
+    return orderStr ? JSON.parse(orderStr) : null;
+  },
+
+  // Incomes order management
+  setIncomesOrder: (order: string[]) => {
+    localStorage.setItem(INCOMES_ORDER_KEY, JSON.stringify(order));
+  },
+
+  getIncomesOrder: (): string[] | null => {
+    const orderStr = localStorage.getItem(INCOMES_ORDER_KEY);
+    return orderStr ? JSON.parse(orderStr) : null;
   },
 };

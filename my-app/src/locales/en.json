@@ -445,6 +445,15 @@
     "thisDebt": "this debt",
     "success": "Debt marked as paid off successfully"
   },
+  "completeAsset": {
+    "title": "Liquidate Asset",
+    "subtitle": "You're liquidating {{assetName}}",
+    "thisAsset": "this asset",
+    "success": "Asset liquidated successfully"
+  },
+  "asset": {
+    "liquidate": "Liquidate Asset"
+  },
   "about": {
     "title": "Oinkly",
     "subtitle": "Your path to financial freedom",

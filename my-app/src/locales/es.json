@@ -445,6 +445,15 @@
     "thisDebt": "esta deuda",
     "success": "Deuda marcada como pagada exitosamente"
   },
+  "completeAsset": {
+    "title": "Liquidar Activo",
+    "subtitle": "Estás liquidando {{assetName}}",
+    "thisAsset": "este activo",
+    "success": "Activo liquidado exitosamente"
+  },
+  "asset": {
+    "liquidate": "Liquidar Activo"
+  },
   "about": {
     "title": "Oinkly",
     "subtitle": "Tu camino hacia la libertad financiera",

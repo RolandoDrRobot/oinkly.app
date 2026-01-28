@@ -1772,17 +1772,19 @@
 
 .item-card {
   background: var(--dark-card, #014a3a);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 20px;
   transition: all 0.3s;
   cursor: pointer;
   user-select: none;
   position: relative;
-  display: flex;
-  align-items: end;
-  gap: 16px;
   border: 1px solid var(--bg-tertiary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-card[data-dragging="true"] {
+  opacity: 0.5;
+  transform: scale(0.95);
 }
 
 .item-card:hover {
@@ -1791,16 +1793,59 @@
   border-color: var(--primary);
 }
 
-.item-card .btn-delete {
+.item-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.item-header-actions-top {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   z-index: 10;
+}
+
+.item-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.item-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-card .btn-delete {
+  position: static;
+}
+
+.item-card .btn-complete-item {
+  position: static;
 }
 
 .item-main-icon {
   font-size: 28px;
   color: var(--primary);
+}
+
+.item-content-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .item-content {
@@ -1815,6 +1860,10 @@
 .item-content .btn-delete {
   flex-shrink: 0;
   margin-left: 8px;
+}
+
+.item-icon-wrapper  {
+  padding-top: 12px;
 }
 
 .item-header {

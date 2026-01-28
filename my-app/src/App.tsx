@@ -15,6 +15,7 @@ import DeleteCommitment from './pages/DeleteCommitment';
 import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
 import CompleteDebt from './pages/CompleteDebt';
+import CompleteAsset from './pages/CompleteAsset';
 import AddFixedExpense from './pages/AddFixedExpense';
 import EditFixedExpense from './pages/EditFixedExpense';
 import AddAsset from './pages/AddAsset';
@@ -161,6 +162,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <EditAsset />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complete-asset/:assetId"
+        element={
+          <ProtectedRoute>
+            <CompleteAsset />
           </ProtectedRoute>
         }
       />
