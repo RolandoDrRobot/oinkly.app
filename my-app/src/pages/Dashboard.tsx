@@ -716,20 +716,40 @@ const Dashboard: React.FC = () => {
       <div className="screen-container">
         <div className="screen-header">
           <h2>{t('dashboard.fixedExpenses')}</h2>
-          <motion.button
-            className="btn-add"
-            onClick={() => navigate('/add-fixed-expense')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Icon component={FaPlus} />
-            {t('common.add')}
-          </motion.button>
         </div>
         {fixedExpenses.length === 0 ? (
-          <div className="empty-state">
-            <p>{t('dashboard.noFixedExpenses')}</p>
-          </div>
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ delay: 0.3 }}
+            className="empty-state"
+          >
+            <motion.img
+              src="/shopping.png"
+              alt="Empty state"
+              className="empty-state-image"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            />
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {t('dashboard.noFixedExpenses')}
+            </motion.p>
+            <motion.p
+              className="empty-subtitle"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {t('dashboard.noFixedExpensesSubtitle')}
+            </motion.p>
+          </motion.div>
         ) : (
           <div className="items-list">
             {fixedExpenses.map(expense => (
@@ -779,20 +799,40 @@ const Dashboard: React.FC = () => {
       <div className="screen-container">
         <div className="screen-header">
           <h2>{t('dashboard.assets')}</h2>
-          <motion.button
-            className="btn-add"
-            onClick={() => navigate('/add-asset')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Icon component={FaPlus} />
-            {t('common.add')}
-          </motion.button>
         </div>
         {assets.length === 0 ? (
-          <div className="empty-state">
-            <p>{t('dashboard.noAssets')}</p>
-          </div>
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ delay: 0.3 }}
+            className="empty-state"
+          >
+            <motion.img
+              src="/shopping.png"
+              alt="Empty state"
+              className="empty-state-image"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            />
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {t('dashboard.noAssets')}
+            </motion.p>
+            <motion.p
+              className="empty-subtitle"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {t('dashboard.noAssetsSubtitle')}
+            </motion.p>
+          </motion.div>
         ) : (
           <div className="items-list">
             {assets.map(asset => (
@@ -843,20 +883,40 @@ const Dashboard: React.FC = () => {
       <div className="screen-container">
         <div className="screen-header">
           <h2>{t('dashboard.incomes')}</h2>
-          <motion.button
-            className="btn-add"
-            onClick={() => navigate('/add-income')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Icon component={FaPlus} />
-            {t('common.add')}
-          </motion.button>
         </div>
         {incomes.length === 0 ? (
-          <div className="empty-state">
-            <p>{t('dashboard.noIncomes')}</p>
-          </div>
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ delay: 0.3 }}
+            className="empty-state"
+          >
+            <motion.img
+              src="/shopping.png"
+              alt="Empty state"
+              className="empty-state-image"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
+            />
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {t('dashboard.noIncomes')}
+            </motion.p>
+            <motion.p
+              className="empty-subtitle"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {t('dashboard.noIncomesSubtitle')}
+            </motion.p>
+          </motion.div>
         ) : (
           <div className="items-list">
             {incomes.map(income => (
@@ -1103,7 +1163,7 @@ const Dashboard: React.FC = () => {
                 transition={{ duration: 0.2 }}
                 style={{ width: '100%' }}
               >
-                <div className="dashboard-content">
+                <div className="dashboard-content dashboard-content-two">
                   <AnimatePresence mode="wait">
                     {debts.length === 0 ? (
                       <motion.div

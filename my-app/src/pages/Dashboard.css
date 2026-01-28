@@ -92,6 +92,10 @@
   max-width: 100%;
 }
 
+.dashboard-content-two {
+  padding: 20px 0;
+}
+
 .dashboard-summary {
   margin-bottom: 20px;
 }
