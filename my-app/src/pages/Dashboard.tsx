@@ -38,7 +38,23 @@ import {
   FaStar,
   FaMicrophone,
   FaMicrophoneSlash,
-  FaPaperPlane
+  FaPaperPlane,
+  FaHome,
+  FaCar,
+  FaPiggyBank,
+  FaBriefcase,
+  FaBuilding,
+  FaShoppingCart,
+  FaUtensils,
+  FaGasPump,
+  FaWifi,
+  FaGamepad,
+  FaGraduationCap,
+  FaHeartbeat,
+  FaDollarSign,
+  FaCoins,
+  FaWallet,
+  FaTag
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, PaymentCommitment, FixedExpense, Asset, Income } from '../types';
@@ -136,6 +152,40 @@ const Dashboard: React.FC = () => {
   const loadIncomes = () => {
     const incomesData = storage.getIncomes();
     setIncomes(incomesData);
+  };
+
+  // Helper functions to get icons for items
+  const getFixedExpenseIcon = (category?: string) => {
+    if (!category) return FaShoppingCart;
+    const cat = category.toLowerCase();
+    if (cat.includes('casa') || cat.includes('home') || cat.includes('vivienda')) return FaHome;
+    if (cat.includes('comida') || cat.includes('food') || cat.includes('restaurant')) return FaUtensils;
+    if (cat.includes('gasolina') || cat.includes('gas') || cat.includes('combustible')) return FaGasPump;
+    if (cat.includes('internet') || cat.includes('wifi') || cat.includes('telefono')) return FaWifi;
+    if (cat.includes('entretenimiento') || cat.includes('entretenimiento') || cat.includes('juego')) return FaGamepad;
+    if (cat.includes('educacion') || cat.includes('education') || cat.includes('escuela')) return FaGraduationCap;
+    if (cat.includes('salud') || cat.includes('health') || cat.includes('medico')) return FaHeartbeat;
+    return FaShoppingCart;
+  };
+
+  const getAssetIcon = (type: Asset['type']) => {
+    switch (type) {
+      case 'property': return FaHome;
+      case 'vehicle': return FaCar;
+      case 'investment': return FaChartLine;
+      case 'savings': return FaPiggyBank;
+      default: return FaWallet;
+    }
+  };
+
+  const getIncomeIcon = (type: Income['type']) => {
+    switch (type) {
+      case 'salary': return FaBriefcase;
+      case 'freelance': return FaUser;
+      case 'investment': return FaChartLine;
+      case 'rental': return FaBuilding;
+      default: return FaDollarSign;
+    }
   };
 
   // Calculate inOrder based on payment commitments
@@ -822,9 +872,6 @@ const Dashboard: React.FC = () => {
   const renderFixedExpensesScreen = () => {
     return (
       <div className="screen-container">
-        <div className="screen-header">
-          <h2>{t('dashboard.fixedExpenses')}</h2>
-        </div>
         {fixedExpenses.length === 0 ? (
           <motion.div
             key="empty"
@@ -861,59 +908,52 @@ const Dashboard: React.FC = () => {
         ) : (
           <div className="items-list">
             {fixedExpenses.map(expense => (
-              <div key={expense.id} className="item-card">
-                <div className="item-header">
-                  <div className="item-header-main">
-                    <div className="item-header-info">
-                      <h3 className="item-name">{expense.name}</h3>
-                      {expense.category && (
-                        <p className="item-type">{expense.category}</p>
-                      )}
-                    </div>
-                    <div className="item-header-actions">
-                      {!hideAmounts && (
-                        <div className="item-amounts">
-                          <div className="summary-item">
-                            <span className="summary-label">{expense.localCurrency}</span>
-                            <span className="summary-value">{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
-                          </div>
-                          <div className="summary-item">
-                            <span className="summary-label">USD</span>
-                            <span className="summary-value">{formatCurrency(expense.amountDollars, 'USD')}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div className="item-card-actions">
-                        <motion.button
-                          className="btn-edit-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/edit-fixed-expense/${expense.id}`);
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaEdit} />
-                        </motion.button>
-                        <motion.button
-                          className="btn-delete-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(t('deleteFixedExpense.confirm'))) {
-                              storage.deleteFixedExpense(expense.id);
-                              loadFixedExpenses();
-                            }
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaTrash} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
+              <motion.div 
+                key={expense.id} 
+                className="item-card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="item-icon-wrapper">
+                  <Icon component={getFixedExpenseIcon(expense.category)} className="item-main-icon" />
                 </div>
-              </div>
+                <div className="item-content">
+                  <div className="item-header-info">
+                    <h3 className="item-name">{expense.name}</h3>
+                    {expense.category && (
+                      <p className="item-type">
+                        <Icon component={FaTag} className="item-type-icon" />
+                        {expense.category}
+                      </p>
+                    )}
+                  </div>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
+                      </div>
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(expense.amountDollars, 'USD')}</span>
+                      </div>
+                      <motion.button
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(t('deleteFixedExpense.confirm'))) {
+                            storage.deleteFixedExpense(expense.id);
+                            loadFixedExpenses();
+                          }
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Icon component={FaTrash} />
+                      </motion.button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -924,9 +964,6 @@ const Dashboard: React.FC = () => {
   const renderAssetsScreen = () => {
     return (
       <div className="screen-container">
-        <div className="screen-header">
-          <h2>{t('dashboard.assets')}</h2>
-        </div>
         {assets.length === 0 ? (
           <motion.div
             key="empty"
@@ -963,57 +1000,50 @@ const Dashboard: React.FC = () => {
         ) : (
           <div className="items-list">
             {assets.map(asset => (
-              <div key={asset.id} className="item-card">
-                <div className="item-header">
-                  <div className="item-header-main">
-                    <div className="item-header-info">
-                      <h3 className="item-name">{asset.name}</h3>
-                      <p className="item-type">{t(`dashboard.${asset.type}`)}</p>
-                    </div>
-                    <div className="item-header-actions">
-                      {!hideAmounts && (
-                        <div className="item-amounts">
-                          <div className="summary-item">
-                            <span className="summary-label">{asset.localCurrency}</span>
-                            <span className="summary-value">{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
-                          </div>
-                          <div className="summary-item">
-                            <span className="summary-label">USD</span>
-                            <span className="summary-value">{formatCurrency(asset.valueDollars, 'USD')}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div className="item-card-actions">
-                        <motion.button
-                          className="btn-edit-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/edit-asset/${asset.id}`);
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaEdit} />
-                        </motion.button>
-                        <motion.button
-                          className="btn-delete-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(t('deleteAsset.confirm'))) {
-                              storage.deleteAsset(asset.id);
-                              loadAssets();
-                            }
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaTrash} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
+              <motion.div 
+                key={asset.id} 
+                className="item-card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="item-icon-wrapper">
+                  <Icon component={getAssetIcon(asset.type)} className="item-main-icon" />
                 </div>
-              </div>
+                <div className="item-content">
+                  <div className="item-header-info">
+                    <h3 className="item-name">{asset.name}</h3>
+                    <p className="item-type">
+                      <Icon component={FaTag} className="item-type-icon" />
+                      {t(`dashboard.${asset.type}`)}
+                    </p>
+                  </div>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
+                      </div>
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(asset.valueDollars, 'USD')}</span>
+                      </div>
+                      <motion.button
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(t('deleteAsset.confirm'))) {
+                            storage.deleteAsset(asset.id);
+                            loadAssets();
+                          }
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Icon component={FaTrash} />
+                      </motion.button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -1024,9 +1054,6 @@ const Dashboard: React.FC = () => {
   const renderIncomesScreen = () => {
     return (
       <div className="screen-container">
-        <div className="screen-header">
-          <h2>{t('dashboard.incomes')}</h2>
-        </div>
         {incomes.length === 0 ? (
           <motion.div
             key="empty"
@@ -1063,60 +1090,56 @@ const Dashboard: React.FC = () => {
         ) : (
           <div className="items-list">
             {incomes.map(income => (
-              <div key={income.id} className="item-card">
-                <div className="item-header">
-                  <div className="item-header-main">
-                    <div className="item-header-info">
-                      <h3 className="item-name">{income.name}</h3>
-                      <div className="debt-bank-type-row">
-                        <p className="item-type">{t(`dashboard.${income.type}`)}</p>
-                        <p className="item-type">{t(`dashboard.${income.frequency}`)}</p>
-                      </div>
-                    </div>
-                    <div className="item-header-actions">
-                      {!hideAmounts && (
-                        <div className="item-amounts">
-                          <div className="summary-item">
-                            <span className="summary-label">{income.localCurrency}</span>
-                            <span className="summary-value">{formatCurrency(income.amountLocal, income.localCurrency)}</span>
-                          </div>
-                          <div className="summary-item">
-                            <span className="summary-label">USD</span>
-                            <span className="summary-value">{formatCurrency(income.amountDollars, 'USD')}</span>
-                          </div>
-                        </div>
-                      )}
-                      <div className="item-card-actions">
-                        <motion.button
-                          className="btn-edit-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/edit-income/${income.id}`);
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaEdit} />
-                        </motion.button>
-                        <motion.button
-                          className="btn-delete-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm(t('deleteIncome.confirm'))) {
-                              storage.deleteIncome(income.id);
-                              loadIncomes();
-                            }
-                          }}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Icon component={FaTrash} />
-                        </motion.button>
-                      </div>
+              <motion.div 
+                key={income.id} 
+                className="item-card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="item-icon-wrapper">
+                  <Icon component={getIncomeIcon(income.type)} className="item-main-icon" />
+                </div>
+                <div className="item-content">
+                  <div className="item-header-info">
+                    <h3 className="item-name">{income.name}</h3>
+                    <div className="item-type-row">
+                      <p className="item-type">
+                        <Icon component={FaTag} className="item-type-icon" />
+                        {t(`dashboard.${income.type}`)}
+                      </p>
+                      <p className="item-frequency">
+                        <Icon component={FaCalendarAlt} className="item-type-icon" />
+                        {t(`dashboard.${income.frequency}`)}
+                      </p>
                     </div>
                   </div>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(income.amountLocal, income.localCurrency)}</span>
+                      </div>
+                      <div className="summary-item">
+                        <span className="summary-value">{formatCurrency(income.amountDollars, 'USD')}</span>
+                      </div>
+                      <motion.button
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(t('deleteIncome.confirm'))) {
+                            storage.deleteIncome(income.id);
+                            loadIncomes();
+                          }
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <Icon component={FaTrash} />
+                      </motion.button>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

@@ -646,6 +646,14 @@
   color: var(--error);
 }
 
+
+.btn-delete {
+  display: flex;
+  justify-content: end;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .debt-main-info {
   display: flex;
   flex-direction: column;
@@ -1762,16 +1770,43 @@
 
 .item-card {
   background: var(--dark-card, #014a3a);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 20px;
   transition: all 0.3s;
   cursor: pointer;
   user-select: none;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--bg-tertiary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .item-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.item-main-icon {
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.item-content .btn-delete {
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .item-header {
@@ -1831,8 +1866,9 @@
 .item-card-actions {
   display: flex;
   gap: 8px;
-  align-items: center;
-  align-self: flex-end;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding-top: 4px;
 }
 
 .btn-edit-item,
@@ -1867,29 +1903,55 @@
 .item-card h3,
 .item-name {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
   display: flex;
   align-items: center;
+  line-height: 1.4;
 }
 
 .item-type {
   margin: 0;
   font-size: 12px;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--overlay);
+  width: fit-content;
+}
+
+.item-type-icon {
+  font-size: 10px;
+  color: var(--primary);
+}
+
+.item-type-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.item-frequency {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--overlay);
+  width: fit-content;
 }
 
 .item-amounts {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
   gap: 8px;
 }
 
