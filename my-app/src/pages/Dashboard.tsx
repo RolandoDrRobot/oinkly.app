@@ -1511,52 +1511,8 @@ const Dashboard: React.FC = () => {
                                                 </span>
                                               )}
                                             </div>
-                                            {(() => {
-                                              const urgent = hasUrgentCommitments(debt);
-                                              if (urgent.hasUrgent) {
-                                                const alertConfig = {
-                                                  'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.overdue'), icon: FaExclamationTriangle },
-                                                  'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.dueToday'), icon: FaExclamationTriangle },
-                                                  'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: t('dashboard.dueTomorrow'), icon: FaExclamationTriangle },
-                                                };
-                                                const config = urgent.highestPriority ? alertConfig[urgent.highestPriority] : alertConfig['due-tomorrow'];
-                                                return (
-                                                  <motion.div
-                                                    initial={{ scale: 0 }}
-                                                    animate={{ scale: 1 }}
-                                                    className="commitment-alert-badge"
-                                                    style={{ 
-                                                      background: config.bg,
-                                                      borderColor: config.color,
-                                                      color: config.color,
-                                                    }}
-                                                    title={t('dashboard.commitmentsNeedAttention', { count: urgent.count })}
-                                                  >
-                                                    <Icon component={config.icon} size={12} />
-                                                    <span>{urgent.count}</span>
-                                                  </motion.div>
-                                                );
-                                              }
-                                              return null;
-                                            })()}
                                           </div>
                                           <div className="debt-actions">
-                                            <motion.div
-                                              initial={{ scale: 0, opacity: 0 }}
-                                              animate={{ scale: 1, opacity: 1 }}
-                                              className={`call-task-icon ${!debt.hasCallTask ? 'inactive' : ''}`}
-                                              title={t('debt.callTask')}
-                                            >
-                                              <Icon component={FaPhone} />
-                                            </motion.div>
-                                            <motion.div
-                                              initial={{ scale: 0, opacity: 0 }}
-                                              animate={{ scale: 1, opacity: 1 }}
-                                              className={`call-completed-icon ${!debt.callCompleted ? 'inactive' : ''}`}
-                                              title={t('debt.callCompleted')}
-                                            >
-                                              <Icon component={FaCheck} />
-                                            </motion.div>
                                             <motion.button
                                               whileHover={{ scale: 1.1 }}
                                               whileTap={{ scale: 0.9 }}
@@ -1749,31 +1705,33 @@ const Dashboard: React.FC = () => {
                                                         </div>
                                                       </div>
                                                       <div className="commitment-notes-row">
-                                                        {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'notes' ? (
-                                                          <input
-                                                            type="text"
-                                                            value={editValue}
-                                                            onChange={(e) => setEditValue(e.target.value)}
-                                                            onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'notes')}
-                                                            onKeyDown={(e) => {
-                                                              if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'notes');
-                                                              if (e.key === 'Escape') cancelEdit();
-                                                            }}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="inline-edit-input"
-                                                            autoFocus
-                                                          />
-                                                        ) : (
-                                                          <p 
-                                                            className="commitment-notes editable-field"
-                                                            onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              startEditingCommitment(debt.id, commitment.id, 'notes', commitment.notes || '', e);
-                                                            }}
-                                                          >
-                                                            {commitment.notes || ''}
-                                                          </p>
-                                                        )}
+                                                        <div className="commitment-notes-container">
+                                                          {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'notes' ? (
+                                                            <input
+                                                              type="text"
+                                                              value={editValue}
+                                                              onChange={(e) => setEditValue(e.target.value)}
+                                                              onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'notes')}
+                                                              onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'notes');
+                                                                if (e.key === 'Escape') cancelEdit();
+                                                              }}
+                                                              onClick={(e) => e.stopPropagation()}
+                                                              className="inline-edit-input"
+                                                              autoFocus
+                                                            />
+                                                          ) : (
+                                                            <p 
+                                                              className="commitment-notes editable-field"
+                                                              onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                startEditingCommitment(debt.id, commitment.id, 'notes', commitment.notes || '', e);
+                                                              }}
+                                                            >
+                                                              {commitment.notes || ''}
+                                                            </p>
+                                                          )}
+                                                        </div>
                                                         <div className="commitment-actions">
                                                           <motion.button
                                                             className="btn-delete-item"
@@ -1788,6 +1746,20 @@ const Dashboard: React.FC = () => {
                                                           >
                                                             <Icon component={FaTrash} />
                                                           </motion.button>
+                                                          {commitment.status === 'pending' && (
+                                                            <motion.button
+                                                              className="btn-complete-item"
+                                                              onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/complete-commitment/${debt.id}/${commitment.id}`);
+                                                              }}
+                                                              whileHover={{ scale: 1.1 }}
+                                                              whileTap={{ scale: 0.9 }}
+                                                              title={t('commitment.markCompleted')}
+                                                            >
+                                                              <Icon component={FaCheck} />
+                                                            </motion.button>
+                                                          )}
                                                         </div>
                                                       </div>
                                                     </div>
