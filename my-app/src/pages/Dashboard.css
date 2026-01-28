@@ -912,27 +912,41 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 28px
 }
 
 .commitment-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: flex-start;
-  padding: 12px;
+  padding: 16px;
   background: var(--dark-card, #014a3a);
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--bg-tertiary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 4px;
+}
+
+.commitment-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 1;
+  width: 100%;
+  gap: 12px;
 }
 
 .commitment-item:hover {
-  transform: translateX(6px);
+  transform: translateX(4px);
   background: var(--overlay-light);
+  border-color: var(--primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .commitment-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -946,12 +960,14 @@
 }
 
 .commitment-date {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .commitment-status {
@@ -1059,6 +1075,14 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
+  flex-shrink: 0;
+}
+
+.commitment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .commitment-amounts span {
@@ -1073,17 +1097,34 @@
   color: var(--text-primary);
 }
 
+.commitment-notes-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border-top: 1px solid var(--bg-tertiary);
+}
+
 .commitment-notes {
   font-size: 13px;
   color: var(--text-muted);
   margin: 0;
   font-style: italic;
+  flex: 0 0 90%;
+}
+
+.commitment-notes-row .commitment-actions {
+  flex: 0 0 10%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .commitment-actions {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .btn-commitment-action {
@@ -1366,34 +1407,67 @@
 }
 
 .call-item {
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
   background: var(--dark-card, #014a3a);
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--bg-tertiary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 12px;
+  position: relative;
 }
 
 .call-item:hover {
-  transform: translateX(6px);
+  transform: translateX(4px);
   background: var(--overlay-light);
+  border-color: var(--primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.call-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.call-notes-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.call-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .call-date {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--bg-tertiary);
 }
 
 .call-notes {
-  font-size: 14px;
-  color: var(--text-primary);
-  line-height: 1.5;
-  white-space: pre-wrap;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
 }
 
 .call-history-empty {
@@ -1465,7 +1539,8 @@
 
   .commitment-item {
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
+    padding: 20px 0 10px;
   }
 
   .commitment-actions {
@@ -1710,7 +1785,7 @@
   border: 0;
   background: transparent;
   color: var(--text-secondary);
-  padding: 6px;
+  padding: 6px 6px 0 6px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;

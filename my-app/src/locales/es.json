@@ -279,6 +279,24 @@
     "saveCall": "Guardar Llamada",
     "success": "Tu llamada ha sido registrada exitosamente"
   },
+  "editCall": {
+    "title": "Editar Llamada",
+    "subtitle": "Actualicemos el registro de llamada para {{debtName}}",
+    "thisDebt": "esta deuda",
+    "date": "Fecha",
+    "dateSubtitle": "¿Cuándo tuvo lugar esta llamada?",
+    "notes": "Notas",
+    "notesSubtitle": "¿De qué hablaron? ¿Algún acuerdo? ¿Próximos pasos?",
+    "notesPlaceholder": "¿De qué hablaron? ¿Algún acuerdo? ¿Próximos pasos?",
+    "success": "Registro de llamada actualizado exitosamente"
+  },
+  "deleteCall": {
+    "title": "Eliminar Llamada",
+    "subtitle": "¿Estás seguro de que quieres eliminar este registro de llamada?",
+    "confirm": "¿Estás seguro de que quieres eliminar esta llamada?",
+    "confirmMessage": "Esta acción no se puede deshacer.",
+    "success": "Registro de llamada eliminado exitosamente"
+  },
   "updateBalances": {
     "title": "Actualizar Saldos",
     "message": "¡Excelente! Completaste un compromiso de pago. ¿Te gustaría actualizar los saldos de tu deuda?",

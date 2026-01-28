@@ -9,6 +9,8 @@ import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
 import AddCommitment from './pages/AddCommitment';
 import AddCall from './pages/AddCall';
+import EditCall from './pages/EditCall';
+import DeleteCall from './pages/DeleteCall';
 import DeleteCommitment from './pages/DeleteCommitment';
 import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
@@ -102,6 +104,22 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <AddCall />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-call/:debtId/:callId"
+        element={
+          <ProtectedRoute>
+            <EditCall />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delete-call/:debtId/:callId"
+        element={
+          <ProtectedRoute>
+            <DeleteCall />
           </ProtectedRoute>
         }
       />
