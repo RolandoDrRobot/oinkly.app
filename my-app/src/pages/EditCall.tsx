@@ -9,7 +9,6 @@ import {
   FaPhoneAlt,
   FaGift,
   FaArrowLeft,
-  FaCheckCircle
 } from 'react-icons/fa';
 import { CallRecord, Debt } from '../types';
 import { storage } from '../utils/storage';

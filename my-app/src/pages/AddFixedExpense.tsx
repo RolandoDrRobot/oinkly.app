@@ -6,13 +6,10 @@ import type { IconType } from 'react-icons';
 import { 
   FaHandPaper, 
   FaPen, 
-  FaMoneyBillWave,
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaCheckCircle, 
   FaGift,
-  FaTimes,
   FaArrowLeft,
   FaCalendarAlt,
   FaTag

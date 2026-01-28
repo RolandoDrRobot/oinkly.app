@@ -6,7 +6,6 @@ import type { IconType } from 'react-icons';
 import { 
   FaHandPaper, 
   FaPen, 
-  FaMoneyBillWave,
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 

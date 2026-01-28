@@ -19,7 +19,6 @@ import {
 } from '@dnd-kit/sortable';
 import { 
   FaPlus, 
-  FaEdit, 
   FaTrash, 
   FaPhone, 
   FaCheck, 
@@ -32,7 +31,6 @@ import {
   FaChartLine, 
   FaMoneyBill, 
   FaCalendarAlt, 
-  FaExclamationTriangle, 
   FaEye,
   FaEyeSlash,
   FaStar,
@@ -52,12 +50,11 @@ import {
   FaGraduationCap,
   FaHeartbeat,
   FaDollarSign,
-  FaCoins,
   FaWallet,
   FaTag
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
-import { Debt, PaymentCommitment, FixedExpense, Asset, Income } from '../types';
+import { Debt, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
@@ -127,6 +124,7 @@ const Dashboard: React.FC = () => {
     return saved === 'true';
   });
   const [tourRun, setTourRun] = useState(false);
+  const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   // AI Agent states
   const [isListening, setIsListening] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
@@ -422,25 +420,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleToggleCallTask = (debt: Debt) => {
-    const updated = {
-      ...debt,
-      hasCallTask: !debt.hasCallTask,
-      callCompleted: false,
-    };
-    storage.saveDebt(updated);
-    loadDebts();
-  };
-
-  const handleToggleCallCompleted = (debt: Debt) => {
-    const updated = {
-      ...debt,
-      callCompleted: !debt.callCompleted,
-    };
-    storage.saveDebt(updated);
-    loadDebts();
-  };
-
   const toggleExpand = (debtId: string) => {
     setExpandedDebts(prev => {
       const newSet = new Set(prev);
@@ -675,61 +654,6 @@ const Dashboard: React.FC = () => {
     
     setEditingCommitment(null);
     setEditValue('');
-  };
-
-  // Get commitment status based on date
-  const getCommitmentStatus = (commitment: PaymentCommitment): 'pending' | 'completed' | 'overdue' | 'due-today' | 'due-tomorrow' => {
-    if (commitment.status === 'completed') return 'completed';
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const commitmentDate = new Date(commitment.date);
-    commitmentDate.setHours(0, 0, 0, 0);
-    const diffTime = commitmentDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) return 'overdue'; // Vencido
-    if (diffDays === 0) return 'due-today'; // Hoy
-    if (diffDays === 1) return 'due-tomorrow'; // Mañana
-    return 'pending'; // Pendiente normal
-  };
-
-  // Check if debt has commitments that need attention
-  const hasUrgentCommitments = (debt: Debt): { hasUrgent: boolean; count: number; highestPriority: 'overdue' | 'due-today' | 'due-tomorrow' | null } => {
-    if (!debt.commitments || debt.commitments.length === 0) {
-      return { hasUrgent: false, count: 0, highestPriority: null };
-    }
-
-    const urgentStatuses: Array<'overdue' | 'due-today' | 'due-tomorrow'> = ['overdue', 'due-today', 'due-tomorrow'];
-    const priorityOrder = { 'overdue': 3, 'due-today': 2, 'due-tomorrow': 1 };
-    
-    const urgentCommitments = debt.commitments.filter(c => {
-      const status = getCommitmentStatus(c);
-      return urgentStatuses.includes(status as any);
-    });
-
-    if (urgentCommitments.length === 0) {
-      return { hasUrgent: false, count: 0, highestPriority: null };
-    }
-
-    const highestPriority = urgentCommitments.reduce((highest, c) => {
-      const status = getCommitmentStatus(c);
-      const currentPriority = priorityOrder[status as keyof typeof priorityOrder] || 0;
-      const highestPriorityValue = priorityOrder[highest as keyof typeof priorityOrder] || 0;
-      return currentPriority > highestPriorityValue ? status : highest;
-    }, urgentCommitments[0] ? getCommitmentStatus(urgentCommitments[0]) : null) as 'overdue' | 'due-today' | 'due-tomorrow' | null;
-
-    return {
-      hasUrgent: true,
-      count: urgentCommitments.length,
-      highestPriority,
-    };
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -2676,110 +2600,177 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="dashboard-summary"
           >
-            <div className="summary-card">
-              {debts.length > 0 && (
-                <>
-                  <div className="summary-section">
-                    <div className="summary-card-header">
-                      <Icon component={FaFileInvoiceDollar} className="summary-icon" />
-                      <span className="summary-label">{t('dashboard.totalDebt')}</span>
-                    </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{totals.mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(totals.totalLocal, totals.mostCommonCurrency)}</span>
+            <motion.div
+              layout
+              className={`summary-card overall-summary ${isOverallSummaryExpanded ? 'expanded' : 'collapsed'}`}
+              onClick={() => {
+                if (!isOverallSummaryExpanded) setIsOverallSummaryExpanded(true);
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (!isOverallSummaryExpanded) setIsOverallSummaryExpanded(true);
+                }
+              }}
+              transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {!isOverallSummaryExpanded ? (
+                  <motion.div
+                    key="collapsed"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18 }}
+                  >
+                    <div className="summary-section">
+                      <div className="summary-card-header">
+                        <Icon component={FaChartLine} className="summary-icon" />
+                        <span className="summary-label">{t('dashboard.netWorth')}</span>
                       </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(totals.totalDollars, 'USD')}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="summary-divider"></div>
-                </>
-              )}
-              {fixedExpenses.length > 0 && (
-                <>
-                  <div className="summary-section">
-                    <div className="summary-card-header">
-                      <Icon component={FaShoppingCart} className="summary-icon" />
-                      <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
-                    </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{calculateFixedExpensesTotals().mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalLocal, calculateFixedExpensesTotals().mostCommonCurrency)}</span>
-                      </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalDollars, 'USD')}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="summary-divider"></div>
-                </>
-              )}
-              {assets.length > 0 && (
-                <>
-                  <div className="summary-section">
-                    <div className="summary-card-header">
-                      <Icon component={FaWallet} className="summary-icon" />
-                      <span className="summary-label">{t('dashboard.totalAssets')}</span>
-                    </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{calculateAssetsTotals().mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(calculateAssetsTotals().totalLocal, calculateAssetsTotals().mostCommonCurrency)}</span>
-                      </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(calculateAssetsTotals().totalDollars, 'USD')}</span>
+                      <div className="summary-values">
+                        <div className="summary-value">
+                          <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
+                          <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
+                        </div>
+                        <div className="summary-value">
+                          <span className="summary-currency">USD</span>
+                          <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalDollars, 'USD')}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="summary-divider"></div>
-                </>
-              )}
-              {incomes.length > 0 && (
-                <>
-                  <div className="summary-section">
-                    <div className="summary-card-header">
-                      <Icon component={FaMoneyBillWave} className="summary-icon" />
-                      <span className="summary-label">{t('dashboard.totalIncomes')}</span>
-                    </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{calculateIncomesTotals().mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalLocal, calculateIncomesTotals().mostCommonCurrency)}</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="expanded"
+                    initial={{ opacity: 0, y: 10, scale: 0.98, filter: 'blur(2px)' }}
+                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, y: 6, scale: 0.99, filter: 'blur(2px)' }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="btn-close-summary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOverallSummaryExpanded(false);
+                      }}
+                      title={t('common.close')}
+                    >
+                      <Icon component={FaTimes} size={16} />
+                    </motion.button>
+
+                    <div style={{ paddingTop: 4 }}>
+                      {debts.length > 0 && (
+                        <>
+                          <div className="summary-section">
+                            <div className="summary-card-header">
+                              <Icon component={FaFileInvoiceDollar} className="summary-icon" />
+                              <span className="summary-label">{t('dashboard.totalDebt')}</span>
+                            </div>
+                            <div className="summary-values">
+                              <div className="summary-value">
+                                <span className="summary-currency">{totals.mostCommonCurrency}</span>
+                                <span className="summary-amount">{formatCurrency(totals.totalLocal, totals.mostCommonCurrency)}</span>
+                              </div>
+                              <div className="summary-value">
+                                <span className="summary-currency">USD</span>
+                                <span className="summary-amount">{formatCurrency(totals.totalDollars, 'USD')}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="summary-divider"></div>
+                        </>
+                      )}
+                      {fixedExpenses.length > 0 && (
+                        <>
+                          <div className="summary-section">
+                            <div className="summary-card-header">
+                              <Icon component={FaShoppingCart} className="summary-icon" />
+                              <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
+                            </div>
+                            <div className="summary-values">
+                              <div className="summary-value">
+                                <span className="summary-currency">{calculateFixedExpensesTotals().mostCommonCurrency}</span>
+                                <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalLocal, calculateFixedExpensesTotals().mostCommonCurrency)}</span>
+                              </div>
+                              <div className="summary-value">
+                                <span className="summary-currency">USD</span>
+                                <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalDollars, 'USD')}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="summary-divider"></div>
+                        </>
+                      )}
+                      {assets.length > 0 && (
+                        <>
+                          <div className="summary-section">
+                            <div className="summary-card-header">
+                              <Icon component={FaWallet} className="summary-icon" />
+                              <span className="summary-label">{t('dashboard.totalAssets')}</span>
+                            </div>
+                            <div className="summary-values">
+                              <div className="summary-value">
+                                <span className="summary-currency">{calculateAssetsTotals().mostCommonCurrency}</span>
+                                <span className="summary-amount">{formatCurrency(calculateAssetsTotals().totalLocal, calculateAssetsTotals().mostCommonCurrency)}</span>
+                              </div>
+                              <div className="summary-value">
+                                <span className="summary-currency">USD</span>
+                                <span className="summary-amount">{formatCurrency(calculateAssetsTotals().totalDollars, 'USD')}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="summary-divider"></div>
+                        </>
+                      )}
+                      {incomes.length > 0 && (
+                        <>
+                          <div className="summary-section">
+                            <div className="summary-card-header">
+                              <Icon component={FaMoneyBillWave} className="summary-icon" />
+                              <span className="summary-label">{t('dashboard.totalIncomes')}</span>
+                            </div>
+                            <div className="summary-values">
+                              <div className="summary-value">
+                                <span className="summary-currency">{calculateIncomesTotals().mostCommonCurrency}</span>
+                                <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalLocal, calculateIncomesTotals().mostCommonCurrency)}</span>
+                              </div>
+                              <div className="summary-value">
+                                <span className="summary-currency">USD</span>
+                                <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalDollars, 'USD')}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="summary-divider"></div>
+                        </>
+                      )}
+                      <div className="summary-section">
+                        <div className="summary-card-header">
+                          <Icon component={FaChartLine} className="summary-icon" />
+                          <span className="summary-label">{t('dashboard.netWorth')}</span>
+                        </div>
+                        <div className="summary-values">
+                          <div className="summary-value">
+                            <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
+                            <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
+                          </div>
+                          <div className="summary-value">
+                            <span className="summary-currency">USD</span>
+                            <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalDollars, 'USD')}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalDollars, 'USD')}</span>
-                      </div>
                     </div>
-                  </div>
-                  <div className="summary-divider"></div>
-                </>
-              )}
-              {(debts.length > 0 || fixedExpenses.length > 0 || assets.length > 0 || incomes.length > 0) && (
-                <div className="summary-section">
-                  <div className="summary-card-header">
-                    <Icon component={FaChartLine} className="summary-icon" />
-                    <span className="summary-label">{t('dashboard.netWorth')}</span>
-                  </div>
-                  <div className="summary-values">
-                    <div className="summary-value">
-                      <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
-                      <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
-                    </div>
-                    <div className="summary-value">
-                      <span className="summary-currency">USD</span>
-                      <span className="summary-amount">{formatCurrency(calculateOverallTotals().netWorth.totalDollars, 'USD')}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </motion.div>
         )}
 
