@@ -1066,9 +1066,60 @@ const Dashboard: React.FC = () => {
 
   const totals = calculateTotals();
 
+  // Calculate totals for each section
+  const calculateFixedExpensesTotals = () => {
+    const localCurrency = storage.getLocalCurrency();
+    const totals = fixedExpenses.reduce((acc, expense) => {
+      acc.totalLocal += expense.amountLocal || 0;
+      acc.totalDollars += expense.amountDollars || 0;
+      return acc;
+    }, {
+      totalLocal: 0,
+      totalDollars: 0,
+    });
+    return {
+      ...totals,
+      mostCommonCurrency: localCurrency,
+    };
+  };
+
+  const calculateAssetsTotals = () => {
+    const localCurrency = storage.getLocalCurrency();
+    const totals = assets.reduce((acc, asset) => {
+      acc.totalLocal += asset.valueLocal || 0;
+      acc.totalDollars += asset.valueDollars || 0;
+      return acc;
+    }, {
+      totalLocal: 0,
+      totalDollars: 0,
+    });
+    return {
+      ...totals,
+      mostCommonCurrency: localCurrency,
+    };
+  };
+
+  const calculateIncomesTotals = () => {
+    const localCurrency = storage.getLocalCurrency();
+    const totals = incomes.reduce((acc, income) => {
+      acc.totalLocal += income.amountLocal || 0;
+      acc.totalDollars += income.amountDollars || 0;
+      return acc;
+    }, {
+      totalLocal: 0,
+      totalDollars: 0,
+    });
+    return {
+      ...totals,
+      mostCommonCurrency: localCurrency,
+    };
+  };
+
   // Render functions for each screen - Deuda screen uses the existing content below
 
   const renderFixedExpensesScreen = () => {
+    const fixedExpensesTotals = calculateFixedExpensesTotals();
+    
     return (
       <div className="screen-container">
         {fixedExpenses.length === 0 ? (
@@ -1105,11 +1156,39 @@ const Dashboard: React.FC = () => {
             </motion.p>
           </motion.div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleFixedExpensesDragEnd}
-          >
+          <>
+            {fixedExpenses.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="dashboard-summary"
+              >
+                <div className="summary-card">
+                  <div className="summary-section">
+                    <div className="summary-card-header">
+                      <Icon component={FaShoppingCart} className="summary-icon" />
+                      <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
+                    </div>
+                    <div className="summary-values">
+                      <div className="summary-value">
+                        <span className="summary-currency">{fixedExpensesTotals.mostCommonCurrency}</span>
+                        <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalLocal, fixedExpensesTotals.mostCommonCurrency)}</span>
+                      </div>
+                      <div className="summary-value">
+                        <span className="summary-currency">USD</span>
+                        <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalDollars, 'USD')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleFixedExpensesDragEnd}
+            >
             <SortableContext
               items={fixedExpenses.map(e => e.id)}
               strategy={verticalListSortingStrategy}
@@ -1302,12 +1381,15 @@ const Dashboard: React.FC = () => {
               </div>
             </SortableContext>
           </DndContext>
+          </>
         )}
       </div>
     );
   };
 
   const renderAssetsScreen = () => {
+    const assetsTotals = calculateAssetsTotals();
+    
     return (
       <div className="screen-container">
         {assets.length === 0 ? (
@@ -1344,11 +1426,39 @@ const Dashboard: React.FC = () => {
             </motion.p>
           </motion.div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleAssetsDragEnd}
-          >
+          <>
+            {assets.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="dashboard-summary"
+              >
+                <div className="summary-card">
+                  <div className="summary-section">
+                    <div className="summary-card-header">
+                      <Icon component={FaWallet} className="summary-icon" />
+                      <span className="summary-label">{t('dashboard.totalAssets')}</span>
+                    </div>
+                    <div className="summary-values">
+                      <div className="summary-value">
+                        <span className="summary-currency">{assetsTotals.mostCommonCurrency}</span>
+                        <span className="summary-amount">{formatCurrency(assetsTotals.totalLocal, assetsTotals.mostCommonCurrency)}</span>
+                      </div>
+                      <div className="summary-value">
+                        <span className="summary-currency">USD</span>
+                        <span className="summary-amount">{formatCurrency(assetsTotals.totalDollars, 'USD')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleAssetsDragEnd}
+            >
             <SortableContext
               items={assets.map(a => a.id)}
               strategy={verticalListSortingStrategy}
@@ -1534,12 +1644,15 @@ const Dashboard: React.FC = () => {
               </div>
             </SortableContext>
           </DndContext>
+          </>
         )}
       </div>
     );
   };
 
   const renderIncomesScreen = () => {
+    const incomesTotals = calculateIncomesTotals();
+    
     return (
       <div className="screen-container">
         {incomes.length === 0 ? (
@@ -1576,11 +1689,39 @@ const Dashboard: React.FC = () => {
             </motion.p>
           </motion.div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleIncomesDragEnd}
-          >
+          <>
+            {incomes.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="dashboard-summary"
+              >
+                <div className="summary-card">
+                  <div className="summary-section">
+                    <div className="summary-card-header">
+                      <Icon component={FaMoneyBillWave} className="summary-icon" />
+                      <span className="summary-label">{t('dashboard.totalIncomes')}</span>
+                    </div>
+                    <div className="summary-values">
+                      <div className="summary-value">
+                        <span className="summary-currency">{incomesTotals.mostCommonCurrency}</span>
+                        <span className="summary-amount">{formatCurrency(incomesTotals.totalLocal, incomesTotals.mostCommonCurrency)}</span>
+                      </div>
+                      <div className="summary-value">
+                        <span className="summary-currency">USD</span>
+                        <span className="summary-amount">{formatCurrency(incomesTotals.totalDollars, 'USD')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleIncomesDragEnd}
+            >
             <SortableContext
               items={incomes.map(i => i.id)}
               strategy={verticalListSortingStrategy}
@@ -1758,6 +1899,7 @@ const Dashboard: React.FC = () => {
               </div>
             </SortableContext>
           </DndContext>
+          </>
         )}
       </div>
     );

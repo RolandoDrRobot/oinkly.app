@@ -95,7 +95,10 @@
     "oneTime": "Una vez",
     "nextPaymentDate": "Próxima fecha de pago",
     "amount": "Monto",
-    "value": "Valor"
+    "value": "Valor",
+    "totalFixedExpenses": "Total Gastos Fijos",
+    "totalAssets": "Total Activos",
+    "totalIncomes": "Total Ingresos"
   },
   "addFixedExpense": {
     "title": "Nuevo Gasto Fijo",

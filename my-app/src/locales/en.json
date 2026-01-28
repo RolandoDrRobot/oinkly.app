@@ -95,7 +95,10 @@
     "oneTime": "One-time",
     "nextPaymentDate": "Next payment date",
     "amount": "Amount",
-    "value": "Value"
+    "value": "Value",
+    "totalFixedExpenses": "Total Fixed Expenses",
+    "totalAssets": "Total Assets",
+    "totalIncomes": "Total Income"
   },
   "addFixedExpense": {
     "title": "New Fixed Expense",
