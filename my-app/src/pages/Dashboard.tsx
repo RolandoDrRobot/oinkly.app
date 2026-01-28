@@ -117,6 +117,9 @@ const Dashboard: React.FC = () => {
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editingCall, setEditingCall] = useState<{ debtId: string; callId: string; field: string } | null>(null);
   const [editingCommitment, setEditingCommitment] = useState<{ debtId: string; commitmentId: string; field: string } | null>(null);
+  const [editingFixedExpense, setEditingFixedExpense] = useState<{ expenseId: string; field: string } | null>(null);
+  const [editingAsset, setEditingAsset] = useState<{ assetId: string; field: string } | null>(null);
+  const [editingIncome, setEditingIncome] = useState<{ incomeId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
   const [hideAmounts, setHideAmounts] = useState<boolean>(() => {
     const saved = localStorage.getItem('hideAmounts');
@@ -393,6 +396,102 @@ const Dashboard: React.FC = () => {
     setEditingField(null);
     setEditingCall(null);
     setEditingCommitment(null);
+    setEditingFixedExpense(null);
+    setEditingAsset(null);
+    setEditingIncome(null);
+    setEditValue('');
+  };
+
+  // Fixed Expense editing functions
+  const startEditingFixedExpense = (expenseId: string, field: string, currentValue: string | number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingFixedExpense({ expenseId, field });
+    setEditValue(currentValue.toString());
+  };
+
+  const saveFixedExpenseEdit = (expenseId: string, field: string) => {
+    const expense = fixedExpenses.find(e => e.id === expenseId);
+    if (!expense) return;
+
+    let newValue: string | number = editValue;
+    
+    const numericFields = ['amountLocal', 'amountDollars'];
+    if (numericFields.includes(field)) {
+      newValue = parseFloat(editValue) || 0;
+    }
+
+    const updated = {
+      ...expense,
+      [field]: newValue,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.updateFixedExpense(updated);
+    notify.overviewUpdated();
+    loadFixedExpenses();
+    setEditingFixedExpense(null);
+    setEditValue('');
+  };
+
+  // Asset editing functions
+  const startEditingAsset = (assetId: string, field: string, currentValue: string | number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingAsset({ assetId, field });
+    setEditValue(currentValue.toString());
+  };
+
+  const saveAssetEdit = (assetId: string, field: string) => {
+    const asset = assets.find(a => a.id === assetId);
+    if (!asset) return;
+
+    let newValue: string | number = editValue;
+    
+    const numericFields = ['valueLocal', 'valueDollars'];
+    if (numericFields.includes(field)) {
+      newValue = parseFloat(editValue) || 0;
+    }
+
+    const updated = {
+      ...asset,
+      [field]: newValue,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.updateAsset(updated);
+    notify.overviewUpdated();
+    loadAssets();
+    setEditingAsset(null);
+    setEditValue('');
+  };
+
+  // Income editing functions
+  const startEditingIncome = (incomeId: string, field: string, currentValue: string | number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingIncome({ incomeId, field });
+    setEditValue(currentValue.toString());
+  };
+
+  const saveIncomeEdit = (incomeId: string, field: string) => {
+    const income = incomes.find(i => i.id === incomeId);
+    if (!income) return;
+
+    let newValue: string | number = editValue;
+    
+    const numericFields = ['amountLocal', 'amountDollars'];
+    if (numericFields.includes(field)) {
+      newValue = parseFloat(editValue) || 0;
+    }
+
+    const updated = {
+      ...income,
+      [field]: newValue,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storage.updateIncome(updated);
+    notify.overviewUpdated();
+    loadIncomes();
+    setEditingIncome(null);
     setEditValue('');
   };
 
@@ -918,38 +1017,124 @@ const Dashboard: React.FC = () => {
                 <div className="item-icon-wrapper">
                   <Icon component={getFixedExpenseIcon(expense.category)} className="item-main-icon" />
                 </div>
+                <motion.button
+                  className="btn-delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(t('deleteFixedExpense.confirm'))) {
+                      storage.deleteFixedExpense(expense.id);
+                      loadFixedExpenses();
+                    }
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Icon component={FaTrash} />
+                </motion.button>
                 <div className="item-content">
                   <div className="item-header-info">
-                    <h3 className="item-name">{expense.name}</h3>
-                    {expense.category && (
-                      <p className="item-type">
-                        <Icon component={FaTag} className="item-type-icon" />
-                        {expense.category}
-                      </p>
+                    {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'name' ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={() => saveFixedExpenseEdit(expense.id, 'name')}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'name');
+                          if (e.key === 'Escape') cancelEdit();
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-edit-input"
+                        autoFocus
+                      />
+                    ) : (
+                      <h3 className="item-name editable-field" onClick={(e) => {
+                        e.stopPropagation();
+                        startEditingFixedExpense(expense.id, 'name', expense.name, e);
+                      }}>
+                        {expense.name}
+                      </h3>
                     )}
+                    {expense.category ? (
+                      editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'category' ? (
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={() => saveFixedExpenseEdit(expense.id, 'category')}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'category');
+                            if (e.key === 'Escape') cancelEdit();
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-edit-input"
+                          autoFocus
+                        />
+                      ) : (
+                        <p className="item-type editable-field" onClick={(e) => {
+                          e.stopPropagation();
+                          startEditingFixedExpense(expense.id, 'category', expense.category || '', e);
+                        }}>
+                          <Icon component={FaTag} className="item-type-icon" />
+                          {expense.category}
+                        </p>
+                      )
+                    ) : null}
                   </div>
                   {!hideAmounts && (
                     <div className="item-amounts">
                       <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
+                        {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountLocal' ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={() => saveFixedExpenseEdit(expense.id, 'amountLocal')}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountLocal');
+                              if (e.key === 'Escape') cancelEdit();
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-edit-input"
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="summary-value editable-field" onClick={(e) => {
+                            e.stopPropagation();
+                            startEditingFixedExpense(expense.id, 'amountLocal', expense.amountLocal, e);
+                          }}>
+                            {formatCurrency(expense.amountLocal, expense.localCurrency)}
+                          </span>
+                        )}
                       </div>
-                      <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(expense.amountDollars, 'USD')}</span>
+                      <div className="item-amounts-row">
+                        <div className="summary-item">
+                          {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountDollars' ? (
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={() => saveFixedExpenseEdit(expense.id, 'amountDollars')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountDollars');
+                                if (e.key === 'Escape') cancelEdit();
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-edit-input"
+                              autoFocus
+                            />
+                          ) : (
+                            <span className="summary-value editable-field" onClick={(e) => {
+                              e.stopPropagation();
+                              startEditingFixedExpense(expense.id, 'amountDollars', expense.amountDollars, e);
+                            }}>
+                              {formatCurrency(expense.amountDollars, 'USD')}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <motion.button
-                        className="btn-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm(t('deleteFixedExpense.confirm'))) {
-                            storage.deleteFixedExpense(expense.id);
-                            loadFixedExpenses();
-                          }
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Icon component={FaTrash} />
-                      </motion.button>
                     </div>
                   )}
                 </div>
@@ -1010,9 +1195,44 @@ const Dashboard: React.FC = () => {
                 <div className="item-icon-wrapper">
                   <Icon component={getAssetIcon(asset.type)} className="item-main-icon" />
                 </div>
+                <motion.button
+                  className="btn-delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(t('deleteAsset.confirm'))) {
+                      storage.deleteAsset(asset.id);
+                      loadAssets();
+                    }
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Icon component={FaTrash} />
+                </motion.button>
                 <div className="item-content">
                   <div className="item-header-info">
-                    <h3 className="item-name">{asset.name}</h3>
+                    {editingAsset?.assetId === asset.id && editingAsset?.field === 'name' ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={() => saveAssetEdit(asset.id, 'name')}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveAssetEdit(asset.id, 'name');
+                          if (e.key === 'Escape') cancelEdit();
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-edit-input"
+                        autoFocus
+                      />
+                    ) : (
+                      <h3 className="item-name editable-field" onClick={(e) => {
+                        e.stopPropagation();
+                        startEditingAsset(asset.id, 'name', asset.name, e);
+                      }}>
+                        {asset.name}
+                      </h3>
+                    )}
                     <p className="item-type">
                       <Icon component={FaTag} className="item-type-icon" />
                       {t(`dashboard.${asset.type}`)}
@@ -1021,25 +1241,57 @@ const Dashboard: React.FC = () => {
                   {!hideAmounts && (
                     <div className="item-amounts">
                       <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
+                        {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueLocal' ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={() => saveAssetEdit(asset.id, 'valueLocal')}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueLocal');
+                              if (e.key === 'Escape') cancelEdit();
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-edit-input"
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="summary-value editable-field" onClick={(e) => {
+                            e.stopPropagation();
+                            startEditingAsset(asset.id, 'valueLocal', asset.valueLocal, e);
+                          }}>
+                            {formatCurrency(asset.valueLocal, asset.localCurrency)}
+                          </span>
+                        )}
                       </div>
-                      <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(asset.valueDollars, 'USD')}</span>
+                      <div className="item-amounts-row">
+                        <div className="summary-item">
+                          {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueDollars' ? (
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={() => saveAssetEdit(asset.id, 'valueDollars')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueDollars');
+                                if (e.key === 'Escape') cancelEdit();
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-edit-input"
+                              autoFocus
+                            />
+                          ) : (
+                            <span className="summary-value editable-field" onClick={(e) => {
+                              e.stopPropagation();
+                              startEditingAsset(asset.id, 'valueDollars', asset.valueDollars, e);
+                            }}>
+                              {formatCurrency(asset.valueDollars, 'USD')}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <motion.button
-                        className="btn-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm(t('deleteAsset.confirm'))) {
-                            storage.deleteAsset(asset.id);
-                            loadAssets();
-                          }
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Icon component={FaTrash} />
-                      </motion.button>
                     </div>
                   )}
                 </div>
@@ -1100,9 +1352,44 @@ const Dashboard: React.FC = () => {
                 <div className="item-icon-wrapper">
                   <Icon component={getIncomeIcon(income.type)} className="item-main-icon" />
                 </div>
+                <motion.button
+                  className="btn-delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(t('deleteIncome.confirm'))) {
+                      storage.deleteIncome(income.id);
+                      loadIncomes();
+                    }
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Icon component={FaTrash} />
+                </motion.button>
                 <div className="item-content">
                   <div className="item-header-info">
-                    <h3 className="item-name">{income.name}</h3>
+                    {editingIncome?.incomeId === income.id && editingIncome?.field === 'name' ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={() => saveIncomeEdit(income.id, 'name')}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveIncomeEdit(income.id, 'name');
+                          if (e.key === 'Escape') cancelEdit();
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-edit-input"
+                        autoFocus
+                      />
+                    ) : (
+                      <h3 className="item-name editable-field" onClick={(e) => {
+                        e.stopPropagation();
+                        startEditingIncome(income.id, 'name', income.name, e);
+                      }}>
+                        {income.name}
+                      </h3>
+                    )}
                     <div className="item-type-row">
                       <p className="item-type">
                         <Icon component={FaTag} className="item-type-icon" />
@@ -1117,25 +1404,57 @@ const Dashboard: React.FC = () => {
                   {!hideAmounts && (
                     <div className="item-amounts">
                       <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(income.amountLocal, income.localCurrency)}</span>
+                        {editingIncome?.incomeId === income.id && editingIncome?.field === 'amountLocal' ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={() => saveIncomeEdit(income.id, 'amountLocal')}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveIncomeEdit(income.id, 'amountLocal');
+                              if (e.key === 'Escape') cancelEdit();
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-edit-input"
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="summary-value editable-field" onClick={(e) => {
+                            e.stopPropagation();
+                            startEditingIncome(income.id, 'amountLocal', income.amountLocal, e);
+                          }}>
+                            {formatCurrency(income.amountLocal, income.localCurrency)}
+                          </span>
+                        )}
                       </div>
-                      <div className="summary-item">
-                        <span className="summary-value">{formatCurrency(income.amountDollars, 'USD')}</span>
+                      <div className="item-amounts-row">
+                        <div className="summary-item">
+                          {editingIncome?.incomeId === income.id && editingIncome?.field === 'amountDollars' ? (
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={() => saveIncomeEdit(income.id, 'amountDollars')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveIncomeEdit(income.id, 'amountDollars');
+                                if (e.key === 'Escape') cancelEdit();
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-edit-input"
+                              autoFocus
+                            />
+                          ) : (
+                            <span className="summary-value editable-field" onClick={(e) => {
+                              e.stopPropagation();
+                              startEditingIncome(income.id, 'amountDollars', income.amountDollars, e);
+                            }}>
+                              {formatCurrency(income.amountDollars, 'USD')}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <motion.button
-                        className="btn-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (window.confirm(t('deleteIncome.confirm'))) {
-                            storage.deleteIncome(income.id);
-                            loadIncomes();
-                          }
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Icon component={FaTrash} />
-                      </motion.button>
                     </div>
                   )}
                 </div>
