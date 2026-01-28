@@ -14,6 +14,7 @@ import DeleteCall from './pages/DeleteCall';
 import DeleteCommitment from './pages/DeleteCommitment';
 import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
+import CompleteDebt from './pages/CompleteDebt';
 import AddFixedExpense from './pages/AddFixedExpense';
 import EditFixedExpense from './pages/EditFixedExpense';
 import AddAsset from './pages/AddAsset';
@@ -64,6 +65,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <DeleteDebt />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complete-debt/:debtId"
+        element={
+          <ProtectedRoute>
+            <CompleteDebt />
           </ProtectedRoute>
         }
       />

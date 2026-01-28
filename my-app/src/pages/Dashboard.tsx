@@ -223,6 +223,28 @@ const Dashboard: React.FC = () => {
     navigate(`/delete-debt/${id}`);
   };
 
+  const hasPendingCommitments = (debt: Debt): boolean => {
+    if (!debt.commitments || debt.commitments.length === 0) {
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return debt.commitments.some(commitment => {
+      if (commitment.status === 'completed') {
+        return false;
+      }
+
+      const commitmentDate = new Date(commitment.date);
+      commitmentDate.setHours(0, 0, 0, 0);
+      const diffTime = commitmentDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays < 0 || commitment.status === 'pending';
+    });
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -1501,7 +1523,11 @@ const Dashboard: React.FC = () => {
                                         <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
                                           <div className="debt-summary">
                                             <div className="debt-status">
-                                              {debt.inOrder ? (
+                                              {debt.totalLocal === 0 && debt.totalDollars === 0 ? (
+                                                <span className="debt-completed-badge">
+                                                  <Icon component={FaCheck} size={12} /> {t('common.completed')}
+                                                </span>
+                                              ) : debt.inOrder ? (
                                                 <span className="status-badge in-order">
                                                   <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
                                                 </span>
@@ -1524,6 +1550,20 @@ const Dashboard: React.FC = () => {
                                             >
                                               <Icon component={FaTrash} />
                                             </motion.button>
+                                            {!hasPendingCommitments(debt) && (
+                                              <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                className="btn-complete-item"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/complete-debt/${debt.id}`);
+                                                }}
+                                                title={t('debt.markAsCompleted')}
+                                              >
+                                                <Icon component={FaCheck} />
+                                              </motion.button>
+                                            )}
                                           </div>
                                         </div>
                                       </div>
@@ -1842,6 +1882,26 @@ const Dashboard: React.FC = () => {
                                                           >
                                                             <Icon component={FaTrash} />
                                                           </motion.button>
+                                                          {!debt.callCompleted && (
+                                                            <motion.button
+                                                              className="btn-complete-item"
+                                                              onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const updatedDebt = {
+                                                                  ...debt,
+                                                                  callCompleted: true,
+                                                                  updatedAt: new Date().toISOString(),
+                                                                };
+                                                                storage.saveDebt(updatedDebt);
+                                                                loadDebts();
+                                                              }}
+                                                              whileHover={{ scale: 1.1 }}
+                                                              whileTap={{ scale: 0.9 }}
+                                                              title={t('debt.callCompleted')}
+                                                            >
+                                                              <Icon component={FaCheck} />
+                                                            </motion.button>
+                                                          )}
                                                         </div>
                                                       </div>
                                                     </div>

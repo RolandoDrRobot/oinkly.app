@@ -436,7 +436,14 @@
   "debt": {
     "deleteConfirm": "Are you sure you want to delete this debt?",
     "callTask": "Call bank task",
-    "callCompleted": "Call completed"
+    "callCompleted": "Call completed",
+    "markAsCompleted": "Mark debt as paid off"
+  },
+  "completeDebt": {
+    "title": "Complete Debt",
+    "subtitle": "Great! You've paid off {{debtName}}",
+    "thisDebt": "this debt",
+    "success": "Debt marked as paid off successfully"
   },
   "about": {
     "title": "Oinkly",

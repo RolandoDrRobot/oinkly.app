@@ -521,6 +521,18 @@
   align-items: center;
 }
 
+.debt-completed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--primary);
+  color: var(--text-primary);
+}
+
 .debt-bank {
   margin: 0;
   font-size: 14px;

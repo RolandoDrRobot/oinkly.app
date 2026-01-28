@@ -436,7 +436,14 @@
   "debt": {
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta deuda?",
     "callTask": "Tarea de llamar al banco",
-    "callCompleted": "Llamada completada"
+    "callCompleted": "Llamada completada",
+    "markAsCompleted": "Marcar deuda como pagada"
+  },
+  "completeDebt": {
+    "title": "Completar Deuda",
+    "subtitle": "¡Excelente! Has pagado {{debtName}}",
+    "thisDebt": "esta deuda",
+    "success": "Deuda marcada como pagada exitosamente"
   },
   "about": {
     "title": "Oinkly",
