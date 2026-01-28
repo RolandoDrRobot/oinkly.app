@@ -12,6 +12,12 @@ import AddCall from './pages/AddCall';
 import DeleteCommitment from './pages/DeleteCommitment';
 import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
+import AddFixedExpense from './pages/AddFixedExpense';
+import EditFixedExpense from './pages/EditFixedExpense';
+import AddAsset from './pages/AddAsset';
+import EditAsset from './pages/EditAsset';
+import AddIncome from './pages/AddIncome';
+import EditIncome from './pages/EditIncome';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -96,6 +102,54 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <AddCall />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-fixed-expense"
+        element={
+          <ProtectedRoute>
+            <AddFixedExpense />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-fixed-expense/:id"
+        element={
+          <ProtectedRoute>
+            <EditFixedExpense />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-asset"
+        element={
+          <ProtectedRoute>
+            <AddAsset />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-asset/:id"
+        element={
+          <ProtectedRoute>
+            <EditAsset />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-income"
+        element={
+          <ProtectedRoute>
+            <AddIncome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-income/:id"
+        element={
+          <ProtectedRoute>
+            <EditIncome />
           </ProtectedRoute>
         }
       />

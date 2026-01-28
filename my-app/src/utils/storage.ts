@@ -127,6 +127,15 @@ export const storage = {
     localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(expenses));
   },
 
+  getFixedExpense: (id: string): FixedExpense | null => {
+    const expenses = storage.getFixedExpenses();
+    return expenses.find(e => e.id === id) || null;
+  },
+
+  updateFixedExpense: (expense: FixedExpense) => {
+    storage.saveFixedExpense(expense);
+  },
+
   deleteFixedExpense: (id: string) => {
     const expenses = storage.getFixedExpenses();
     const filtered = expenses.filter(e => e.id !== id);
@@ -152,6 +161,15 @@ export const storage = {
     localStorage.setItem(ASSETS_KEY, JSON.stringify(assets));
   },
 
+  getAsset: (id: string): Asset | null => {
+    const assets = storage.getAssets();
+    return assets.find(a => a.id === id) || null;
+  },
+
+  updateAsset: (asset: Asset) => {
+    storage.saveAsset(asset);
+  },
+
   deleteAsset: (id: string) => {
     const assets = storage.getAssets();
     const filtered = assets.filter(a => a.id !== id);
@@ -175,6 +193,15 @@ export const storage = {
     }
     
     localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes));
+  },
+
+  getIncome: (id: string): Income | null => {
+    const incomes = storage.getIncomes();
+    return incomes.find(i => i.id === id) || null;
+  },
+
+  updateIncome: (income: Income) => {
+    storage.saveIncome(income);
   },
 
   deleteIncome: (id: string) => {

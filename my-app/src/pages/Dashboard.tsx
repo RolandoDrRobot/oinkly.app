@@ -110,8 +110,6 @@ const Dashboard: React.FC = () => {
   const [aiInputText, setAiInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  // Modal states for adding new items
-  const [showAddModal, setShowAddModal] = useState<'fixedExpense' | 'asset' | 'income' | null>(null);
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
@@ -717,10 +715,10 @@ const Dashboard: React.FC = () => {
     return (
       <div className="screen-container">
         <div className="screen-header">
-          <h2>{t('dashboard.fixedExpenses') || 'Gastos Fijos'}</h2>
+          <h2>{t('dashboard.fixedExpenses')}</h2>
           <motion.button
             className="btn-add"
-            onClick={() => setShowAddModal('fixedExpense')}
+            onClick={() => navigate('/add-fixed-expense')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -730,19 +728,44 @@ const Dashboard: React.FC = () => {
         </div>
         {fixedExpenses.length === 0 ? (
           <div className="empty-state">
-            <p>{t('dashboard.noFixedExpenses') || 'No hay gastos fijos'}</p>
+            <p>{t('dashboard.noFixedExpenses')}</p>
           </div>
         ) : (
           <div className="items-list">
             {fixedExpenses.map(expense => (
               <div key={expense.id} className="item-card">
-                <h3>{expense.name}</h3>
-                {!hideAmounts && (
-                  <div className="item-amounts">
-                    <span>{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
-                    <span>{formatCurrency(expense.amountDollars, 'USD')}</span>
-                  </div>
-                )}
+                <div className="item-card-content">
+                  <h3>{expense.name}</h3>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <span>{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
+                      <span>{formatCurrency(expense.amountDollars, 'USD')}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="item-card-actions">
+                  <motion.button
+                    className="btn-edit-item"
+                    onClick={() => navigate(`/edit-fixed-expense/${expense.id}`)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaEdit} />
+                  </motion.button>
+                  <motion.button
+                    className="btn-delete-item"
+                    onClick={() => {
+                      if (window.confirm(t('deleteFixedExpense.confirm'))) {
+                        storage.deleteFixedExpense(expense.id);
+                        loadFixedExpenses();
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaTrash} />
+                  </motion.button>
+                </div>
               </div>
             ))}
           </div>
@@ -755,10 +778,10 @@ const Dashboard: React.FC = () => {
     return (
       <div className="screen-container">
         <div className="screen-header">
-          <h2>{t('dashboard.assets') || 'Activos'}</h2>
+          <h2>{t('dashboard.assets')}</h2>
           <motion.button
             className="btn-add"
-            onClick={() => setShowAddModal('asset')}
+            onClick={() => navigate('/add-asset')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -768,20 +791,45 @@ const Dashboard: React.FC = () => {
         </div>
         {assets.length === 0 ? (
           <div className="empty-state">
-            <p>{t('dashboard.noAssets') || 'No hay activos'}</p>
+            <p>{t('dashboard.noAssets')}</p>
           </div>
         ) : (
           <div className="items-list">
             {assets.map(asset => (
               <div key={asset.id} className="item-card">
-                <h3>{asset.name}</h3>
-                <span className="item-type">{asset.type}</span>
-                {!hideAmounts && (
-                  <div className="item-amounts">
-                    <span>{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
-                    <span>{formatCurrency(asset.valueDollars, 'USD')}</span>
-                  </div>
-                )}
+                <div className="item-card-content">
+                  <h3>{asset.name}</h3>
+                  <span className="item-type">{asset.type}</span>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <span>{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
+                      <span>{formatCurrency(asset.valueDollars, 'USD')}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="item-card-actions">
+                  <motion.button
+                    className="btn-edit-item"
+                    onClick={() => navigate(`/edit-asset/${asset.id}`)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaEdit} />
+                  </motion.button>
+                  <motion.button
+                    className="btn-delete-item"
+                    onClick={() => {
+                      if (window.confirm(t('deleteAsset.confirm'))) {
+                        storage.deleteAsset(asset.id);
+                        loadAssets();
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaTrash} />
+                  </motion.button>
+                </div>
               </div>
             ))}
           </div>
@@ -794,10 +842,10 @@ const Dashboard: React.FC = () => {
     return (
       <div className="screen-container">
         <div className="screen-header">
-          <h2>{t('dashboard.incomes') || 'Ingresos'}</h2>
+          <h2>{t('dashboard.incomes')}</h2>
           <motion.button
             className="btn-add"
-            onClick={() => setShowAddModal('income')}
+            onClick={() => navigate('/add-income')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -807,20 +855,45 @@ const Dashboard: React.FC = () => {
         </div>
         {incomes.length === 0 ? (
           <div className="empty-state">
-            <p>{t('dashboard.noIncomes') || 'No hay ingresos'}</p>
+            <p>{t('dashboard.noIncomes')}</p>
           </div>
         ) : (
           <div className="items-list">
             {incomes.map(income => (
               <div key={income.id} className="item-card">
-                <h3>{income.name}</h3>
-                <span className="item-type">{income.type} - {income.frequency}</span>
-                {!hideAmounts && (
-                  <div className="item-amounts">
-                    <span>{formatCurrency(income.amountLocal, income.localCurrency)}</span>
-                    <span>{formatCurrency(income.amountDollars, 'USD')}</span>
-                  </div>
-                )}
+                <div className="item-card-content">
+                  <h3>{income.name}</h3>
+                  <span className="item-type">{income.type} - {income.frequency}</span>
+                  {!hideAmounts && (
+                    <div className="item-amounts">
+                      <span>{formatCurrency(income.amountLocal, income.localCurrency)}</span>
+                      <span>{formatCurrency(income.amountDollars, 'USD')}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="item-card-actions">
+                  <motion.button
+                    className="btn-edit-item"
+                    onClick={() => navigate(`/edit-income/${income.id}`)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaEdit} />
+                  </motion.button>
+                  <motion.button
+                    className="btn-delete-item"
+                    onClick={() => {
+                      if (window.confirm(t('deleteIncome.confirm'))) {
+                        storage.deleteIncome(income.id);
+                        loadIncomes();
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon component={FaTrash} />
+                  </motion.button>
+                </div>
               </div>
             ))}
           </div>
@@ -987,7 +1060,7 @@ const Dashboard: React.FC = () => {
             <div className="menu-button-icon">
               <Icon component={FaFileInvoiceDollar} />
             </div>
-            <span className="menu-button-text">Deuda</span>
+            <span className="menu-button-text">{t('dashboard.debt')}</span>
           </button>
           <button
             className={`menu-button ${activeTab === 'fixedExpenses' ? 'active' : ''}`}
@@ -996,7 +1069,7 @@ const Dashboard: React.FC = () => {
             <div className="menu-button-icon">
               <Icon component={FaMoneyBillWave} />
             </div>
-            <span className="menu-button-text">Gastos</span>
+            <span className="menu-button-text">{t('dashboard.fixedExpenses')}</span>
           </button>
           <button
             className={`menu-button ${activeTab === 'assets' ? 'active' : ''}`}
@@ -1005,7 +1078,7 @@ const Dashboard: React.FC = () => {
             <div className="menu-button-icon">
               <Icon component={FaLandmark} />
             </div>
-            <span className="menu-button-text">Activos</span>
+            <span className="menu-button-text">{t('dashboard.assets')}</span>
           </button>
           <button
             className={`menu-button ${activeTab === 'incomes' ? 'active' : ''}`}
@@ -1014,7 +1087,7 @@ const Dashboard: React.FC = () => {
             <div className="menu-button-icon">
               <Icon component={FaChartLine} />
             </div>
-            <span className="menu-button-text">Ingresos</span>
+            <span className="menu-button-text">{t('dashboard.incomes')}</span>
           </button>
         </motion.div>
 
@@ -1533,7 +1606,7 @@ const Dashboard: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="fab-add"
-            onClick={() => setShowAddModal('fixedExpense')}
+            onClick={() => navigate('/add-fixed-expense')}
           >
             <Icon component={FaPlus} />
           </motion.button>
@@ -1546,7 +1619,7 @@ const Dashboard: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="fab-add"
-            onClick={() => setShowAddModal('asset')}
+            onClick={() => navigate('/add-asset')}
           >
             <Icon component={FaPlus} />
           </motion.button>
@@ -1559,352 +1632,12 @@ const Dashboard: React.FC = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="fab-add"
-            onClick={() => setShowAddModal('income')}
+            onClick={() => navigate('/add-income')}
           >
             <Icon component={FaPlus} />
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* Modals for adding items */}
-      <AnimatePresence>
-        {showAddModal === 'fixedExpense' && (
-          <AddFixedExpenseModal
-            onClose={() => setShowAddModal(null)}
-            onSave={(expense) => {
-              storage.saveFixedExpense(expense);
-              loadFixedExpenses();
-              setShowAddModal(null);
-            }}
-          />
-        )}
-        {showAddModal === 'asset' && (
-          <AddAssetModal
-            onClose={() => setShowAddModal(null)}
-            onSave={(asset) => {
-              storage.saveAsset(asset);
-              loadAssets();
-              setShowAddModal(null);
-            }}
-          />
-        )}
-        {showAddModal === 'income' && (
-          <AddIncomeModal
-            onClose={() => setShowAddModal(null)}
-            onSave={(income) => {
-              storage.saveIncome(income);
-              loadIncomes();
-              setShowAddModal(null);
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-    </motion.div>
-  );
-};
-
-// Modal Components
-const AddFixedExpenseModal: React.FC<{
-  onClose: () => void;
-  onSave: (expense: FixedExpense) => void;
-}> = ({ onClose, onSave }) => {
-  const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [amountLocal, setAmountLocal] = useState('');
-  const [amountDollars, setAmountDollars] = useState('');
-  const [category, setCategory] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const expense: FixedExpense = {
-      id: Date.now().toString(),
-      name,
-      amountLocal: parseFloat(amountLocal) || 0,
-      amountDollars: parseFloat(amountDollars) || 0,
-      localCurrency: storage.getLocalCurrency(),
-      category: category || undefined,
-      dueDate: dueDate || undefined,
-      notes: notes || undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    onSave(expense);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="modal-overlay"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2>{t('dashboard.addFixedExpense') || 'Agregar Gasto Fijo'}</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder={t('dashboard.expenseName') || 'Nombre del gasto'}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder={`${storage.getLocalCurrency()} Amount`}
-            value={amountLocal}
-            onChange={(e) => setAmountLocal(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="USD Amount"
-            value={amountDollars}
-            onChange={(e) => setAmountDollars(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder={t('dashboard.category') || 'Categoría (opcional)'}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          />
-          <input
-            type="number"
-            min="1"
-            max="31"
-            placeholder={t('dashboard.dueDate') || 'Día de vencimiento (1-31)'}
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
-          <textarea
-            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-          />
-          <div className="modal-actions">
-            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
-            <button type="submit">{t('common.save')}</button>
-          </div>
-        </form>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-const AddAssetModal: React.FC<{
-  onClose: () => void;
-  onSave: (asset: Asset) => void;
-}> = ({ onClose, onSave }) => {
-  const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [type, setType] = useState<Asset['type']>('other');
-  const [valueLocal, setValueLocal] = useState('');
-  const [valueDollars, setValueDollars] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const asset: Asset = {
-      id: Date.now().toString(),
-      name,
-      type,
-      valueLocal: parseFloat(valueLocal) || 0,
-      valueDollars: parseFloat(valueDollars) || 0,
-      localCurrency: storage.getLocalCurrency(),
-      purchaseDate: purchaseDate || undefined,
-      notes: notes || undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    onSave(asset);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="modal-overlay"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2>{t('dashboard.addAsset') || 'Agregar Activo'}</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder={t('dashboard.assetName') || 'Nombre del activo'}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <select value={type} onChange={(e) => setType(e.target.value as Asset['type'])} required>
-            <option value="property">{t('dashboard.property') || 'Propiedad'}</option>
-            <option value="vehicle">{t('dashboard.vehicle') || 'Vehículo'}</option>
-            <option value="investment">{t('dashboard.investment') || 'Inversión'}</option>
-            <option value="savings">{t('dashboard.savings') || 'Ahorros'}</option>
-            <option value="other">{t('dashboard.other') || 'Otro'}</option>
-          </select>
-          <input
-            type="number"
-            step="0.01"
-            placeholder={`${storage.getLocalCurrency()} Value`}
-            value={valueLocal}
-            onChange={(e) => setValueLocal(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="USD Value"
-            value={valueDollars}
-            onChange={(e) => setValueDollars(e.target.value)}
-            required
-          />
-          <input
-            type="date"
-            placeholder={t('dashboard.purchaseDate') || 'Fecha de compra'}
-            value={purchaseDate}
-            onChange={(e) => setPurchaseDate(e.target.value)}
-          />
-          <textarea
-            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-          />
-          <div className="modal-actions">
-            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
-            <button type="submit">{t('common.save')}</button>
-          </div>
-        </form>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-const AddIncomeModal: React.FC<{
-  onClose: () => void;
-  onSave: (income: Income) => void;
-}> = ({ onClose, onSave }) => {
-  const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [type, setType] = useState<Income['type']>('salary');
-  const [frequency, setFrequency] = useState<Income['frequency']>('monthly');
-  const [amountLocal, setAmountLocal] = useState('');
-  const [amountDollars, setAmountDollars] = useState('');
-  const [nextPaymentDate, setNextPaymentDate] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const income: Income = {
-      id: Date.now().toString(),
-      name,
-      type,
-      frequency,
-      amountLocal: parseFloat(amountLocal) || 0,
-      amountDollars: parseFloat(amountDollars) || 0,
-      localCurrency: storage.getLocalCurrency(),
-      nextPaymentDate: nextPaymentDate || undefined,
-      notes: notes || undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    onSave(income);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="modal-overlay"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2>{t('dashboard.addIncome') || 'Agregar Ingreso'}</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder={t('dashboard.incomeName') || 'Nombre del ingreso'}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <select value={type} onChange={(e) => setType(e.target.value as Income['type'])} required>
-            <option value="salary">{t('dashboard.salary') || 'Salario'}</option>
-            <option value="freelance">{t('dashboard.freelance') || 'Freelance'}</option>
-            <option value="investment">{t('dashboard.investment') || 'Inversión'}</option>
-            <option value="rental">{t('dashboard.rental') || 'Alquiler'}</option>
-            <option value="other">{t('dashboard.other') || 'Otro'}</option>
-          </select>
-          <select value={frequency} onChange={(e) => setFrequency(e.target.value as Income['frequency'])} required>
-            <option value="monthly">{t('dashboard.monthly') || 'Mensual'}</option>
-            <option value="weekly">{t('dashboard.weekly') || 'Semanal'}</option>
-            <option value="biweekly">{t('dashboard.biweekly') || 'Quincenal'}</option>
-            <option value="yearly">{t('dashboard.yearly') || 'Anual'}</option>
-            <option value="one-time">{t('dashboard.oneTime') || 'Una vez'}</option>
-          </select>
-          <input
-            type="number"
-            step="0.01"
-            placeholder={`${storage.getLocalCurrency()} Amount`}
-            value={amountLocal}
-            onChange={(e) => setAmountLocal(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="USD Amount"
-            value={amountDollars}
-            onChange={(e) => setAmountDollars(e.target.value)}
-            required
-          />
-          <input
-            type="date"
-            placeholder={t('dashboard.nextPaymentDate') || 'Próxima fecha de pago'}
-            value={nextPaymentDate}
-            onChange={(e) => setNextPaymentDate(e.target.value)}
-          />
-          <textarea
-            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-          />
-          <div className="modal-actions">
-            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
-            <button type="submit">{t('common.save')}</button>
-          </div>
-        </form>
-      </motion.div>
     </motion.div>
   );
 };

@@ -88,7 +88,7 @@
 }
 
 .dashboard-content {
-  padding: 20px 15px;
+  padding: 20px;
   max-width: 100%;
 }
 
@@ -316,13 +316,12 @@
 
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
   color: var(--text-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 20vh;
 }
 
 .empty-state-image {
@@ -1544,6 +1543,48 @@
   border-radius: 12px;
   padding: 16px;
   transition: all 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.item-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-edit-item,
+.btn-delete-item {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.btn-edit-item:hover {
+  background: var(--primary-overlay);
+  color: var(--primary);
+}
+
+.btn-delete-item:hover {
+  background: var(--error-light);
+  color: var(--error);
 }
 
 .item-card:hover {
