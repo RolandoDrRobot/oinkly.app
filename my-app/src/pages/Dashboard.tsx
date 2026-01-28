@@ -41,7 +41,7 @@ import {
   FaPaperPlane
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
-import { Debt, PaymentCommitment } from '../types';
+import { Debt, PaymentCommitment, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
@@ -88,9 +88,15 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
+type ActiveTab = 'debt' | 'fixedExpenses' | 'assets' | 'incomes';
+
 const Dashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [incomes, setIncomes] = useState<Income[]>([]);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('debt');
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>('');
@@ -104,13 +110,33 @@ const Dashboard: React.FC = () => {
   const [aiInputText, setAiInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // Modal states for adding new items
+  const [showAddModal, setShowAddModal] = useState<'fixedExpense' | 'asset' | 'income' | null>(null);
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
   useEffect(() => {
     loadDebts();
+    loadFixedExpenses();
+    loadAssets();
+    loadIncomes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const loadFixedExpenses = () => {
+    const expenses = storage.getFixedExpenses();
+    setFixedExpenses(expenses);
+  };
+
+  const loadAssets = () => {
+    const assetsData = storage.getAssets();
+    setAssets(assetsData);
+  };
+
+  const loadIncomes = () => {
+    const incomesData = storage.getIncomes();
+    setIncomes(incomesData);
+  };
 
   // Calculate inOrder based on payment commitments
   // Returns true if no pending/overdue commitments (shows "No compromisos")
@@ -685,6 +711,124 @@ const Dashboard: React.FC = () => {
 
   const totals = calculateTotals();
 
+  // Render functions for each screen - Deuda screen uses the existing content below
+
+  const renderFixedExpensesScreen = () => {
+    return (
+      <div className="screen-container">
+        <div className="screen-header">
+          <h2>{t('dashboard.fixedExpenses') || 'Gastos Fijos'}</h2>
+          <motion.button
+            className="btn-add"
+            onClick={() => setShowAddModal('fixedExpense')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Icon component={FaPlus} />
+            {t('common.add')}
+          </motion.button>
+        </div>
+        {fixedExpenses.length === 0 ? (
+          <div className="empty-state">
+            <p>{t('dashboard.noFixedExpenses') || 'No hay gastos fijos'}</p>
+          </div>
+        ) : (
+          <div className="items-list">
+            {fixedExpenses.map(expense => (
+              <div key={expense.id} className="item-card">
+                <h3>{expense.name}</h3>
+                {!hideAmounts && (
+                  <div className="item-amounts">
+                    <span>{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
+                    <span>{formatCurrency(expense.amountDollars, 'USD')}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAssetsScreen = () => {
+    return (
+      <div className="screen-container">
+        <div className="screen-header">
+          <h2>{t('dashboard.assets') || 'Activos'}</h2>
+          <motion.button
+            className="btn-add"
+            onClick={() => setShowAddModal('asset')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Icon component={FaPlus} />
+            {t('common.add')}
+          </motion.button>
+        </div>
+        {assets.length === 0 ? (
+          <div className="empty-state">
+            <p>{t('dashboard.noAssets') || 'No hay activos'}</p>
+          </div>
+        ) : (
+          <div className="items-list">
+            {assets.map(asset => (
+              <div key={asset.id} className="item-card">
+                <h3>{asset.name}</h3>
+                <span className="item-type">{asset.type}</span>
+                {!hideAmounts && (
+                  <div className="item-amounts">
+                    <span>{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
+                    <span>{formatCurrency(asset.valueDollars, 'USD')}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderIncomesScreen = () => {
+    return (
+      <div className="screen-container">
+        <div className="screen-header">
+          <h2>{t('dashboard.incomes') || 'Ingresos'}</h2>
+          <motion.button
+            className="btn-add"
+            onClick={() => setShowAddModal('income')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Icon component={FaPlus} />
+            {t('common.add')}
+          </motion.button>
+        </div>
+        {incomes.length === 0 ? (
+          <div className="empty-state">
+            <p>{t('dashboard.noIncomes') || 'No hay ingresos'}</p>
+          </div>
+        ) : (
+          <div className="items-list">
+            {incomes.map(income => (
+              <div key={income.id} className="item-card">
+                <h3>{income.name}</h3>
+                <span className="item-type">{income.type} - {income.frequency}</span>
+                {!hideAmounts && (
+                  <div className="item-amounts">
+                    <span>{formatCurrency(income.amountLocal, income.localCurrency)}</span>
+                    <span>{formatCurrency(income.amountDollars, 'USD')}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -829,832 +973,938 @@ const Dashboard: React.FC = () => {
           </form>
         </motion.div>
 
-        <AnimatePresence mode="wait">
-          {debts.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: 0.3 }}
-              className="empty-state"
-            >
-              <motion.img
-                src="/shopping.png"
-                alt="Empty state"
-                className="empty-state-image"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.3 }}
-              />
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                {t('dashboard.noDebts')}
-              </motion.p>
-              <motion.p
-                className="empty-subtitle"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                {t('dashboard.noDebtsSubtitle')}
-              </motion.p>
-              <motion.button
-                className="btn-add-first-debt"
-                onClick={() => navigate('/add-debt')}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Icon component={FaPlus} style={{ marginRight: '8px' }} />
-                {t('dashboard.addFirstDebt')}
-              </motion.button>
-            </motion.div>
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={debts.map(d => d.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <motion.div
-                  key="debts"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="debts-container"
-                >
-                  {debts.map((debt, index) => {
-                    const isExpanded = expandedDebts.has(debt.id);
-                    return (
-                      <SortableDebtCard key={debt.id} debt={debt} index={index}>
-                        {({ dragAttributes, dragListeners, isDragging }) => (
-                          <div
-                            className="debt-card"
-                            onClick={() => {
-                              if (!isExpanded) {
-                                toggleExpand(debt.id);
-                              }
-                            }}
-                          >
-                            <div className="debt-header">
-                              <div className="debt-header-actions-top">
-                                {isExpanded && (
-                                  <motion.button
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    className="btn-close-debt"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleExpand(debt.id);
-                                    }}
-                                    title={t('common.close')}
-                                  >
-                                    <Icon component={FaTimes} size={16} />
-                                  </motion.button>
-                                )}
-                                <div
-                                  {...dragAttributes}
-                                  {...dragListeners}
-                                  className="drag-handle"
-                                  style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    cursor: isDragging ? 'grabbing' : 'grab',
-                                    touchAction: 'none',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: '6px',
-                                    background: 'var(--bg-tertiary)',
-                                    border: '1px solid var(--bg-tertiary)',
-                                    opacity: 0.7,
-                                    transition: 'all 0.2s',
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.opacity = '1';
-                                    e.currentTarget.style.background = 'var(--overlay)';
-                                    e.currentTarget.style.borderColor = 'var(--accent-color)';
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.opacity = '0.7';
-                                    e.currentTarget.style.background = 'var(--bg-tertiary)';
-                                    e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                                    <circle cx="3" cy="3" r="1.5" />
-                                    <circle cx="8" cy="3" r="1.5" />
-                                    <circle cx="13" cy="3" r="1.5" />
-                                    <circle cx="3" cy="8" r="1.5" />
-                                    <circle cx="8" cy="8" r="1.5" />
-                                    <circle cx="13" cy="8" r="1.5" />
-                                    <circle cx="3" cy="13" r="1.5" />
-                                    <circle cx="8" cy="13" r="1.5" />
-                                    <circle cx="13" cy="13" r="1.5" />
-                                  </svg>
-                                </div>
-                              </div>
-                              <div className="debt-header-main">
-                                <div className="debt-header-info">
-                          {editingField?.debtId === debt.id && editingField?.field === 'name' ? (
-                            <input
-                              type="text"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={() => saveEdit(debt.id, 'name')}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEdit(debt.id, 'name');
-                                if (e.key === 'Escape') cancelEdit();
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-edit-input"
-                              autoFocus
-                            />
-                          ) : (
-                            <h3 onClick={(e) => {
-                              e.stopPropagation();
-                              startEditing(debt.id, 'name', debt.name, e);
-                            }} className="editable-field debt-name">
-                              <Icon component={FaFileInvoiceDollar} className="debt-info-icon" />
-                              {debt.name}
-                            </h3>
-                          )}
-                          <div className="debt-bank-type-row">
-                            {editingField?.debtId === debt.id && editingField?.field === 'bankName' ? (
-                              <input
-                                type="text"
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onBlur={() => saveEdit(debt.id, 'bankName')}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') saveEdit(debt.id, 'bankName');
-                                  if (e.key === 'Escape') cancelEdit();
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-edit-input"
-                                autoFocus
-                              />
-                            ) : (
-                              <p className="debt-bank editable-field" onClick={(e) => {
-                                e.stopPropagation();
-                                startEditing(debt.id, 'bankName', debt.bankName, e);
-                              }}>
-                                <Icon component={FaLandmark} className="debt-info-icon" />
-                                {debt.bankName}
-                              </p>
-                            )}
-                            <p className="debt-type">
-                              <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
-                              {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
-                        <div className="debt-summary">
-                          <div className="debt-status">
-                            {debt.inOrder ? (
-                              <span className="status-badge in-order">
-                                <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
-                              </span>
-                            ) : (
-                              <span className="status-badge not-in-order">
-                                <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
-                              </span>
-                            )}
-                          </div>
-                          {(() => {
-                            const urgent = hasUrgentCommitments(debt);
-                            if (urgent.hasUrgent) {
-                              const alertConfig = {
-                                'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.overdue'), icon: FaExclamationTriangle },
-                                'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.dueToday'), icon: FaExclamationTriangle },
-                                'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: t('dashboard.dueTomorrow'), icon: FaExclamationTriangle },
-                              };
-                              const config = urgent.highestPriority ? alertConfig[urgent.highestPriority] : alertConfig['due-tomorrow'];
-                              return (
-                                <motion.div
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  className="commitment-alert-badge"
-                                  style={{ 
-                                    background: config.bg,
-                                    borderColor: config.color,
-                                    color: config.color,
-                                  }}
-                                  title={t('dashboard.commitmentsNeedAttention', { count: urgent.count })}
-                                >
-                                  <Icon component={config.icon} size={12} />
-                                  <span>{urgent.count}</span>
-                                </motion.div>
-                              );
-                            }
-                            return null;
-                          })()}
-                        </div>
-                        <div className="debt-actions">
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className={`call-task-icon ${!debt.hasCallTask ? 'inactive' : ''}`}
-                            title={t('debt.callTask')}
-                          >
-                            <Icon component={FaPhone} />
-                          </motion.div>
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className={`call-completed-icon ${!debt.callCompleted ? 'inactive' : ''}`}
-                            title={t('debt.callCompleted')}
-                          >
-                            <Icon component={FaCheck} />
-                          </motion.div>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="btn-delete"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(debt.id);
-                            }}
-                          >
-                            <Icon component={FaTrash} />
-                          </motion.button>
-                        </div>
-                      </div>
-                    </div>
+        {/* Menu de 4 botones */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="dashboard-menu"
+        >
+          <button
+            className={`menu-button ${activeTab === 'debt' ? 'active' : ''}`}
+            onClick={() => setActiveTab('debt')}
+          >
+            <div className="menu-button-icon">
+              <Icon component={FaFileInvoiceDollar} />
+            </div>
+            <span className="menu-button-text">Deuda</span>
+          </button>
+          <button
+            className={`menu-button ${activeTab === 'fixedExpenses' ? 'active' : ''}`}
+            onClick={() => setActiveTab('fixedExpenses')}
+          >
+            <div className="menu-button-icon">
+              <Icon component={FaMoneyBillWave} />
+            </div>
+            <span className="menu-button-text">Gastos</span>
+          </button>
+          <button
+            className={`menu-button ${activeTab === 'assets' ? 'active' : ''}`}
+            onClick={() => setActiveTab('assets')}
+          >
+            <div className="menu-button-icon">
+              <Icon component={FaLandmark} />
+            </div>
+            <span className="menu-button-text">Activos</span>
+          </button>
+          <button
+            className={`menu-button ${activeTab === 'incomes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('incomes')}
+          >
+            <div className="menu-button-icon">
+              <Icon component={FaChartLine} />
+            </div>
+            <span className="menu-button-text">Ingresos</span>
+          </button>
+        </motion.div>
 
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="debt-expanded-content"
+        {/* Contenedor de pantallas */}
+        <div className="dashboard-screens-container">
+          <AnimatePresence mode="wait">
+            {activeTab === 'debt' && (
+              <motion.div
+                key="debt"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                style={{ width: '100%' }}
+              >
+                <div className="dashboard-content">
+                  <AnimatePresence mode="wait">
+                    {debts.length === 0 ? (
+                      <motion.div
+                        key="empty"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ delay: 0.3 }}
+                        className="empty-state"
+                      >
+                        <motion.img
+                          src="/shopping.png"
+                          alt="Empty state"
+                          className="empty-state-image"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 0.4, duration: 0.3 }}
+                        />
+                        <motion.p
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 }}
                         >
-                          <div className="debt-main-info">
-                            <div className="debt-payments">
-                              <div className="payment-item">
-                                <span className="payment-label">{t('dashboard.monthly')} ({storage.getLocalCurrency()})</span>
-                                {editingField?.debtId === debt.id && editingField?.field === 'localFee' ? (
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onBlur={() => saveEdit(debt.id, 'localFee')}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') saveEdit(debt.id, 'localFee');
-                                      if (e.key === 'Escape') cancelEdit();
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-edit-input"
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => {
-                                    e.stopPropagation();
-                                    startEditing(debt.id, 'localFee', debt.localFee, e);
-                                  }}>
-                                    {formatCurrency(debt.localFee, storage.getLocalCurrency())}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="payment-item">
-                                <span className="payment-label">{t('dashboard.monthly')} (USD)</span>
-                                {editingField?.debtId === debt.id && editingField?.field === 'dollarFee' ? (
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onBlur={() => saveEdit(debt.id, 'dollarFee')}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') saveEdit(debt.id, 'dollarFee');
-                                      if (e.key === 'Escape') cancelEdit();
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-edit-input"
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => {
-                                    e.stopPropagation();
-                                    startEditing(debt.id, 'dollarFee', debt.dollarFee, e);
-                                  }}>
-                                    {formatCurrency(debt.dollarFee, 'USD')}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="payment-item total-debt">
-                                <span className="payment-label">{t('dashboard.total')} ({storage.getLocalCurrency()})</span>
-                                {editingField?.debtId === debt.id && editingField?.field === 'totalLocal' ? (
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onBlur={() => saveEdit(debt.id, 'totalLocal')}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') saveEdit(debt.id, 'totalLocal');
-                                      if (e.key === 'Escape') cancelEdit();
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-edit-input"
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => {
-                                    e.stopPropagation();
-                                    startEditing(debt.id, 'totalLocal', debt.totalLocal, e);
-                                  }}>
-                                    {formatCurrency(debt.totalLocal, storage.getLocalCurrency())}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="payment-item total-debt">
-                                <span className="payment-label">{t('dashboard.total')} (USD)</span>
-                                {editingField?.debtId === debt.id && editingField?.field === 'totalDollars' ? (
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    onBlur={() => saveEdit(debt.id, 'totalDollars')}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') saveEdit(debt.id, 'totalDollars');
-                                      if (e.key === 'Escape') cancelEdit();
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="inline-edit-input"
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <span className="payment-value editable-field" onClick={(e) => {
-                                    e.stopPropagation();
-                                    startEditing(debt.id, 'totalDollars', debt.totalDollars, e);
-                                  }}>
-                                    {formatCurrency(debt.totalDollars, 'USD')}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Commitments Section */}
-                          <div className="debt-commitments">
-                            <div className="commitments-header">
-                              <div>
-                                <h4 className="commitments-title">
-                                  <Icon component={FaCalendarAlt} size={16} />
-                                  Payment Commitments
-                                </h4>
-                                {debt.commitments && debt.commitments.length > 0 && (() => {
-                                  const completed = debt.commitments.filter(c => c.status === 'completed').length;
-                                  const total = debt.commitments.length;
-                                  return (
-                                    <div className="commitments-progress">
-                                      <span className="progress-text">
-                                        {t('dashboard.ofCompleted', { total })}
-                                      </span>
-                                      <div className="progress-bar-container-small">
-                                        <motion.div
-                                          className="progress-bar-fill"
-                                          initial={{ width: 0 }}
-                                          animate={{ width: `${(completed / total) * 100}%` }}
-                                          transition={{ duration: 0.5, ease: "easeOut" }}
-                                        />
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                            </div>
-                            
-                            {debt.commitments && debt.commitments.length > 0 ? (
-                              <>
-                                {/* Active Commitments */}
-                                {debt.commitments.filter(c => c.status !== 'completed').length > 0 && (
-                                  <div className="commitments-list">
-                                    {debt.commitments
-                                      .filter(c => c.status !== 'completed')
-                                      .map((commitment) => {
-                                  const status = getCommitmentStatus(commitment);
-                                  const statusConfig = {
-                                    'pending': { 
-                                      color: 'var(--text-muted)', 
-                                      bg: 'var(--dark-bg)', 
-                                      label: t('dashboard.pending'),
-                                      pulse: false,
-                                    },
-                                    'due-tomorrow': { 
-                                      color: '#ff9800', 
-                                      bg: 'rgba(255, 152, 0, 0.15)', 
-                                      label: t('dashboard.dueTomorrow'),
-                                      pulse: true,
-                                    },
-                                    'due-today': { 
-                                      color: '#f44336', 
-                                      bg: 'rgba(244, 67, 54, 0.15)', 
-                                      label: t('dashboard.dueToday'),
-                                      pulse: true,
-                                    },
-                                    'overdue': { 
-                                      color: '#d32f2f', 
-                                      bg: 'rgba(211, 47, 47, 0.2)', 
-                                      label: t('dashboard.overdue'),
-                                      pulse: true,
-                                    },
-                                    'completed': { 
-                                      color: 'var(--primary-bright)', 
-                                      bg: 'var(--overlay)', 
-                                      label: t('common.completed'),
-                                      pulse: false,
-                                    },
-                                  };
-                                  const config = statusConfig[status];
-                                  
-                                  return (
-                                    <motion.div
-                                      key={commitment.id}
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      className="commitment-item"
-                                      style={{ 
-                                        borderLeft: `4px solid ${config.color}`,
-                                        background: config.bg 
+                          {t('dashboard.noDebts')}
+                        </motion.p>
+                        <motion.p
+                          className="empty-subtitle"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6 }}
+                        >
+                          {t('dashboard.noDebtsSubtitle')}
+                        </motion.p>
+                        <motion.button
+                          className="btn-add-first-debt"
+                          onClick={() => navigate('/add-debt')}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.7 }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Icon component={FaPlus} style={{ marginRight: '8px' }} />
+                          {t('dashboard.addFirstDebt')}
+                        </motion.button>
+                      </motion.div>
+                    ) : (
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext
+                          items={debts.map(d => d.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          <motion.div
+                            key="debts"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="debts-container"
+                          >
+                            {debts.map((debt, index) => {
+                              const isExpanded = expandedDebts.has(debt.id);
+                              return (
+                                <SortableDebtCard key={debt.id} debt={debt} index={index}>
+                                  {({ dragAttributes, dragListeners, isDragging }) => (
+                                    <div
+                                      className="debt-card"
+                                      onClick={() => {
+                                        if (!isExpanded) {
+                                          toggleExpand(debt.id);
+                                        }
                                       }}
                                     >
-                                      <div className="commitment-info">
-                                        <div className="commitment-header-row">
-                                          <span className="commitment-date">
-                                            <Icon component={FaCalendarAlt} size={12} />
-                                            {formatDate(commitment.date)}
-                                          </span>
-                                          <motion.span 
-                                            className={`commitment-status-badge ${config.pulse ? 'pulse-badge' : ''}`}
-                                            style={{ 
-                                              color: config.color,
-                                              background: config.bg,
-                                              border: `1px solid ${config.color}`,
+                                      <div className="debt-header">
+                                        <div className="debt-header-actions-top">
+                                          {isExpanded && (
+                                            <motion.button
+                                              initial={{ opacity: 0, scale: 0.8 }}
+                                              animate={{ opacity: 1, scale: 1 }}
+                                              whileHover={{ scale: 1.1 }}
+                                              whileTap={{ scale: 0.9 }}
+                                              className="btn-close-debt"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleExpand(debt.id);
+                                              }}
+                                              title={t('common.close')}
+                                            >
+                                              <Icon component={FaTimes} size={16} />
+                                            </motion.button>
+                                          )}
+                                          <div
+                                            {...dragAttributes}
+                                            {...dragListeners}
+                                            className="drag-handle"
+                                            style={{
+                                              width: '32px',
+                                              height: '32px',
+                                              cursor: isDragging ? 'grabbing' : 'grab',
+                                              touchAction: 'none',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              borderRadius: '6px',
+                                              background: 'var(--bg-tertiary)',
+                                              border: '1px solid var(--bg-tertiary)',
+                                              opacity: 0.7,
+                                              transition: 'all 0.2s',
                                             }}
-                                            animate={config.pulse ? {
-                                              scale: [1, 1.05, 1],
-                                              opacity: [1, 0.9, 1],
-                                            } : {}}
-                                            transition={config.pulse ? {
-                                              duration: 2,
-                                              repeat: Infinity,
-                                              ease: "easeInOut",
-                                            } : {}}
+                                            onMouseEnter={(e) => {
+                                              e.currentTarget.style.opacity = '1';
+                                              e.currentTarget.style.background = 'var(--overlay)';
+                                              e.currentTarget.style.borderColor = 'var(--accent-color)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.currentTarget.style.opacity = '0.7';
+                                              e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                              e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
                                           >
-                                            {config.pulse && <Icon component={FaExclamationTriangle} size={10} style={{ marginRight: '4px' }} />}
-                                            {config.label}
-                                          </motion.span>
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
+                                              <circle cx="3" cy="3" r="1.5" />
+                                              <circle cx="8" cy="3" r="1.5" />
+                                              <circle cx="13" cy="3" r="1.5" />
+                                              <circle cx="3" cy="8" r="1.5" />
+                                              <circle cx="8" cy="8" r="1.5" />
+                                              <circle cx="13" cy="8" r="1.5" />
+                                              <circle cx="3" cy="13" r="1.5" />
+                                              <circle cx="8" cy="13" r="1.5" />
+                                              <circle cx="13" cy="13" r="1.5" />
+                                            </svg>
+                                          </div>
                                         </div>
-                                        <div className="commitment-amounts">
-                                          {commitment.amountLocal > 0 && (
-                                            <span className="commitment-amount">
-                                              {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
-                                            </span>
-                                          )}
-                                          {commitment.amountDollars > 0 && (
-                                            <span className="commitment-amount">
-                                              {formatCurrency(commitment.amountDollars, 'USD')}
-                                            </span>
-                                          )}
+                                        <div className="debt-header-main">
+                                          <div className="debt-header-info">
+                                            {editingField?.debtId === debt.id && editingField?.field === 'name' ? (
+                                              <input
+                                                type="text"
+                                                value={editValue}
+                                                onChange={(e) => setEditValue(e.target.value)}
+                                                onBlur={() => saveEdit(debt.id, 'name')}
+                                                onKeyDown={(e) => {
+                                                  if (e.key === 'Enter') saveEdit(debt.id, 'name');
+                                                  if (e.key === 'Escape') cancelEdit();
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="inline-edit-input"
+                                                autoFocus
+                                              />
+                                            ) : (
+                                              <h3 onClick={(e) => {
+                                                e.stopPropagation();
+                                                startEditing(debt.id, 'name', debt.name, e);
+                                              }} className="editable-field debt-name">
+                                                <Icon component={FaFileInvoiceDollar} className="debt-info-icon" />
+                                                {debt.name}
+                                              </h3>
+                                            )}
+                                            <div className="debt-bank-type-row">
+                                              {editingField?.debtId === debt.id && editingField?.field === 'bankName' ? (
+                                                <input
+                                                  type="text"
+                                                  value={editValue}
+                                                  onChange={(e) => setEditValue(e.target.value)}
+                                                  onBlur={() => saveEdit(debt.id, 'bankName')}
+                                                  onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') saveEdit(debt.id, 'bankName');
+                                                    if (e.key === 'Escape') cancelEdit();
+                                                  }}
+                                                  onClick={(e) => e.stopPropagation()}
+                                                  className="inline-edit-input"
+                                                  autoFocus
+                                                />
+                                              ) : (
+                                                <p className="debt-bank editable-field" onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  startEditing(debt.id, 'bankName', debt.bankName, e);
+                                                }}>
+                                                  <Icon component={FaLandmark} className="debt-info-icon" />
+                                                  {debt.bankName}
+                                                </p>
+                                              )}
+                                              <p className="debt-type">
+                                                <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
+                                                {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
+                                              </p>
+                                            </div>
+                                          </div>
                                         </div>
-                                        {commitment.notes && (
-                                          <p className="commitment-notes">{commitment.notes}</p>
-                                        )}
+                                        <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
+                                          <div className="debt-summary">
+                                            <div className="debt-status">
+                                              {debt.inOrder ? (
+                                                <span className="status-badge in-order">
+                                                  <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
+                                                </span>
+                                              ) : (
+                                                <span className="status-badge not-in-order">
+                                                  <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
+                                                </span>
+                                              )}
+                                            </div>
+                                            {(() => {
+                                              const urgent = hasUrgentCommitments(debt);
+                                              if (urgent.hasUrgent) {
+                                                const alertConfig = {
+                                                  'overdue': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.overdue'), icon: FaExclamationTriangle },
+                                                  'due-today': { color: 'var(--error)', bg: 'var(--error-light)', label: t('dashboard.dueToday'), icon: FaExclamationTriangle },
+                                                  'due-tomorrow': { color: 'var(--warning)', bg: 'var(--warning-overlay)', label: t('dashboard.dueTomorrow'), icon: FaExclamationTriangle },
+                                                };
+                                                const config = urgent.highestPriority ? alertConfig[urgent.highestPriority] : alertConfig['due-tomorrow'];
+                                                return (
+                                                  <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    className="commitment-alert-badge"
+                                                    style={{ 
+                                                      background: config.bg,
+                                                      borderColor: config.color,
+                                                      color: config.color,
+                                                    }}
+                                                    title={t('dashboard.commitmentsNeedAttention', { count: urgent.count })}
+                                                  >
+                                                    <Icon component={config.icon} size={12} />
+                                                    <span>{urgent.count}</span>
+                                                  </motion.div>
+                                                );
+                                              }
+                                              return null;
+                                            })()}
+                                          </div>
+                                          <div className="debt-actions">
+                                            <motion.div
+                                              initial={{ scale: 0, opacity: 0 }}
+                                              animate={{ scale: 1, opacity: 1 }}
+                                              className={`call-task-icon ${!debt.hasCallTask ? 'inactive' : ''}`}
+                                              title={t('debt.callTask')}
+                                            >
+                                              <Icon component={FaPhone} />
+                                            </motion.div>
+                                            <motion.div
+                                              initial={{ scale: 0, opacity: 0 }}
+                                              animate={{ scale: 1, opacity: 1 }}
+                                              className={`call-completed-icon ${!debt.callCompleted ? 'inactive' : ''}`}
+                                              title={t('debt.callCompleted')}
+                                            >
+                                              <Icon component={FaCheck} />
+                                            </motion.div>
+                                            <motion.button
+                                              whileHover={{ scale: 1.1 }}
+                                              whileTap={{ scale: 0.9 }}
+                                              className="btn-delete"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(debt.id);
+                                              }}
+                                            >
+                                              <Icon component={FaTrash} />
+                                            </motion.button>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="commitment-actions">
-                                        {status !== 'completed' && (
-                                          <>
-                                            {commitment.status !== 'completed' && (
+
+                                      <AnimatePresence>
+                                        {isExpanded && (
+                                          <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="debt-expanded-content"
+                                          >
+                                            <div className="debt-main-info">
+                                              <div className="debt-payments">
+                                                <div className="payment-item">
+                                                  <span className="payment-label">{t('dashboard.monthly')} ({storage.getLocalCurrency()})</span>
+                                                  {editingField?.debtId === debt.id && editingField?.field === 'localFee' ? (
+                                                    <input
+                                                      type="number"
+                                                      step="0.01"
+                                                      value={editValue}
+                                                      onChange={(e) => setEditValue(e.target.value)}
+                                                      onBlur={() => saveEdit(debt.id, 'localFee')}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') saveEdit(debt.id, 'localFee');
+                                                        if (e.key === 'Escape') cancelEdit();
+                                                      }}
+                                                      onClick={(e) => e.stopPropagation()}
+                                                      className="inline-edit-input"
+                                                      autoFocus
+                                                    />
+                                                  ) : (
+                                                    <span className="payment-value editable-field" onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      startEditing(debt.id, 'localFee', debt.localFee, e);
+                                                    }}>
+                                                      {hideAmounts ? '••••' : formatCurrency(debt.localFee, debt.localCurrency)}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                <div className="payment-item">
+                                                  <span className="payment-label">{t('dashboard.monthly')} (USD)</span>
+                                                  {editingField?.debtId === debt.id && editingField?.field === 'dollarFee' ? (
+                                                    <input
+                                                      type="number"
+                                                      step="0.01"
+                                                      value={editValue}
+                                                      onChange={(e) => setEditValue(e.target.value)}
+                                                      onBlur={() => saveEdit(debt.id, 'dollarFee')}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') saveEdit(debt.id, 'dollarFee');
+                                                        if (e.key === 'Escape') cancelEdit();
+                                                      }}
+                                                      onClick={(e) => e.stopPropagation()}
+                                                      className="inline-edit-input"
+                                                      autoFocus
+                                                    />
+                                                  ) : (
+                                                    <span className="payment-value editable-field" onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      startEditing(debt.id, 'dollarFee', debt.dollarFee, e);
+                                                    }}>
+                                                      {hideAmounts ? '••••' : formatCurrency(debt.dollarFee, 'USD')}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                <div className="payment-item">
+                                                  <span className="payment-label">{t('dashboard.total')} ({storage.getLocalCurrency()})</span>
+                                                  <span className="payment-value">
+                                                    {hideAmounts ? '••••' : formatCurrency(debt.totalLocal, debt.localCurrency)}
+                                                  </span>
+                                                </div>
+                                                <div className="payment-item">
+                                                  <span className="payment-label">{t('dashboard.total')} (USD)</span>
+                                                  <span className="payment-value">
+                                                    {hideAmounts ? '••••' : formatCurrency(debt.totalDollars, 'USD')}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            <div className="debt-actions-section">
                                               <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                className="btn-commitment-action"
+                                                className="btn-add-commitment"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  navigate(`/edit-commitment/${debt.id}/${commitment.id}`);
+                                                  navigate(`/add-commitment/${debt.id}`);
                                                 }}
-                                                title={t('commitment.editCommitment')}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
                                               >
-                                                <Icon component={FaEdit} size={14} />
+                                                <Icon component={FaPlus} style={{ marginRight: '8px' }} />
+                                                {t('dashboard.addCommitment')}
                                               </motion.button>
-                                            )}
-                                            <motion.button
-                                              whileHover={{ scale: 1.1 }}
-                                              whileTap={{ scale: 0.9 }}
-                                              className="btn-commitment-action"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(`/complete-commitment/${debt.id}/${commitment.id}`);
-                                              }}
-                                              title={t('commitment.markCompleted')}
-                                            >
-                                              <Icon component={FaCheck} size={14} />
-                                            </motion.button>
-                                            <motion.button
-                                              whileHover={{ scale: 1.1 }}
-                                              whileTap={{ scale: 0.9 }}
-                                              className="btn-commitment-action btn-delete"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(`/delete-commitment/${debt.id}/${commitment.id}`);
-                                              }}
-                                              title={t('commitment.deleteCommitment')}
-                                            >
-                                              <Icon component={FaTrash} size={14} />
-                                            </motion.button>
-                                          </>
-                                        )}
-                                      </div>
-                                    </motion.div>
-                                  );
-                                })}
-                              </div>
-                                )}
-                                
-                                {/* Completed Commitments History */}
-                                {debt.commitments.filter(c => c.status === 'completed').length > 0 && (
-                                  <div className="commitments-completed-section">
-                                    <h5 className="completed-title">{t('dashboard.completedCommitments')}</h5>
-                                    <div className="commitments-list">
-                                      {debt.commitments
-                                        .filter(c => c.status === 'completed')
-                                        .sort((a, b) => {
-                                          const dateA = a.completedAt || a.date;
-                                          const dateB = b.completedAt || b.date;
-                                          return new Date(dateB).getTime() - new Date(dateA).getTime();
-                                        })
-                                        .map((commitment) => {
-                                          const config = {
-                                            color: 'var(--primary-bright)',
-                                            bg: 'var(--overlay)',
-                                            label: t('common.completed'),
-                                          };
-                                          
-                                          return (
-                                            <motion.div
-                                              key={commitment.id}
-                                              initial={{ opacity: 0, y: 10 }}
-                                              animate={{ opacity: 1, y: 0 }}
-                                              className="commitment-item commitment-completed"
-                                              style={{ 
-                                                borderLeft: `4px solid ${config.color}`,
-                                                background: config.bg,
-                                                opacity: 0.8,
-                                              }}
-                                            >
-                                              <div className="commitment-info">
-                                                <div className="commitment-header-row">
-                                                  <span className="commitment-date">
-                                                    <Icon component={FaCalendarAlt} size={12} />
-                                                    {formatDate(commitment.date)}
-                                                  </span>
-                                                  <span className="commitment-status-badge" style={{ color: config.color }}>
-                                                    {config.label}
-                                                  </span>
+                                              <motion.button
+                                                className="btn-add-call"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/add-call/${debt.id}`);
+                                                }}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                              >
+                                                <Icon component={FaPhone} style={{ marginRight: '8px' }} />
+                                                {t('dashboard.recordCall')}
+                                              </motion.button>
+                                              <motion.button
+                                                className="btn-edit-debt"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/edit-debt/${debt.id}`);
+                                                }}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                              >
+                                                <Icon component={FaEdit} style={{ marginRight: '8px' }} />
+                                                {t('common.edit')}
+                                              </motion.button>
+                                            </div>
+
+                                            {debt.commitments && debt.commitments.length > 0 && (
+                                              <div className="debt-commitments">
+                                                <h4>{t('dashboard.paymentCommitments')}</h4>
+                                                <div className="commitments-list">
+                                                  {debt.commitments.map(commitment => (
+                                                    <div key={commitment.id} className="commitment-item">
+                                                      <div className="commitment-info">
+                                                        <span className="commitment-date">{new Date(commitment.date).toLocaleDateString()}</span>
+                                                        <span className={`commitment-status ${commitment.status}`}>
+                                                          {commitment.status === 'completed' ? t('common.completed') : 
+                                                           commitment.status === 'overdue' ? t('dashboard.overdue') : 
+                                                           t('dashboard.pending')}
+                                                        </span>
+                                                      </div>
+                                                      <div className="commitment-amounts">
+                                                        {!hideAmounts && (
+                                                          <>
+                                                            <span>{formatCurrency(commitment.amountLocal, debt.localCurrency)}</span>
+                                                            <span>{formatCurrency(commitment.amountDollars, 'USD')}</span>
+                                                          </>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  ))}
                                                 </div>
-                                                <div className="commitment-amounts">
-                                                  {commitment.amountLocal > 0 && (
-                                                    <span className="commitment-amount">
-                                                      {formatCurrency(commitment.amountLocal, storage.getLocalCurrency())}
-                                                    </span>
-                                                  )}
-                                                  {commitment.amountDollars > 0 && (
-                                                    <span className="commitment-amount">
-                                                      {formatCurrency(commitment.amountDollars, 'USD')}
-                                                    </span>
-                                                  )}
-                                                </div>
-                                                {commitment.notes && (
-                                                  <p className="commitment-notes">{commitment.notes}</p>
-                                                )}
-                                                {commitment.completedAt && (
-                                                  <p className="commitment-completed-date" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                                    {t('commitment.completedOn')} {formatDate(commitment.completedAt)}
-                                                  </p>
-                                                )}
                                               </div>
-                                            </motion.div>
-                                          );
-                                        })}
+                                            )}
+
+                                            {debt.callHistory && debt.callHistory.length > 0 && (
+                                              <div className="debt-calls">
+                                                <h4>{t('dashboard.callHistory')}</h4>
+                                                <div className="calls-list">
+                                                  {debt.callHistory.map(call => (
+                                                    <div key={call.id} className="call-item">
+                                                      <span className="call-date">{new Date(call.date).toLocaleDateString()}</span>
+                                                      <p className="call-notes">{call.notes}</p>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            )}
+                                          </motion.div>
+                                        )}
+                                      </AnimatePresence>
                                     </div>
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <div className="commitments-empty">
-                                <p>{t('dashboard.noCommitments')}</p>
-                              </div>
-                            )}
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="btn-add-commitment"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/add-commitment/${debt.id}`);
-                              }}
-                              style={{ marginTop: '16px', width: '100%' }}
-                            >
-                              <Icon component={FaPlus} size={12} />
-                              {t('dashboard.addCommitment')}
-                            </motion.button>
-                          </div>
-
-                          {/* Call History Section */}
-                          <div className="debt-call-history">
-                            <div className="call-history-header">
-                              <h4 className="call-history-title">
-                                <Icon component={FaPhone} size={16} />
-                                {t('dashboard.callHistory')}
-                              </h4>
-                            </div>
-                            
-                            {debt.callHistory && debt.callHistory.length > 0 ? (
-                              <div className="call-history-list">
-                                {debt.callHistory
-                                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Most recent first
-                                  .map((call) => (
-                                    <motion.div
-                                      key={call.id}
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      className="call-item"
-                                    >
-                                      <div className="call-date">
-                                        <Icon component={FaCalendarAlt} size={12} />
-                                        {formatDate(call.date)}
-                                      </div>
-                                      <div className="call-notes">{call.notes}</div>
-                                    </motion.div>
-                                  ))}
-                              </div>
-                            ) : (
-                              <div className="call-history-empty">
-                                <p>{t('dashboard.noCalls')}</p>
-                              </div>
-                            )}
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="btn-add-call"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/add-call/${debt.id}`);
-                              }}
-                              style={{ marginTop: '16px', width: '100%' }}
-                            >
-                              <Icon component={FaPlus} size={12} />
-                              {t('dashboard.recordCall')}
-                            </motion.button>
-                          </div>
-
-                          {debt.currentPlan && (
-                            <div className="debt-plan">
-                              <span className="plan-label">{t('dashboard.plan')}:</span>
-                              {editingField?.debtId === debt.id && editingField?.field === 'currentPlan' ? (
-                                <input
-                                  type="text"
-                                  value={editValue}
-                                  onChange={(e) => setEditValue(e.target.value)}
-                                  onBlur={() => saveEdit(debt.id, 'currentPlan')}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') saveEdit(debt.id, 'currentPlan');
-                                    if (e.key === 'Escape') cancelEdit();
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-edit-input"
-                                  autoFocus
-                                />
-                              ) : (
-                                <span className="plan-value editable-field" onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditing(debt.id, 'currentPlan', debt.currentPlan, e);
-                                }}>
-                                  {debt.currentPlan}
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="payment-item">
-                            <span className="payment-label">
-                              <Icon component={FaPhone} size={14} style={{ marginRight: '6px' }} />
-                              {t('addDebt.bankPhone')}
-                            </span>
-                            {editingField?.debtId === debt.id && editingField?.field === 'bankPhone' ? (
-                              <input
-                                type="tel"
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onBlur={() => saveEdit(debt.id, 'bankPhone')}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') saveEdit(debt.id, 'bankPhone');
-                                  if (e.key === 'Escape') cancelEdit();
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-edit-input"
-                                autoFocus
-                                placeholder={t('editDebt.phoneOptional')}
-                              />
-                            ) : (
-                              debt.bankPhone ? (
-                                <span 
-                                  className="payment-value editable-field" 
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    startEditing(debt.id, 'bankPhone', debt.bankPhone || '', e);
-                                  }}
-                                  style={{ cursor: 'pointer' }}
-                                  title={t('dashboard.addPhone')}
-                                >
-                                  {debt.bankPhone}
-                                </span>
-                              ) : (
-                                <span className="payment-value editable-field" onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditing(debt.id, 'bankPhone', '', e);
-                                }} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                                  {t('dashboard.addPhone')}
-                                </span>
-                              )
-                            )}
-                          </div>
-
-                          <div className="debt-task">
-                            <motion.button
-                              className={`task-button ${debt.hasCallTask ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleCallTask(debt);
-                              }}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <Icon component={FaPhone} size={16} />
-                              <span>{t('dashboard.callBank')}</span>
-                            </motion.button>
-                            <motion.button
-                              className={`task-button ${debt.callCompleted ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleCallCompleted(debt);
-                              }}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <Icon component={FaCheck} size={16} />
-                              <span>{t('common.debtReviewed')}</span>
-                            </motion.button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                          </div>
-                        )}
-                      </SortableDebtCard>
-                    );
-                  })}
-                </motion.div>
-              </SortableContext>
-            </DndContext>
+                                  )}
+                                </SortableDebtCard>
+                              );
+                            })}
+                          </motion.div>
+                        </SortableContext>
+                      </DndContext>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
             )}
-        </AnimatePresence>
+            {activeTab === 'fixedExpenses' && (
+              <motion.div
+                key="fixedExpenses"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {renderFixedExpensesScreen()}
+              </motion.div>
+            )}
+            {activeTab === 'assets' && (
+              <motion.div
+                key="assets"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {renderAssetsScreen()}
+              </motion.div>
+            )}
+            {activeTab === 'incomes' && (
+              <motion.div
+                key="incomes"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {renderIncomesScreen()}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fab-add-debt"
-        onClick={() => navigate('/add-debt')}
-      >
-        <Icon component={FaPlus} />
-      </motion.button>
+      {/* FAB buttons for adding items */}
+      <AnimatePresence>
+        {activeTab === 'debt' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="fab-add"
+            onClick={() => navigate('/add-debt')}
+          >
+            <Icon component={FaPlus} />
+          </motion.button>
+        )}
+        {activeTab === 'fixedExpenses' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="fab-add"
+            onClick={() => setShowAddModal('fixedExpense')}
+          >
+            <Icon component={FaPlus} />
+          </motion.button>
+        )}
+        {activeTab === 'assets' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="fab-add"
+            onClick={() => setShowAddModal('asset')}
+          >
+            <Icon component={FaPlus} />
+          </motion.button>
+        )}
+        {activeTab === 'incomes' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="fab-add"
+            onClick={() => setShowAddModal('income')}
+          >
+            <Icon component={FaPlus} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
+      {/* Modals for adding items */}
+      <AnimatePresence>
+        {showAddModal === 'fixedExpense' && (
+          <AddFixedExpenseModal
+            onClose={() => setShowAddModal(null)}
+            onSave={(expense) => {
+              storage.saveFixedExpense(expense);
+              loadFixedExpenses();
+              setShowAddModal(null);
+            }}
+          />
+        )}
+        {showAddModal === 'asset' && (
+          <AddAssetModal
+            onClose={() => setShowAddModal(null)}
+            onSave={(asset) => {
+              storage.saveAsset(asset);
+              loadAssets();
+              setShowAddModal(null);
+            }}
+          />
+        )}
+        {showAddModal === 'income' && (
+          <AddIncomeModal
+            onClose={() => setShowAddModal(null)}
+            onSave={(income) => {
+              storage.saveIncome(income);
+              loadIncomes();
+              setShowAddModal(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+    </motion.div>
+  );
+};
+
+// Modal Components
+const AddFixedExpenseModal: React.FC<{
+  onClose: () => void;
+  onSave: (expense: FixedExpense) => void;
+}> = ({ onClose, onSave }) => {
+  const { t } = useTranslation();
+  const [name, setName] = useState('');
+  const [amountLocal, setAmountLocal] = useState('');
+  const [amountDollars, setAmountDollars] = useState('');
+  const [category, setCategory] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const expense: FixedExpense = {
+      id: Date.now().toString(),
+      name,
+      amountLocal: parseFloat(amountLocal) || 0,
+      amountDollars: parseFloat(amountDollars) || 0,
+      localCurrency: storage.getLocalCurrency(),
+      category: category || undefined,
+      dueDate: dueDate || undefined,
+      notes: notes || undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    onSave(expense);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="modal-overlay"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2>{t('dashboard.addFixedExpense') || 'Agregar Gasto Fijo'}</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder={t('dashboard.expenseName') || 'Nombre del gasto'}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            placeholder={`${storage.getLocalCurrency()} Amount`}
+            value={amountLocal}
+            onChange={(e) => setAmountLocal(e.target.value)}
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            placeholder="USD Amount"
+            value={amountDollars}
+            onChange={(e) => setAmountDollars(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder={t('dashboard.category') || 'Categoría (opcional)'}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          />
+          <input
+            type="number"
+            min="1"
+            max="31"
+            placeholder={t('dashboard.dueDate') || 'Día de vencimiento (1-31)'}
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+          <textarea
+            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+          />
+          <div className="modal-actions">
+            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
+            <button type="submit">{t('common.save')}</button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const AddAssetModal: React.FC<{
+  onClose: () => void;
+  onSave: (asset: Asset) => void;
+}> = ({ onClose, onSave }) => {
+  const { t } = useTranslation();
+  const [name, setName] = useState('');
+  const [type, setType] = useState<Asset['type']>('other');
+  const [valueLocal, setValueLocal] = useState('');
+  const [valueDollars, setValueDollars] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const asset: Asset = {
+      id: Date.now().toString(),
+      name,
+      type,
+      valueLocal: parseFloat(valueLocal) || 0,
+      valueDollars: parseFloat(valueDollars) || 0,
+      localCurrency: storage.getLocalCurrency(),
+      purchaseDate: purchaseDate || undefined,
+      notes: notes || undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    onSave(asset);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="modal-overlay"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2>{t('dashboard.addAsset') || 'Agregar Activo'}</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder={t('dashboard.assetName') || 'Nombre del activo'}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <select value={type} onChange={(e) => setType(e.target.value as Asset['type'])} required>
+            <option value="property">{t('dashboard.property') || 'Propiedad'}</option>
+            <option value="vehicle">{t('dashboard.vehicle') || 'Vehículo'}</option>
+            <option value="investment">{t('dashboard.investment') || 'Inversión'}</option>
+            <option value="savings">{t('dashboard.savings') || 'Ahorros'}</option>
+            <option value="other">{t('dashboard.other') || 'Otro'}</option>
+          </select>
+          <input
+            type="number"
+            step="0.01"
+            placeholder={`${storage.getLocalCurrency()} Value`}
+            value={valueLocal}
+            onChange={(e) => setValueLocal(e.target.value)}
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            placeholder="USD Value"
+            value={valueDollars}
+            onChange={(e) => setValueDollars(e.target.value)}
+            required
+          />
+          <input
+            type="date"
+            placeholder={t('dashboard.purchaseDate') || 'Fecha de compra'}
+            value={purchaseDate}
+            onChange={(e) => setPurchaseDate(e.target.value)}
+          />
+          <textarea
+            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+          />
+          <div className="modal-actions">
+            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
+            <button type="submit">{t('common.save')}</button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const AddIncomeModal: React.FC<{
+  onClose: () => void;
+  onSave: (income: Income) => void;
+}> = ({ onClose, onSave }) => {
+  const { t } = useTranslation();
+  const [name, setName] = useState('');
+  const [type, setType] = useState<Income['type']>('salary');
+  const [frequency, setFrequency] = useState<Income['frequency']>('monthly');
+  const [amountLocal, setAmountLocal] = useState('');
+  const [amountDollars, setAmountDollars] = useState('');
+  const [nextPaymentDate, setNextPaymentDate] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const income: Income = {
+      id: Date.now().toString(),
+      name,
+      type,
+      frequency,
+      amountLocal: parseFloat(amountLocal) || 0,
+      amountDollars: parseFloat(amountDollars) || 0,
+      localCurrency: storage.getLocalCurrency(),
+      nextPaymentDate: nextPaymentDate || undefined,
+      notes: notes || undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    onSave(income);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="modal-overlay"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2>{t('dashboard.addIncome') || 'Agregar Ingreso'}</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder={t('dashboard.incomeName') || 'Nombre del ingreso'}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <select value={type} onChange={(e) => setType(e.target.value as Income['type'])} required>
+            <option value="salary">{t('dashboard.salary') || 'Salario'}</option>
+            <option value="freelance">{t('dashboard.freelance') || 'Freelance'}</option>
+            <option value="investment">{t('dashboard.investment') || 'Inversión'}</option>
+            <option value="rental">{t('dashboard.rental') || 'Alquiler'}</option>
+            <option value="other">{t('dashboard.other') || 'Otro'}</option>
+          </select>
+          <select value={frequency} onChange={(e) => setFrequency(e.target.value as Income['frequency'])} required>
+            <option value="monthly">{t('dashboard.monthly') || 'Mensual'}</option>
+            <option value="weekly">{t('dashboard.weekly') || 'Semanal'}</option>
+            <option value="biweekly">{t('dashboard.biweekly') || 'Quincenal'}</option>
+            <option value="yearly">{t('dashboard.yearly') || 'Anual'}</option>
+            <option value="one-time">{t('dashboard.oneTime') || 'Una vez'}</option>
+          </select>
+          <input
+            type="number"
+            step="0.01"
+            placeholder={`${storage.getLocalCurrency()} Amount`}
+            value={amountLocal}
+            onChange={(e) => setAmountLocal(e.target.value)}
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            placeholder="USD Amount"
+            value={amountDollars}
+            onChange={(e) => setAmountDollars(e.target.value)}
+            required
+          />
+          <input
+            type="date"
+            placeholder={t('dashboard.nextPaymentDate') || 'Próxima fecha de pago'}
+            value={nextPaymentDate}
+            onChange={(e) => setNextPaymentDate(e.target.value)}
+          />
+          <textarea
+            placeholder={t('dashboard.notes') || 'Notas (opcional)'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+          />
+          <div className="modal-actions">
+            <button type="button" onClick={onClose}>{t('common.cancel')}</button>
+            <button type="submit">{t('common.save')}</button>
+          </div>
+        </form>
+      </motion.div>
     </motion.div>
   );
 };

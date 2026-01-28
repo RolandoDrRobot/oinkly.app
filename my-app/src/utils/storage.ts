@@ -1,6 +1,9 @@
-import { Debt, User } from '../types';
+import { Debt, User, FixedExpense, Asset, Income } from '../types';
 
 const DEBTS_KEY = 'debts';
+const FIXED_EXPENSES_KEY = 'fixedExpenses';
+const ASSETS_KEY = 'assets';
+const INCOMES_KEY = 'incomes';
 const USER_KEY = 'user';
 const IS_LOGGED_IN_KEY = 'isLoggedIn';
 const DEBTS_ORDER_KEY = 'debtsOrder';
@@ -103,5 +106,80 @@ export const storage = {
   getDebtsOrder: (): string[] | null => {
     const orderStr = localStorage.getItem(DEBTS_ORDER_KEY);
     return orderStr ? JSON.parse(orderStr) : null;
+  },
+
+  // Fixed Expenses management
+  getFixedExpenses: (): FixedExpense[] => {
+    const expensesStr = localStorage.getItem(FIXED_EXPENSES_KEY);
+    return expensesStr ? JSON.parse(expensesStr) : [];
+  },
+
+  saveFixedExpense: (expense: FixedExpense) => {
+    const expenses = storage.getFixedExpenses();
+    const existingIndex = expenses.findIndex(e => e.id === expense.id);
+    
+    if (existingIndex >= 0) {
+      expenses[existingIndex] = { ...expense, updatedAt: new Date().toISOString() };
+    } else {
+      expenses.push({ ...expense, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    
+    localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(expenses));
+  },
+
+  deleteFixedExpense: (id: string) => {
+    const expenses = storage.getFixedExpenses();
+    const filtered = expenses.filter(e => e.id !== id);
+    localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(filtered));
+  },
+
+  // Assets management
+  getAssets: (): Asset[] => {
+    const assetsStr = localStorage.getItem(ASSETS_KEY);
+    return assetsStr ? JSON.parse(assetsStr) : [];
+  },
+
+  saveAsset: (asset: Asset) => {
+    const assets = storage.getAssets();
+    const existingIndex = assets.findIndex(a => a.id === asset.id);
+    
+    if (existingIndex >= 0) {
+      assets[existingIndex] = { ...asset, updatedAt: new Date().toISOString() };
+    } else {
+      assets.push({ ...asset, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    
+    localStorage.setItem(ASSETS_KEY, JSON.stringify(assets));
+  },
+
+  deleteAsset: (id: string) => {
+    const assets = storage.getAssets();
+    const filtered = assets.filter(a => a.id !== id);
+    localStorage.setItem(ASSETS_KEY, JSON.stringify(filtered));
+  },
+
+  // Incomes management
+  getIncomes: (): Income[] => {
+    const incomesStr = localStorage.getItem(INCOMES_KEY);
+    return incomesStr ? JSON.parse(incomesStr) : [];
+  },
+
+  saveIncome: (income: Income) => {
+    const incomes = storage.getIncomes();
+    const existingIndex = incomes.findIndex(i => i.id === income.id);
+    
+    if (existingIndex >= 0) {
+      incomes[existingIndex] = { ...income, updatedAt: new Date().toISOString() };
+    } else {
+      incomes.push({ ...income, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    
+    localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes));
+  },
+
+  deleteIncome: (id: string) => {
+    const incomes = storage.getIncomes();
+    const filtered = incomes.filter(i => i.id !== id);
+    localStorage.setItem(INCOMES_KEY, JSON.stringify(filtered));
   },
 };

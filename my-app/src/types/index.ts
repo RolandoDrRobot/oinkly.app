@@ -51,3 +51,43 @@ export interface User {
   email: string;
   name: string;
 }
+
+export interface FixedExpense {
+  id: string;
+  name: string;
+  amountLocal: number;
+  amountDollars: number;
+  localCurrency: string;
+  category?: string;
+  dueDate?: string; // Día del mes (1-31)
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Asset {
+  id: string;
+  name: string;
+  type: 'property' | 'vehicle' | 'investment' | 'savings' | 'other';
+  valueLocal: number;
+  valueDollars: number;
+  localCurrency: string;
+  purchaseDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Income {
+  id: string;
+  name: string;
+  amountLocal: number;
+  amountDollars: number;
+  localCurrency: string;
+  type: 'salary' | 'freelance' | 'investment' | 'rental' | 'other';
+  frequency: 'monthly' | 'weekly' | 'biweekly' | 'yearly' | 'one-time';
+  nextPaymentDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
