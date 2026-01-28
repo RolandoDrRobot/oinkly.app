@@ -754,37 +754,56 @@ const Dashboard: React.FC = () => {
           <div className="items-list">
             {fixedExpenses.map(expense => (
               <div key={expense.id} className="item-card">
-                <div className="item-card-content">
-                  <h3>{expense.name}</h3>
-                  {!hideAmounts && (
-                    <div className="item-amounts">
-                      <span>{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
-                      <span>{formatCurrency(expense.amountDollars, 'USD')}</span>
+                <div className="item-header">
+                  <div className="item-header-main">
+                    <div className="item-header-info">
+                      <h3 className="item-name">{expense.name}</h3>
+                      {expense.category && (
+                        <p className="item-type">{expense.category}</p>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="item-card-actions">
-                  <motion.button
-                    className="btn-edit-item"
-                    onClick={() => navigate(`/edit-fixed-expense/${expense.id}`)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaEdit} />
-                  </motion.button>
-                  <motion.button
-                    className="btn-delete-item"
-                    onClick={() => {
-                      if (window.confirm(t('deleteFixedExpense.confirm'))) {
-                        storage.deleteFixedExpense(expense.id);
-                        loadFixedExpenses();
-                      }
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaTrash} />
-                  </motion.button>
+                    <div className="item-header-actions">
+                      {!hideAmounts && (
+                        <div className="item-amounts">
+                          <div className="summary-item">
+                            <span className="summary-label">{expense.localCurrency}</span>
+                            <span className="summary-value">{formatCurrency(expense.amountLocal, expense.localCurrency)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">USD</span>
+                            <span className="summary-value">{formatCurrency(expense.amountDollars, 'USD')}</span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="item-card-actions">
+                        <motion.button
+                          className="btn-edit-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/edit-fixed-expense/${expense.id}`);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaEdit} />
+                        </motion.button>
+                        <motion.button
+                          className="btn-delete-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(t('deleteFixedExpense.confirm'))) {
+                              storage.deleteFixedExpense(expense.id);
+                              loadFixedExpenses();
+                            }
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaTrash} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -837,38 +856,54 @@ const Dashboard: React.FC = () => {
           <div className="items-list">
             {assets.map(asset => (
               <div key={asset.id} className="item-card">
-                <div className="item-card-content">
-                  <h3>{asset.name}</h3>
-                  <span className="item-type">{asset.type}</span>
-                  {!hideAmounts && (
-                    <div className="item-amounts">
-                      <span>{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
-                      <span>{formatCurrency(asset.valueDollars, 'USD')}</span>
+                <div className="item-header">
+                  <div className="item-header-main">
+                    <div className="item-header-info">
+                      <h3 className="item-name">{asset.name}</h3>
+                      <p className="item-type">{t(`dashboard.${asset.type}`)}</p>
                     </div>
-                  )}
-                </div>
-                <div className="item-card-actions">
-                  <motion.button
-                    className="btn-edit-item"
-                    onClick={() => navigate(`/edit-asset/${asset.id}`)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaEdit} />
-                  </motion.button>
-                  <motion.button
-                    className="btn-delete-item"
-                    onClick={() => {
-                      if (window.confirm(t('deleteAsset.confirm'))) {
-                        storage.deleteAsset(asset.id);
-                        loadAssets();
-                      }
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaTrash} />
-                  </motion.button>
+                    <div className="item-header-actions">
+                      {!hideAmounts && (
+                        <div className="item-amounts">
+                          <div className="summary-item">
+                            <span className="summary-label">{asset.localCurrency}</span>
+                            <span className="summary-value">{formatCurrency(asset.valueLocal, asset.localCurrency)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">USD</span>
+                            <span className="summary-value">{formatCurrency(asset.valueDollars, 'USD')}</span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="item-card-actions">
+                        <motion.button
+                          className="btn-edit-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/edit-asset/${asset.id}`);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaEdit} />
+                        </motion.button>
+                        <motion.button
+                          className="btn-delete-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(t('deleteAsset.confirm'))) {
+                              storage.deleteAsset(asset.id);
+                              loadAssets();
+                            }
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaTrash} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -921,38 +956,57 @@ const Dashboard: React.FC = () => {
           <div className="items-list">
             {incomes.map(income => (
               <div key={income.id} className="item-card">
-                <div className="item-card-content">
-                  <h3>{income.name}</h3>
-                  <span className="item-type">{income.type} - {income.frequency}</span>
-                  {!hideAmounts && (
-                    <div className="item-amounts">
-                      <span>{formatCurrency(income.amountLocal, income.localCurrency)}</span>
-                      <span>{formatCurrency(income.amountDollars, 'USD')}</span>
+                <div className="item-header">
+                  <div className="item-header-main">
+                    <div className="item-header-info">
+                      <h3 className="item-name">{income.name}</h3>
+                      <div className="debt-bank-type-row">
+                        <p className="item-type">{t(`dashboard.${income.type}`)}</p>
+                        <p className="item-type">{t(`dashboard.${income.frequency}`)}</p>
+                      </div>
                     </div>
-                  )}
-                </div>
-                <div className="item-card-actions">
-                  <motion.button
-                    className="btn-edit-item"
-                    onClick={() => navigate(`/edit-income/${income.id}`)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaEdit} />
-                  </motion.button>
-                  <motion.button
-                    className="btn-delete-item"
-                    onClick={() => {
-                      if (window.confirm(t('deleteIncome.confirm'))) {
-                        storage.deleteIncome(income.id);
-                        loadIncomes();
-                      }
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon component={FaTrash} />
-                  </motion.button>
+                    <div className="item-header-actions">
+                      {!hideAmounts && (
+                        <div className="item-amounts">
+                          <div className="summary-item">
+                            <span className="summary-label">{income.localCurrency}</span>
+                            <span className="summary-value">{formatCurrency(income.amountLocal, income.localCurrency)}</span>
+                          </div>
+                          <div className="summary-item">
+                            <span className="summary-label">USD</span>
+                            <span className="summary-value">{formatCurrency(income.amountDollars, 'USD')}</span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="item-card-actions">
+                        <motion.button
+                          className="btn-edit-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/edit-income/${income.id}`);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaEdit} />
+                        </motion.button>
+                        <motion.button
+                          className="btn-delete-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(t('deleteIncome.confirm'))) {
+                              storage.deleteIncome(income.id);
+                              loadIncomes();
+                            }
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon component={FaTrash} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
