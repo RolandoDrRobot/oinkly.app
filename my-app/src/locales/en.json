@@ -15,7 +15,8 @@
     "no": "No",
     "allDone": "All Done!",
     "loading": "Loading...",
-    "close": "Close"
+    "close": "Close",
+    "amountPlaceholder": "0.00"
   },
   "landing": {
     "title": "Debts",
@@ -105,7 +106,9 @@
     "totalFixedExpenses": "Total Fixed Expenses",
     "totalAssets": "Total Assets",
     "totalIncomes": "Total Income",
-    "netWorth": "Net Worth"
+    "netWorth": "Net Worth",
+    "emptyStateAlt": "Empty state",
+    "logoAlt": "Oinkly Logo"
   },
   "addFixedExpense": {
     "title": "New Fixed Expense",
@@ -506,6 +509,7 @@
     "subtitle": "Your path to financial freedom",
     "methodTitle": "The Snowball Method",
     "methodDescription": "Pay off your smallest debt first. Build momentum. Win faster. Your debts auto-organize from smallest to largest—focus on one while paying minimums on others.",
+    "snowballTagline": "Pay smallest first. Build momentum. Win faster.",
     "methodBenefit1": "Quick wins build momentum",
     "methodBenefit2": "Fewer debts, faster",
     "methodBenefit3": "See progress. Stay motivated.",

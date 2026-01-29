@@ -210,7 +210,7 @@ const Landing: React.FC = () => {
                 <div className="welcome-icon-wrapper">
                   <img 
                     src={`${process.env.PUBLIC_URL}/logo.png`} 
-                    alt="Oinkly Logo" 
+                    alt={t('dashboard.logoAlt')} 
                     className="welcome-logo"
                   />
                 </div>
@@ -226,7 +226,7 @@ const Landing: React.FC = () => {
                   <Icon component={currentStepData.icon} className="step-icon-large" size={64} />
                 </div>
                 <h2 className="step-title">{currentStepData.title}</h2>
-                <p className="step-description-compact">Pay smallest first. Build momentum. Win faster.</p>
+                <p className="step-description-compact">{t('about.snowballTagline')}</p>
                 <ul className="benefits-list-compact">
                   {currentStepData.benefits?.map((benefit, index) => (
                     <li key={index} className="benefit-item-compact">

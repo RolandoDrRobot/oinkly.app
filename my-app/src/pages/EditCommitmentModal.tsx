@@ -286,7 +286,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 type="text"
                 value={getCurrencyInputValue('amountLocal', storage.getLocalCurrency())}
                 onChange={(e) => handleCurrencyInputChange(e, 'amountLocal', storage.getLocalCurrency())}
-                placeholder="0.00"
+                placeholder={t('common.amountPlaceholder')}
                 required
               />
               <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -335,7 +335,7 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
                 type="text"
                 value={getCurrencyInputValue('amountDollars', 'USD')}
                 onChange={(e) => handleCurrencyInputChange(e, 'amountDollars', 'USD')}
-                placeholder="0.00"
+                placeholder={t('common.amountPlaceholder')}
                 required
               />
               <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>

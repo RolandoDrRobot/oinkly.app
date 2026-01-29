@@ -15,7 +15,8 @@
     "no": "No",
     "allDone": "¡Todo Listo!",
     "loading": "Cargando...",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "amountPlaceholder": "0,00"
   },
   "landing": {
     "title": "Deudas",
@@ -105,7 +106,9 @@
     "totalFixedExpenses": "Total Gastos Fijos",
     "totalAssets": "Total Activos",
     "totalIncomes": "Total Ingresos",
-    "netWorth": "Patrimonio Neto"
+    "netWorth": "Patrimonio Neto",
+    "emptyStateAlt": "Estado vacío",
+    "logoAlt": "Logo de Oinkly"
   },
   "addFixedExpense": {
     "title": "Nuevo Gasto Fijo",
@@ -506,6 +509,7 @@
     "subtitle": "Tu camino hacia la libertad financiera",
     "methodTitle": "El Método de Bola de Nieve",
     "methodDescription": "Paga primero tu deuda más pequeña. Genera impulso. Gana más rápido. Tus deudas se organizan automáticamente de menor a mayor—enfócate en una mientras pagas mínimos en las demás.",
+    "snowballTagline": "Paga la más pequeña primero. Genera impulso. Gana más rápido.",
     "methodBenefit1": "Victorias rápidas generan impulso",
     "methodBenefit2": "Menos deudas, más rápido",
     "methodBenefit3": "Ve el progreso. Mantente motivado.",
@@ -581,7 +585,7 @@
     "dataStorageText": "Todos los datos ingresados en la aplicación Oinkly se almacenan localmente en tu dispositivo utilizando el almacenamiento local del navegador. No transmitimos, almacenamos ni tenemos acceso a tus datos financieros en servidores externos. Tus datos permanecen bajo tu control completo y se almacenan solo en el dispositivo que usas para acceder a la aplicación.",
     "dataUsageTitle": "3. Cómo Usamos Tu Información",
     "dataUsageText": "La información que proporcionas se usa únicamente para los siguientes propósitos:",
-    "usagePurpose1": "Para proporcionar y mantener la funcionalidad de la aplicación Debt.",
+    "usagePurpose1": "Para proporcionar y mantener la funcionalidad de la aplicación Oinkly.",
     "usagePurpose2": "Para personalizar tu experiencia y recordar tus preferencias.",
     "usagePurpose3": "Para mejorar las funciones de la aplicación y la experiencia del usuario.",
     "dataSharingTitle": "4. Compartir Datos",

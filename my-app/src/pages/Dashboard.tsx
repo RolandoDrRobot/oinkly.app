@@ -1125,7 +1125,7 @@ const Dashboard: React.FC = () => {
           >
             <motion.img
               src="/shopping.png"
-              alt="Empty state"
+              alt={t('dashboard.emptyStateAlt')}
               className="empty-state-image"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1868,7 +1868,7 @@ const Dashboard: React.FC = () => {
           >
             <motion.img
               src="/shopping.png"
-              alt="Empty state"
+              alt={t('dashboard.emptyStateAlt')}
               className="empty-state-image"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -2162,7 +2162,7 @@ const Dashboard: React.FC = () => {
           >
             <motion.img
               src="/shopping.png"
-              alt="Empty state"
+              alt={t('dashboard.emptyStateAlt')}
               className="empty-state-image"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -2425,7 +2425,7 @@ const Dashboard: React.FC = () => {
           >
             <motion.img
               src="/shopping.png"
-              alt="Empty state"
+              alt={t('dashboard.emptyStateAlt')}
               className="empty-state-image"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -2713,7 +2713,7 @@ const Dashboard: React.FC = () => {
           <div className="header-title-wrapper">
             <img 
               src={`${process.env.PUBLIC_URL}/logo.png`} 
-              alt="Oinkly Logo" 
+              alt={t('dashboard.logoAlt')} 
               className="header-logo"
             />
             <h1>{t('dashboard.title')}</h1>
