@@ -2791,7 +2791,7 @@ const Dashboard: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-profile"
+              className="btn-profile btn-nav-profile"
               onClick={() => navigate('/profile')}
               title={t('profile.title')}
             >
@@ -3145,7 +3145,7 @@ const Dashboard: React.FC = () => {
             exit={{ opacity: 0, scale: 0 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="fab-add"
+            className="fab-add fab-add-debt"
             onClick={() => navigate('/add-debt')}
           >
             <Icon component={FaPlus} />
