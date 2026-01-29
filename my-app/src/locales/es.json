@@ -361,13 +361,33 @@
     "cannotEditCompleted": "No puedes editar un compromiso completado. Si necesitas ajustar el total de la deuda, por favor edita la deuda directamente y crea un nuevo compromiso."
   },
   "notifications": {
+    "title": "Notificaciones",
     "debtTotalUpdated": "Total de deuda actualizado: {{debtName}} - {{currency}} {{amount}}",
     "overviewUpdated": "Resumen actualizado automáticamente",
     "debtStatusChanged": "Estado actualizado: {{debtName}} - {{status}}",
     "commitmentAffectsStatus": "Estado de deuda recalculado: {{debtName}}",
     "feeAutoReset": "Cuota mensual ajustada a 0: {{debtName}} ({{currency}})",
     "inOrder": "al día",
-    "notInOrder": "con compromisos pendientes"
+    "notInOrder": "con compromisos pendientes",
+    "noNotifications": "No hay notificaciones aún",
+    "markAllRead": "Leer",
+    "clearAll": "Limpiar",
+    "clearAllConfirm": "¿Estás seguro de que quieres limpiar todas las notificaciones?",
+    "markAsRead": "Marcar como leída",
+    "delete": "Eliminar",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "hace {{count}} minuto",
+    "minutesAgo_plural": "hace {{count}} minutos",
+    "hoursAgo": "hace {{count}} hora",
+    "hoursAgo_plural": "hace {{count}} horas",
+    "daysAgo": "hace {{count}} día",
+    "daysAgo_plural": "hace {{count}} días",
+    "type": {
+      "success": "Éxito",
+      "info": "Información",
+      "warning": "Advertencia",
+      "error": "Error"
+    }
   },
   "tour": {
     "startTour": "Iniciar Tour",

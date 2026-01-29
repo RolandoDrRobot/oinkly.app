@@ -95,3 +95,11 @@ export interface Income {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Notification {
+  id: string;
+  message: string;
+  type: 'success' | 'info' | 'warning' | 'error';
+  createdAt: string;
+  read: boolean;
+}

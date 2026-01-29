@@ -361,13 +361,33 @@
     "cannotEditCompleted": "You cannot edit a completed commitment. If you need to adjust the debt total, please edit the debt directly and create a new commitment."
   },
   "notifications": {
+    "title": "Notifications",
     "debtTotalUpdated": "Debt total updated: {{debtName}} - {{currency}} {{amount}}",
     "overviewUpdated": "Overview updated automatically",
     "debtStatusChanged": "Status updated: {{debtName}} - {{status}}",
     "commitmentAffectsStatus": "Debt status recalculated: {{debtName}}",
     "feeAutoReset": "Monthly fee adjusted to 0: {{debtName}} ({{currency}})",
     "inOrder": "up to date",
-    "notInOrder": "with pending commitments"
+    "notInOrder": "with pending commitments",
+    "noNotifications": "No notifications yet",
+    "markAllRead": "Read",
+    "clearAll": "Clear",
+    "clearAllConfirm": "Are you sure you want to clear all notifications?",
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_plural": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_plural": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_plural": "{{count}} days ago",
+    "type": {
+      "success": "Success",
+      "info": "Info",
+      "warning": "Warning",
+      "error": "Error"
+    }
   },
   "tour": {
     "startTour": "Start Tour",

@@ -21,7 +21,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .btn-profile {
@@ -38,6 +38,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
+  position: relative;
 }
 
 .btn-profile svg {
@@ -48,6 +49,26 @@
 .btn-profile:hover {
   color: var(--primary);
   background: var(--primary-overlay);
+}
+
+.btn-notifications {
+  position: relative;
+}
+
+.header-notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--error);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+  border: 2px solid var(--dark-bg);
 }
 
 .header-title-wrapper {

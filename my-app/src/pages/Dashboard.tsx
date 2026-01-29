@@ -51,7 +51,8 @@ import {
   FaHeartbeat,
   FaDollarSign,
   FaWallet,
-  FaTag
+  FaTag,
+  FaBell
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
@@ -60,6 +61,7 @@ import { notify } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
+import NotificationsSidebar from '../components/NotificationsSidebar';
 import './Dashboard.css';
 
 // Extend Window interface for Speech Recognition
@@ -125,6 +127,8 @@ const Dashboard: React.FC = () => {
   });
   const [tourRun, setTourRun] = useState(false);
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   // AI Agent states
   const [isListening, setIsListening] = useState(false);
   const [aiInputText, setAiInputText] = useState('');
@@ -138,8 +142,22 @@ const Dashboard: React.FC = () => {
     loadFixedExpenses();
     loadAssets();
     loadIncomes();
+    updateUnreadNotificationsCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // Update unread count every 5 seconds
+    const interval = setInterval(() => {
+      updateUnreadNotificationsCount();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const updateUnreadNotificationsCount = () => {
+    const count = storage.getUnreadNotificationsCount();
+    setUnreadNotificationsCount(count);
+  };
 
   const loadFixedExpenses = () => {
     const allExpenses = storage.getFixedExpenses();
@@ -2677,6 +2695,13 @@ const Dashboard: React.FC = () => {
       className="dashboard"
     >
       <Tour run={tourRun} onComplete={() => setTourRun(false)} />
+      <NotificationsSidebar
+        isOpen={isNotificationsOpen}
+        onClose={() => {
+          setIsNotificationsOpen(false);
+          updateUnreadNotificationsCount();
+        }}
+      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -2693,6 +2718,21 @@ const Dashboard: React.FC = () => {
             <h1>{t('dashboard.title')}</h1>
           </div>
           <div className="header-actions">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile btn-notifications"
+              onClick={() => {
+                setIsNotificationsOpen(true);
+                updateUnreadNotificationsCount();
+              }}
+              title={t('notifications.title')}
+            >
+              <Icon component={FaBell} />
+              {unreadNotificationsCount > 0 && (
+                <span className="header-notification-badge">{unreadNotificationsCount}</span>
+              )}
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

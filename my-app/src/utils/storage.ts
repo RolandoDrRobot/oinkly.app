@@ -1,4 +1,4 @@
-import { Debt, User, FixedExpense, Asset, Income } from '../types';
+import { Debt, User, FixedExpense, Asset, Income, Notification } from '../types';
 
 const DEBTS_KEY = 'debts';
 const FIXED_EXPENSES_KEY = 'fixedExpenses';
@@ -10,6 +10,7 @@ const DEBTS_ORDER_KEY = 'debtsOrder';
 const FIXED_EXPENSES_ORDER_KEY = 'fixedExpensesOrder';
 const ASSETS_ORDER_KEY = 'assetsOrder';
 const INCOMES_ORDER_KEY = 'incomesOrder';
+const NOTIFICATIONS_KEY = 'notifications';
 
 export const storage = {
   // User management
@@ -241,5 +242,48 @@ export const storage = {
   getIncomesOrder: (): string[] | null => {
     const orderStr = localStorage.getItem(INCOMES_ORDER_KEY);
     return orderStr ? JSON.parse(orderStr) : null;
+  },
+
+  // Notifications management
+  saveNotification: (notification: Notification) => {
+    const notifications = storage.getNotifications();
+    notifications.unshift(notification); // Add to beginning
+    // Keep only last 100 notifications
+    const limitedNotifications = notifications.slice(0, 100);
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(limitedNotifications));
+  },
+
+  getNotifications: (): Notification[] => {
+    const notificationsStr = localStorage.getItem(NOTIFICATIONS_KEY);
+    return notificationsStr ? JSON.parse(notificationsStr) : [];
+  },
+
+  markNotificationAsRead: (notificationId: string) => {
+    const notifications = storage.getNotifications();
+    const updated = notifications.map(n => 
+      n.id === notificationId ? { ...n, read: true } : n
+    );
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+  },
+
+  markAllNotificationsAsRead: () => {
+    const notifications = storage.getNotifications();
+    const updated = notifications.map(n => ({ ...n, read: true }));
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+  },
+
+  deleteNotification: (notificationId: string) => {
+    const notifications = storage.getNotifications();
+    const updated = notifications.filter(n => n.id !== notificationId);
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+  },
+
+  clearAllNotifications: () => {
+    localStorage.removeItem(NOTIFICATIONS_KEY);
+  },
+
+  getUnreadNotificationsCount: (): number => {
+    const notifications = storage.getNotifications();
+    return notifications.filter(n => !n.read).length;
   },
 };
