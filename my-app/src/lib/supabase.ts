@@ -33,15 +33,26 @@ export const mapSupabaseUser = (supabaseUser: any): User | null => {
     return null;
   }
   
+  const metadata = supabaseUser.user_metadata || {};
+  // Avatar: Google sends "picture"; Supabase may store as avatar_url or in identities[].identity_data
+  const identityData = supabaseUser.identities?.[0]?.identity_data;
+  const avatarUrl =
+    metadata.avatar_url ||
+    metadata.picture ||
+    identityData?.avatar_url ||
+    identityData?.picture ||
+    undefined;
+
   const mappedUser = {
     id: supabaseUser.id,
     email: supabaseUser.email || '',
-    name: supabaseUser.user_metadata?.full_name || 
-          supabaseUser.user_metadata?.name || 
-          supabaseUser.email?.split('@')[0] || 
-          'User',
+    name: metadata.full_name || metadata.name || identityData?.full_name || identityData?.name || supabaseUser.email?.split('@')[0] || 'User',
+    avatarUrl: avatarUrl || undefined,
   };
   
-  console.info('[mapSupabaseUser] Mapped user result:', mappedUser);
+  if (process.env.NODE_ENV === 'development' && !avatarUrl) {
+    console.info('[mapSupabaseUser] No avatar URL found. user_metadata keys:', Object.keys(metadata), 'identity_data keys:', identityData ? Object.keys(identityData) : []);
+  }
+  console.info('[mapSupabaseUser] Mapped user result:', { ...mappedUser, avatarUrl: mappedUser.avatarUrl ? '(set)' : '(empty)' });
   return mappedUser;
 };

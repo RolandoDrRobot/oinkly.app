@@ -16,6 +16,15 @@ const Profile: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  // Fallback to stored user if context user is null (e.g. after refresh before auth hydrates)
+  const displayUser = user || (typeof window !== 'undefined' ? (() => {
+    try {
+      const { storage } = require('../utils/storage');
+      return storage.getUser();
+    } catch {
+      return null;
+    }
+  })() : null);
 
   return (
     <motion.div
@@ -50,10 +59,32 @@ const Profile: React.FC = () => {
           className="profile-card"
         >
           <div className="profile-icon">
-            <Icon component={FaUser} size={64} />
+            {displayUser?.avatarUrl && (
+              <img
+                src={displayUser.avatarUrl}
+                alt={displayUser.name || ''}
+                className="profile-avatar-img"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            )}
+            <span
+              className="profile-icon-fallback"
+              style={{
+                display: displayUser?.avatarUrl ? 'none' : 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon component={FaUser} size={64} />
+            </span>
           </div>
-          <h2>{user?.name}</h2>
-          <p className="profile-email">{user?.email}</p>
+          <h2>{displayUser?.name}</h2>
+          <p className="profile-email">{displayUser?.email}</p>
         </motion.div>
 
         <motion.div

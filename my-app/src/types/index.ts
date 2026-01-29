@@ -53,6 +53,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  avatarUrl?: string; // Profile picture URL (e.g. from Google)
 }
 
 export interface FixedExpense {
