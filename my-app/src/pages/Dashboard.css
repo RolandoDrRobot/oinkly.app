@@ -1810,7 +1810,7 @@
 .item-card {
   background: var(--dark-card, #014a3a);
   border-radius: 8px;
-  padding: 0 24px 10px;
+  padding: 10px 24px 15px;
   transition: all 0.3s;
   cursor: pointer;
   user-select: none;
