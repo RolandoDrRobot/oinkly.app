@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import './ProtectedRoute.css';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,23 +10,17 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
-  console.info('[ProtectedRoute] Render check:', {
-    isAuthenticated,
-    loading,
-  });
-
-  // Show loading state while checking authentication
+  // Show loading state: floating logo (same as landing first screen)
   if (loading) {
-    console.info('[ProtectedRoute] Loading state, showing loader');
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        color: 'var(--color-text-primary)'
-      }}>
-        Loading...
+      <div className="auth-loading-screen">
+        <div className="auth-loading-logo-wrapper">
+          <img
+            src={`${process.env.PUBLIC_URL}/logo.png`}
+            alt=""
+            className="auth-loading-logo"
+          />
+        </div>
       </div>
     );
   }
