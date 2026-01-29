@@ -42,6 +42,9 @@ export interface Debt {
   updatedAt: string;
   // Nuevos campos opcionales
   lastCallDate?: string;
+  paymentDate?: string; // Fecha de pago (ISO string)
+  cutDate?: string; // Fecha de corte (solo para tarjetas de crédito, ISO string)
+  interestRate?: number; // Tasa de interés que está pagando la deuda (%)
   commitments?: PaymentCommitment[];
   callHistory?: CallRecord[];
 }

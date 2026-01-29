@@ -444,10 +444,17 @@ const Dashboard: React.FC = () => {
 
     let newValue: string | number = editValue;
     
-    // Convert to number if it's a numeric field
-    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars'];
-    if (numericFields.includes(field)) {
-      newValue = parseFloat(editValue) || 0;
+    // Define numeric fields at the top level
+    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars', 'interestRate'];
+    
+    // Handle date fields - convert to ISO string if not empty
+    if (field === 'paymentDate' || field === 'cutDate') {
+      newValue = editValue ? new Date(editValue).toISOString() : '';
+    } else {
+      // Convert to number if it's a numeric field
+      if (numericFields.includes(field)) {
+        newValue = parseFloat(editValue) || 0;
+      }
     }
 
     const oldValue = debt[field as keyof Debt] as number;
@@ -1435,6 +1442,86 @@ const Dashboard: React.FC = () => {
                                         <span className="payment-value">
                                           {hideAmounts ? '••••' : formatCurrency(debt.totalDollars, 'USD')}
                                         </span>
+                                      </div>
+                                      <div className="payment-item">
+                                        <span className="payment-label">{t('dashboard.paymentDate')}</span>
+                                        {editingField?.debtId === debt.id && editingField?.field === 'paymentDate' ? (
+                                          <input
+                                            type="date"
+                                            value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onBlur={() => saveEdit(debt.id, 'paymentDate')}
+                                            onKeyDown={(e) => {
+                                              if (e.key === 'Enter') saveEdit(debt.id, 'paymentDate');
+                                              if (e.key === 'Escape') cancelEdit();
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="inline-edit-input"
+                                            autoFocus
+                                          />
+                                        ) : (
+                                          <span className="payment-value editable-field" onClick={(e) => {
+                                            e.stopPropagation();
+                                            const dateValue = debt.paymentDate ? (debt.paymentDate.includes('T') ? debt.paymentDate.split('T')[0] : debt.paymentDate) : '';
+                                            startEditing(debt.id, 'paymentDate', dateValue || '', e);
+                                          }}>
+                                            {debt.paymentDate && debt.paymentDate.trim() !== '' ? new Date(debt.paymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {debt.type === 'tarjeta' && (
+                                        <div className="payment-item">
+                                          <span className="payment-label">{t('dashboard.cutDate')}</span>
+                                          {editingField?.debtId === debt.id && editingField?.field === 'cutDate' ? (
+                                            <input
+                                              type="date"
+                                              value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                                              onChange={(e) => setEditValue(e.target.value)}
+                                              onBlur={() => saveEdit(debt.id, 'cutDate')}
+                                              onKeyDown={(e) => {
+                                                if (e.key === 'Enter') saveEdit(debt.id, 'cutDate');
+                                                if (e.key === 'Escape') cancelEdit();
+                                              }}
+                                              onClick={(e) => e.stopPropagation()}
+                                              className="inline-edit-input"
+                                              autoFocus
+                                            />
+                                          ) : (
+                                            <span className="payment-value editable-field" onClick={(e) => {
+                                              e.stopPropagation();
+                                              const dateValue = debt.cutDate ? (debt.cutDate.includes('T') ? debt.cutDate.split('T')[0] : debt.cutDate) : '';
+                                              startEditing(debt.id, 'cutDate', dateValue || '', e);
+                                            }}>
+                                              {debt.cutDate && debt.cutDate.trim() !== '' ? new Date(debt.cutDate).toLocaleDateString() : t('dashboard.noCutDate')}
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                      <div className="payment-item">
+                                        <span className="payment-label">{t('dashboard.interestRate')}</span>
+                                        {editingField?.debtId === debt.id && editingField?.field === 'interestRate' ? (
+                                          <input
+                                            type="number"
+                                            step="0.01"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onBlur={() => saveEdit(debt.id, 'interestRate')}
+                                            onKeyDown={(e) => {
+                                              if (e.key === 'Enter') saveEdit(debt.id, 'interestRate');
+                                              if (e.key === 'Escape') cancelEdit();
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="inline-edit-input"
+                                            autoFocus
+                                          />
+                                        ) : (
+                                          <span className="payment-value editable-field" onClick={(e) => {
+                                            e.stopPropagation();
+                                            startEditing(debt.id, 'interestRate', debt.interestRate || 0, e);
+                                          }}>
+                                            {debt.interestRate !== undefined && debt.interestRate !== null ? `${debt.interestRate}%` : t('dashboard.noInterestRate')}
+                                          </span>
+                                        )}
                                       </div>
                                     </div>
                                   </div>

@@ -17,7 +17,9 @@ import {
   FaPhoneAlt,
   FaGift,
   FaTimes,
-  FaArrowLeft
+  FaArrowLeft,
+  FaCalendarAlt,
+  FaPercent
 } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
@@ -62,6 +64,9 @@ interface StepData {
   totalLocal?: number;
   totalDollars?: number;
   currentPlan?: string;
+  paymentDate?: string;
+  cutDate?: string;
+  interestRate?: number;
   hasCallTask?: boolean;
 }
 
@@ -166,6 +171,34 @@ const AddDebt: React.FC = () => {
       icon: FaClipboardList,
       field: 'currentPlan' as keyof StepData,
       placeholder: t('addDebt.paymentPlanPlaceholder'),
+    },
+    {
+      id: 'paymentDate',
+      title: t('addDebt.paymentDate'),
+      subtitle: t('addDebt.paymentDateSubtitle'),
+      icon: FaCalendarAlt,
+      field: 'paymentDate' as keyof StepData,
+      type: 'date',
+      optional: true,
+    },
+    ...(formData.type === 'tarjeta' ? [{
+      id: 'cutDate',
+      title: t('addDebt.cutDate'),
+      subtitle: t('addDebt.cutDateSubtitle'),
+      icon: FaCalendarAlt,
+      field: 'cutDate' as keyof StepData,
+      type: 'date',
+      optional: true,
+    }] : []),
+    {
+      id: 'interestRate',
+      title: t('addDebt.interestRate'),
+      subtitle: t('addDebt.interestRateSubtitle'),
+      icon: FaPercent,
+      field: 'interestRate' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+      optional: true,
     },
     {
       id: 'callTask',
@@ -294,6 +327,9 @@ const AddDebt: React.FC = () => {
           currentPlan: formData.currentPlan || '',
           bankName: formData.bankName || '',
           bankPhone: formData.bankPhone || '',
+          paymentDate: formData.paymentDate ? new Date(formData.paymentDate).toISOString() : undefined,
+          cutDate: formData.cutDate ? new Date(formData.cutDate).toISOString() : undefined,
+          interestRate: formData.interestRate,
           hasCallTask: formData.hasCallTask || false,
           callCompleted: false,
           createdAt: new Date().toISOString(),
@@ -439,6 +475,8 @@ const AddDebt: React.FC = () => {
                   value={
                     currentStepData.type === 'number'
                       ? getCurrencyInputValue()
+                      : currentStepData.type === 'date'
+                      ? (formData[currentStepData.field] as string)?.split('T')[0] || ''
                       : typeof formData[currentStepData.field] === 'number'
                       ? formData[currentStepData.field]?.toString() || ''
                       : (formData[currentStepData.field] as string) || ''

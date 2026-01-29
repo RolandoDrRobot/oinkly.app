@@ -53,10 +53,18 @@ const EditDebt: React.FC = () => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    setFormData(prev => ({
-      ...prev!,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    // Handle date fields - convert to ISO string
+    if (type === 'date' && value) {
+      setFormData(prev => ({
+        ...prev!,
+        [name]: new Date(value).toISOString(),
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev!,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    }
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +117,15 @@ const EditDebt: React.FC = () => {
   };
 
   const getCurrencyInputValue = (name: string): string => {
+    // Handle interestRate differently
+    if (name === 'interestRate') {
+      if (currencyDisplayValues[name] !== undefined) {
+        return currencyDisplayValues[name];
+      }
+      const value = formData?.[name];
+      if (value === undefined || value === null || (typeof value === 'number' && (isNaN(value) || value === 0))) return '';
+      return typeof value === 'number' ? `${value}%` : '';
+    }
     if (!formData) return '';
     
     // Use stored display value if available
@@ -275,6 +292,38 @@ const EditDebt: React.FC = () => {
               onChange={handleChange}
               placeholder={t('editDebt.currentPlan')}
               required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              name="paymentDate"
+              type="date"
+              value={formData.paymentDate ? (formData.paymentDate.includes('T') ? formData.paymentDate.split('T')[0] : formData.paymentDate) : ''}
+              onChange={handleChange}
+              placeholder={t('editDebt.paymentDate')}
+            />
+          </div>
+
+          {formData.type === 'tarjeta' && (
+            <div className="form-group">
+              <input
+                name="cutDate"
+                type="date"
+                value={formData.cutDate ? (formData.cutDate.includes('T') ? formData.cutDate.split('T')[0] : formData.cutDate) : ''}
+                onChange={handleChange}
+                placeholder={t('editDebt.cutDate')}
+              />
+            </div>
+          )}
+
+          <div className="form-group">
+            <input
+              name="interestRate"
+              type="text"
+              value={getCurrencyInputValue('interestRate')}
+              onChange={handleNumberChange}
+              placeholder={t('editDebt.interestRate')}
             />
           </div>
 
