@@ -94,6 +94,7 @@
     "yearly": "Anual",
     "oneTime": "Una vez",
     "nextPaymentDate": "Próxima fecha de pago",
+    "noPaymentDate": "Sin fecha de pago",
     "amount": "Monto",
     "value": "Valor",
     "totalFixedExpenses": "Total Gastos Fijos",

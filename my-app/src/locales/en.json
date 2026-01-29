@@ -94,6 +94,7 @@
     "yearly": "Yearly",
     "oneTime": "One-time",
     "nextPaymentDate": "Next payment date",
+    "noPaymentDate": "No payment date",
     "amount": "Amount",
     "value": "Value",
     "totalFixedExpenses": "Total Fixed Expenses",
