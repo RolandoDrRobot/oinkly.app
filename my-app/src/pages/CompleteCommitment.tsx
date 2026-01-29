@@ -169,6 +169,10 @@ const CompleteCommitment: React.FC = () => {
         const oldInOrder = debt.inOrder;
         updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
+        if (newTotalLocal === 0 && newTotalDollars === 0) {
+          updatedDebt.closedAt = new Date().toISOString();
+        }
+
         storage.saveDebt(updatedDebt);
         
         // Notify about automatic changes
@@ -182,6 +186,7 @@ const CompleteCommitment: React.FC = () => {
             : formatCurrencyInput(Math.abs(newTotalDollars - (debt.totalDollars || 0)), 'USD');
           const currency = localChanged ? localCurrency : 'USD';
           notify.debtTotalUpdated(debt.name, amount, currency);
+          notify.overviewUpdated();
         }
         
         if (newTotalLocal === 0 && (debt.totalLocal || 0) > 0) {

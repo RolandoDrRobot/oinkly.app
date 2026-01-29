@@ -47,6 +47,7 @@ export interface Debt {
   interestRate?: number; // Tasa de interés que está pagando la deuda (%)
   commitments?: PaymentCommitment[];
   callHistory?: CallRecord[];
+  closedAt?: string; // ISO date when debt was paid off (total reached 0)
 }
 
 export interface User {
@@ -97,10 +98,18 @@ export interface Income {
   updatedAt: string;
 }
 
+export interface NotificationMeta {
+  reminderType: 'payment_reminder' | 'overdue_commitment' | 'call_reminder';
+  debtId: string;
+  commitmentId?: string;
+  paymentDate?: string;
+}
+
 export interface Notification {
   id: string;
   message: string;
   type: 'success' | 'info' | 'warning' | 'error';
   createdAt: string;
   read: boolean;
+  meta?: NotificationMeta;
 }

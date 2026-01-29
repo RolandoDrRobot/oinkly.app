@@ -21,6 +21,7 @@ import {
 } from 'react-icons/fa';
 import { Income } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
@@ -277,6 +278,7 @@ const EditIncome: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.updateIncome(updatedIncome);
+        notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

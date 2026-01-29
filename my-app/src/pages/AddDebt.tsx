@@ -23,6 +23,7 @@ import {
 } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
@@ -336,6 +337,7 @@ const AddDebt: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveDebt(newDebt);
+        notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

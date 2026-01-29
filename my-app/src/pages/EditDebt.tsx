@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './EditDebt.css';
 
@@ -143,7 +144,7 @@ const EditDebt: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) {
-      // If total reaches 0, set corresponding fee to 0
+      // If total reaches 0, set corresponding fee to 0 and mark as closed
       const finalData = { ...formData };
       if (finalData.totalLocal === 0) {
         finalData.localFee = 0;
@@ -151,15 +152,19 @@ const EditDebt: React.FC = () => {
       if (finalData.totalDollars === 0) {
         finalData.dollarFee = 0;
       }
-      
+      const isPaidOff = (finalData.totalLocal || 0) === 0 && (finalData.totalDollars || 0) === 0;
+      const closedAt = isPaidOff ? new Date().toISOString() : finalData.closedAt;
+
       storage.saveDebt({
         ...finalData,
         localCurrency: storage.getLocalCurrency(), // Use currency from preferences
         feeToUpdate: 0,
         feeToUpdateDollars: 0,
+        closedAt,
         // inOrder will be calculated based on commitments
         updatedAt: new Date().toISOString(),
       });
+      notify.overviewUpdated();
       navigate('/dashboard');
     }
   };

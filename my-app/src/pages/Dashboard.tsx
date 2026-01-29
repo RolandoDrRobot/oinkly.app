@@ -58,7 +58,7 @@ import {
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
-import { notify } from '../utils/notifications';
+import { notify, ensureReminders } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
@@ -299,10 +299,22 @@ const Dashboard: React.FC = () => {
       if (!debt.commitments) debt.commitments = [];
       if (!debt.callHistory) debt.callHistory = [];
       
+      // Migrate: if total is 0 but no closedAt, set closedAt so it sorts as closed
+      const isPaidOff = (debt.totalLocal || 0) === 0 && (debt.totalDollars || 0) === 0;
+      if (isPaidOff && !debt.closedAt) {
+        const updated = {
+          ...debt,
+          closedAt: debt.updatedAt || debt.createdAt,
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updated);
+        return updated;
+      }
+      
       // Calculate inOrder based on commitments
       const calculatedInOrder = calculateInOrder(debt);
       
-      // Update debt if inOrder changed
+      // Update debt if inOrder changed (e.g. commitment became overdue)
       if (debt.inOrder !== calculatedInOrder) {
         const updated = {
           ...debt,
@@ -310,6 +322,7 @@ const Dashboard: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveDebt(updated);
+        notify.debtStatusChanged(debt.name, calculatedInOrder);
         return updated;
       }
       
@@ -337,7 +350,19 @@ const Dashboard: React.FC = () => {
       // Save current order
       storage.setDebtsOrder(orderedDebts.map(d => d.id));
     }
-    
+
+    // Active debts first, then closed (preserve relative order within each group)
+    orderedDebts = [...orderedDebts].sort((a, b) => {
+      const aClosed = !!a.closedAt;
+      const bClosed = !!b.closedAt;
+      if (aClosed !== bClosed) return aClosed ? 1 : -1;
+      return 0;
+    });
+
+    // Create reminder notifications (payment due, overdue commitments, call bank) – deduped
+    ensureReminders(orderedDebts);
+    updateUnreadNotificationsCount();
+
     setDebts(orderedDebts);
   };
 
@@ -365,6 +390,18 @@ const Dashboard: React.FC = () => {
 
       return diffDays < 0 || commitment.status === 'pending';
     });
+  };
+
+  const getOverdueCount = (debt: Debt): number => {
+    if (!debt.commitments || debt.commitments.length === 0) return 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return debt.commitments.filter(c => {
+      if (c.status === 'completed') return false;
+      const d = new Date(c.date);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() < today.getTime();
+    }).length;
   };
 
   const sensors = useSensors(
@@ -1343,7 +1380,11 @@ const Dashboard: React.FC = () => {
                               <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
                                 <div className="debt-summary">
                                   <div className="debt-status">
-                                    {debt.totalLocal === 0 && debt.totalDollars === 0 ? (
+                                    {debt.closedAt ? (
+                                      <span className="debt-completed-badge debt-closed-badge">
+                                        <Icon component={FaCheck} size={12} /> {t('dashboard.closed')}
+                                      </span>
+                                    ) : debt.totalLocal === 0 && debt.totalDollars === 0 ? (
                                       <span className="debt-completed-badge">
                                         <Icon component={FaCheck} size={12} /> {t('common.completed')}
                                       </span>
@@ -1352,9 +1393,16 @@ const Dashboard: React.FC = () => {
                                         <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
                                       </span>
                                     ) : (
-                                      <span className="status-badge not-in-order">
-                                        <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
-                                      </span>
+                                      <>
+                                        <span className="status-badge not-in-order">
+                                          <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
+                                        </span>
+                                        {getOverdueCount(debt) > 0 && (
+                                          <span className="debt-overdue-count">
+                                            {t('dashboard.overdueCount', { count: getOverdueCount(debt) })}
+                                          </span>
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 </div>
@@ -2120,6 +2168,7 @@ const Dashboard: React.FC = () => {
                                         if (window.confirm(t('deleteFixedExpense.confirm'))) {
                                           storage.deleteFixedExpense(expense.id);
                                           loadFixedExpenses();
+                                          notify.overviewUpdated();
                                         }
                                       }}
                                       whileHover={{ scale: 1.1 }}
@@ -2371,6 +2420,7 @@ const Dashboard: React.FC = () => {
                                         if (window.confirm(t('deleteAsset.confirm'))) {
                                           storage.deleteAsset(asset.id);
                                           loadAssets();
+                                          notify.overviewUpdated();
                                         }
                                       }}
                                       whileHover={{ scale: 1.1 }}
@@ -2662,6 +2712,7 @@ const Dashboard: React.FC = () => {
                                         if (window.confirm(t('deleteIncome.confirm'))) {
                                           storage.deleteIncome(income.id);
                                           loadIncomes();
+                                          notify.overviewUpdated();
                                         }
                                       }}
                                       whileHover={{ scale: 1.1 }}

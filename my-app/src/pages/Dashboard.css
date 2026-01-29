@@ -839,6 +839,19 @@
   background: var(--error-light);
   color: var(--error);
 }
+
+.debt-overdue-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.debt-closed-badge {
+  background: var(--overlay);
+  color: var(--text-muted);
+}
+
 .debt-task {
   display: flex;
   flex-direction: row;

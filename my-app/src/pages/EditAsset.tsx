@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fa';
 import { Asset } from '../types';
 import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
@@ -258,6 +259,7 @@ const EditAsset: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.updateAsset(updatedAsset);
+        notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

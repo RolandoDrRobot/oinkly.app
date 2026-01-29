@@ -99,7 +99,7 @@ const CompleteDebt: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete' && debt) {
       const timer = setTimeout(() => {
-        // Mark debt as paid off
+        // Mark debt as paid off (closed, not deleted)
         const updatedDebt: Debt = {
           ...debt,
           totalLocal: 0,
@@ -107,6 +107,7 @@ const CompleteDebt: React.FC = () => {
           localFee: 0,
           dollarFee: 0,
           inOrder: true,
+          closedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
 
