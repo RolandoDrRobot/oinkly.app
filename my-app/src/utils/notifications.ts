@@ -1,4 +1,4 @@
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import i18next from 'i18next';
 import { Debt, Notification, NotificationMeta } from '../types';
 import { storage } from './storage';
