@@ -2088,57 +2088,13 @@ const Dashboard: React.FC = () => {
                     {({ dragAttributes, dragListeners, isDragging }) => (
                       <div className="item-card" data-dragging={isDragging}>
                         <div className="item-header">
-                          <div className="item-header-actions-top item-header-actions-top-v2">
-                            <div
-                              {...dragAttributes}
-                              {...dragListeners}
-                              className="drag-handle"
-                              style={{
-                                width: '32px',
-                                height: '32px',
-                                cursor: isDragging ? 'grabbing' : 'grab',
-                                touchAction: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '6px',
-                                background: 'var(--bg-tertiary)',
-                                border: '1px solid var(--bg-tertiary)',
-                                opacity: 0.7,
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.opacity = '1';
-                                e.currentTarget.style.background = 'var(--overlay)';
-                                e.currentTarget.style.borderColor = 'var(--accent-color)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.opacity = '0.7';
-                                e.currentTarget.style.background = 'var(--bg-tertiary)';
-                                e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                                <circle cx="3" cy="3" r="1.5" />
-                                <circle cx="8" cy="3" r="1.5" />
-                                <circle cx="13" cy="3" r="1.5" />
-                                <circle cx="3" cy="8" r="1.5" />
-                                <circle cx="8" cy="8" r="1.5" />
-                                <circle cx="13" cy="8" r="1.5" />
-                                <circle cx="3" cy="13" r="1.5" />
-                                <circle cx="8" cy="13" r="1.5" />
-                                <circle cx="13" cy="13" r="1.5" />
-                              </svg>
-                            </div>
-                          </div>
                           <div className="item-header-main">
                             <div className="item-content-row">
-                              <div className="item-icon-wrapper">
-                                <Icon component={getAssetIcon(asset.type)} className="item-main-icon" />
-                              </div>
                               <div className="item-content">
                                 <div className="item-header-info">
+                                  <div className="item-icon-wrapper">
+                                    <Icon component={getAssetIcon(asset.type)} className="item-main-icon" />
+                                  </div>
                                   {editingAsset?.assetId === asset.id && editingAsset?.field === 'name' ? (
                                     <input
                                       type="text"
@@ -2171,6 +2127,50 @@ const Dashboard: React.FC = () => {
                               </div>
                               {!hideAmounts && (
                                 <div className="item-amounts">
+                                  <div className="item-header-actions-top item-header-actions-top-v2">
+                                    <div
+                                      {...dragAttributes}
+                                      {...dragListeners}
+                                      className="drag-handle"
+                                      style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        cursor: isDragging ? 'grabbing' : 'grab',
+                                        touchAction: 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '6px',
+                                        background: 'var(--bg-tertiary)',
+                                        border: '1px solid var(--bg-tertiary)',
+                                        opacity: 0.7,
+                                        transition: 'all 0.2s',
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.opacity = '1';
+                                        e.currentTarget.style.background = 'var(--overlay)';
+                                        e.currentTarget.style.borderColor = 'var(--accent-color)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.opacity = '0.7';
+                                        e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                        e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
+                                        <circle cx="3" cy="3" r="1.5" />
+                                        <circle cx="8" cy="3" r="1.5" />
+                                        <circle cx="13" cy="3" r="1.5" />
+                                        <circle cx="3" cy="8" r="1.5" />
+                                        <circle cx="8" cy="8" r="1.5" />
+                                        <circle cx="13" cy="8" r="1.5" />
+                                        <circle cx="3" cy="13" r="1.5" />
+                                        <circle cx="8" cy="13" r="1.5" />
+                                        <circle cx="13" cy="13" r="1.5" />
+                                      </svg>
+                                    </div>
+                                  </div>
                                   <div className="summary-item">
                                     {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueLocal' ? (
                                       <input
@@ -2223,37 +2223,37 @@ const Dashboard: React.FC = () => {
                                       )}
                                     </div>
                                   </div>
+                                  <div className="item-header-actions">
+                                    <motion.button
+                                      className="btn-delete"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.confirm(t('deleteAsset.confirm'))) {
+                                          storage.deleteAsset(asset.id);
+                                          loadAssets();
+                                        }
+                                      }}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                    >
+                                      <Icon component={FaTrash} />
+                                    </motion.button>
+                                    <motion.button
+                                      className="btn-complete-item"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/complete-asset/${asset.id}`);
+                                      }}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      title={t('asset.liquidate')}
+                                    >
+                                      <Icon component={FaCheck} />
+                                    </motion.button>
+                                  </div>
                                 </div>
                               )}
                             </div>
-                          </div>
-                          <div className="item-header-actions">
-                            <motion.button
-                              className="btn-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm(t('deleteAsset.confirm'))) {
-                                  storage.deleteAsset(asset.id);
-                                  loadAssets();
-                                }
-                              }}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <Icon component={FaTrash} />
-                            </motion.button>
-                            <motion.button
-                              className="btn-complete-item"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/complete-asset/${asset.id}`);
-                              }}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              title={t('asset.liquidate')}
-                            >
-                              <Icon component={FaCheck} />
-                            </motion.button>
                           </div>
                         </div>
                       </div>
@@ -2351,57 +2351,13 @@ const Dashboard: React.FC = () => {
                     {({ dragAttributes, dragListeners, isDragging }) => (
                       <div className="item-card" data-dragging={isDragging}>
                         <div className="item-header">
-                          <div className="item-header-actions-top item-header-actions-top-v2">
-                            <div
-                              {...dragAttributes}
-                              {...dragListeners}
-                              className="drag-handle"
-                              style={{
-                                width: '32px',
-                                height: '32px',
-                                cursor: isDragging ? 'grabbing' : 'grab',
-                                touchAction: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '6px',
-                                background: 'var(--bg-tertiary)',
-                                border: '1px solid var(--bg-tertiary)',
-                                opacity: 0.7,
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.opacity = '1';
-                                e.currentTarget.style.background = 'var(--overlay)';
-                                e.currentTarget.style.borderColor = 'var(--accent-color)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.opacity = '0.7';
-                                e.currentTarget.style.background = 'var(--bg-tertiary)';
-                                e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                                <circle cx="3" cy="3" r="1.5" />
-                                <circle cx="8" cy="3" r="1.5" />
-                                <circle cx="13" cy="3" r="1.5" />
-                                <circle cx="3" cy="8" r="1.5" />
-                                <circle cx="8" cy="8" r="1.5" />
-                                <circle cx="13" cy="8" r="1.5" />
-                                <circle cx="3" cy="13" r="1.5" />
-                                <circle cx="8" cy="13" r="1.5" />
-                                <circle cx="13" cy="13" r="1.5" />
-                              </svg>
-                            </div>
-                          </div>
                           <div className="item-header-main">
                             <div className="item-content-row">
-                              <div className="item-icon-wrapper">
-                                <Icon component={getIncomeIcon(income.type)} className="item-main-icon" />
-                              </div>
                               <div className="item-content">
                                 <div className="item-header-info">
+                                  <div className="item-icon-wrapper">
+                                    <Icon component={getIncomeIcon(income.type)} className="item-main-icon" />
+                                  </div>
                                   {editingIncome?.incomeId === income.id && editingIncome?.field === 'name' ? (
                                     <input
                                       type="text"
@@ -2438,6 +2394,50 @@ const Dashboard: React.FC = () => {
                               </div>
                               {!hideAmounts && (
                                 <div className="item-amounts">
+                                  <div className="item-header-actions-top item-header-actions-top-v2">
+                                    <div
+                                      {...dragAttributes}
+                                      {...dragListeners}
+                                      className="drag-handle"
+                                      style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        cursor: isDragging ? 'grabbing' : 'grab',
+                                        touchAction: 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '6px',
+                                        background: 'var(--bg-tertiary)',
+                                        border: '1px solid var(--bg-tertiary)',
+                                        opacity: 0.7,
+                                        transition: 'all 0.2s',
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.opacity = '1';
+                                        e.currentTarget.style.background = 'var(--overlay)';
+                                        e.currentTarget.style.borderColor = 'var(--accent-color)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.opacity = '0.7';
+                                        e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                        e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
+                                        <circle cx="3" cy="3" r="1.5" />
+                                        <circle cx="8" cy="3" r="1.5" />
+                                        <circle cx="13" cy="3" r="1.5" />
+                                        <circle cx="3" cy="8" r="1.5" />
+                                        <circle cx="8" cy="8" r="1.5" />
+                                        <circle cx="13" cy="8" r="1.5" />
+                                        <circle cx="3" cy="13" r="1.5" />
+                                        <circle cx="8" cy="13" r="1.5" />
+                                        <circle cx="13" cy="13" r="1.5" />
+                                      </svg>
+                                    </div>
+                                  </div>
                                   <div className="summary-item">
                                     {editingIncome?.incomeId === income.id && editingIncome?.field === 'amountLocal' ? (
                                       <input
@@ -2490,25 +2490,25 @@ const Dashboard: React.FC = () => {
                                       )}
                                     </div>
                                   </div>
+                                  <div className="item-header-actions">
+                                    <motion.button
+                                      className="btn-delete"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.confirm(t('deleteIncome.confirm'))) {
+                                          storage.deleteIncome(income.id);
+                                          loadIncomes();
+                                        }
+                                      }}
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                    >
+                                      <Icon component={FaTrash} />
+                                    </motion.button>
+                                  </div>
                                 </div>
                               )}
                             </div>
-                          </div>
-                          <div className="item-header-actions">
-                            <motion.button
-                              className="btn-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm(t('deleteIncome.confirm'))) {
-                                  storage.deleteIncome(income.id);
-                                  loadIncomes();
-                                }
-                              }}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <Icon component={FaTrash} />
-                            </motion.button>
                           </div>
                         </div>
                       </div>

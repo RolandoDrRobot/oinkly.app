@@ -1865,6 +1865,7 @@
   justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  padding-bottom: 8px;
 }
 
 .item-card .btn-delete {
@@ -2059,7 +2060,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 0 4px 10px;
   border-radius: 6px;
   background: var(--overlay);
   width: fit-content;
