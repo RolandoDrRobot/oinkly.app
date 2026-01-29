@@ -47,14 +47,14 @@ export const notify = {
   // When debt totals are automatically updated
   debtTotalUpdated: (debtName: string, amount: string, currency: string) => {
     const message = t('notifications.debtTotalUpdated', { debtName, amount, currency });
-    toast.success(message, toastConfig);
+    // Only save to sidebar, don't show toast
     saveNotification(message, 'success');
   },
   
   // When overview totals change automatically
   overviewUpdated: () => {
     const message = t('notifications.overviewUpdated');
-    toast.success(message, toastConfig);
+    // Only save to sidebar, don't show toast
     saveNotification(message, 'success');
   },
   
@@ -63,21 +63,21 @@ export const notify = {
     const statusKey = isInOrder ? 'notifications.inOrder' : 'notifications.notInOrder';
     const status = t(statusKey);
     const message = t('notifications.debtStatusChanged', { debtName, status });
-    toast.success(message, toastConfig);
+    // Only save to sidebar, don't show toast
     saveNotification(message, 'success');
   },
   
   // When commitment affects debt status
   commitmentAffectsStatus: (debtName: string) => {
     const message = t('notifications.commitmentAffectsStatus', { debtName });
-    toast.success(message, toastConfig);
+    // Only save to sidebar, don't show toast
     saveNotification(message, 'info');
   },
   
   // When fee is automatically set to 0
   feeAutoReset: (debtName: string, currency: string) => {
     const message = t('notifications.feeAutoReset', { debtName, currency });
-    toast.success(message, toastConfig);
+    // Only save to sidebar, don't show toast
     saveNotification(message, 'info');
   },
 };
