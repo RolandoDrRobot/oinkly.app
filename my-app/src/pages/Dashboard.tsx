@@ -33,7 +33,6 @@ import {
   FaCalendarAlt, 
   FaEye,
   FaEyeSlash,
-  FaStar,
   FaMicrophone,
   FaMicrophoneSlash,
   FaPaperPlane,

@@ -8,28 +8,6 @@ const t = (key: string, options?: any): string => {
   return (i18next.t as any)(key, options);
 };
 
-// Configure toast with Apple-style notifications
-export const toastConfig = {
-  position: 'top-center' as const,
-  duration: 5000,
-  style: {
-    background: 'var(--primary, #569a3c)',
-    color: 'var(--text-primary, #f4e3c5)',
-    borderRadius: '12px',
-    padding: '12px 16px',
-    fontSize: '14px',
-    fontWeight: 500,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    border: 'none',
-    maxWidth: '90%',
-    fontFamily: 'var(--font-family, "DynaPuff", system-ui)',
-  },
-  iconTheme: {
-    primary: 'var(--text-primary, #f4e3c5)',
-    secondary: 'var(--primary, #569a3c)',
-  },
-};
-
 // Helper function to save notification (optional meta for reminder dedupe)
 const saveNotification = (
   message: string,
