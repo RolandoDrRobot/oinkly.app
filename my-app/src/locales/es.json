@@ -390,43 +390,51 @@
     }
   },
   "tour": {
-    "startTour": "Iniciar Tour",
+    "startTour": "Cómo Usar",
     "back": "Atrás",
     "next": "Siguiente",
     "skip": "Omitir",
     "close": "Cerrar",
     "last": "Finalizar",
     "step1": {
-      "title": "Resumen General",
-      "content": "Aquí puedes ver tu deuda total y pagos mensuales de un vistazo. Esto te ayuda a entender tu situación financiera general."
+      "title": "Resumen Financiero",
+      "content": "¡Este es tu panel financiero completo! El resumen muestra tus deudas totales, gastos fijos, activos e ingresos. Haz clic para expandir y ver tu Patrimonio Neto - la métrica clave para rastrear tu riqueza. Entender esto te ayuda a ver el panorama completo: lo que debes vs lo que posees."
     },
     "step2": {
-      "title": "Asistente de IA",
-      "content": "¡Usa el Asistente de IA para controlar la app con comandos de voz o texto! Puedes crear o editar deudas, agregar compromisos de pago, completar compromisos, eliminar deudas, registrar llamadas, mostrar resumen, ocultar/mostrar montos y navegar a diferentes páginas. Solo escribe o habla tu comando de forma natural."
+      "title": "Categorías Financieras",
+      "content": "Navega entre cuatro áreas clave: Deudas (lo que debes), Gastos Fijos (costos recurrentes), Activos (lo que posees) e Ingresos (dinero que entra). Rastrea todo para entender tu salud financiera completa y planificar tu camino hacia la riqueza."
     },
     "step3": {
-      "title": "Agregar Tu Primera Deuda",
-      "content": "Haz clic en este botón para agregar una nueva deuda. Ingresarás detalles como el banco, tipo de deuda, montos y cuotas mensuales."
+      "title": "Gestionar Deudas",
+      "content": "Cada tarjeta de deuda muestra fechas de pago, tasas de interés y fechas de corte (para tarjetas). Haz clic en cualquier campo para editar inline - ¡no necesitas abrir formularios! Arrastra las tarjetas para priorizar qué deudas pagar primero. Expande para ver compromisos de pago e historial de llamadas."
     },
     "step4": {
-      "title": "Tus Deudas",
-      "content": "Cada tarjeta muestra una deuda con sus detalles. Puedes expandirla para ver compromisos de pago, historial de llamadas y gestionar la deuda. Arrastra y suelta las tarjetas para reordenarlas por prioridad."
+      "title": "Salir de Deudas",
+      "content": "Para eliminar deudas: 1) Rastrea todas las deudas aquí, 2) Crea compromisos de pago cuando negocies con bancos, 3) Registra llamadas para rastrear comunicación, 4) Completa compromisos al pagar - los totales se actualizan automáticamente. ¡Enfócate en deudas de alto interés primero arrastrándolas arriba!"
     },
     "step5": {
       "title": "Compromisos de Pago",
-      "content": "Crea compromisos de pago para rastrear acuerdos con tu banco. Puedes establecer pagos parciales, pagos completos o acuerdos. Cuando completas un compromiso, tus totales de deuda se actualizan automáticamente."
+      "content": "Cuando negocies con bancos, crea compromisos aquí. Establece pagos parciales, pagos completos o acuerdos. Completar compromisos reduce automáticamente tus totales de deuda. ¡Así es como rastreas el progreso hacia estar libre de deudas!"
     },
     "step6": {
-      "title": "Registrar Llamadas",
-      "content": "Rastrea tu comunicación con los bancos registrando llamadas. También puedes crear compromisos de pago directamente desde un registro de llamada."
+      "title": "Registro de Llamadas",
+      "content": "Registra cada llamada con bancos. Documenta lo discutido y crea compromisos de pago directamente desde los registros. Esto crea un rastro y te ayuda a mantenerte organizado durante negociaciones de deuda."
     },
     "step7": {
-      "title": "Completar Pagos",
-      "content": "Cuando completas un compromiso de pago, la app actualiza automáticamente tus totales de deuda según el tipo de pago (parcial, completo o acuerdo). Esto mantiene todo sincronizado."
+      "title": "Gastos, Activos e Ingresos",
+      "content": "Rastrea gastos fijos (renta, servicios), activos (propiedad, ahorros) e ingresos (salario, freelance). Edita cualquier campo inline haciendo clic. Establece fechas de pago para gastos e ingresos. Arrastra para reordenar por prioridad. Este panorama completo te ayuda a presupuestar y construir riqueza."
     },
     "step8": {
-      "title": "Acciones Rápidas",
-      "content": "Usa estos botones para ocultar/mostrar montos, aprender sobre el método bola de nieve, o acceder a tu perfil y preferencias."
+      "title": "Notificaciones",
+      "content": "Todas las actualizaciones importantes aparecen aquí: cambios en totales de deuda, actualizaciones de estado, recálculos automáticos. Revisa esto regularmente para mantenerte informado sobre tus cambios financieros sin interrumpir tu flujo de trabajo."
+    },
+    "step9": {
+      "title": "Asistente de IA",
+      "content": "¡Controla la app con voz o texto! Di 'agregar deuda', 'mostrar resumen', 'ocultar montos' o 'ir a perfil'. La IA entiende lenguaje natural - solo habla o escribe lo que quieres hacer. Perfecto para acciones rápidas mientras gestionas tus finanzas."
+    },
+    "step10": {
+      "title": "Construir Riqueza",
+      "content": "Usa esta app para: 1) Eliminar deudas sistemáticamente, 2) Rastrear gastos para reducir desperdicios, 3) Monitorear activos para hacer crecer el patrimonio neto, 4) Planificar ingresos para aumentar ahorros. ¡El resumen muestra tu Patrimonio Neto - observa cómo crece mientras pagas deudas y acumulas activos!"
     }
   },
   "aiAgent": {

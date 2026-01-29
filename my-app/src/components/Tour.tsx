@@ -20,20 +20,20 @@ const Tour: React.FC<TourProps> = ({ run, onComplete }) => {
 
   const steps: Step[] = [
     {
-      target: '.summary-card',
+      target: '.dashboard-summary',
       content: t('tour.step1.content'),
       title: t('tour.step1.title'),
       placement: 'bottom',
       disableBeacon: true,
     },
     {
-      target: '.ai-agent-section',
+      target: '.dashboard-menu',
       content: t('tour.step2.content'),
       title: t('tour.step2.title'),
-      placement: 'bottom',
+      placement: 'top',
     },
     {
-      target: '.fab-add-debt',
+      target: '.debt-card',
       content: t('tour.step3.content'),
       title: t('tour.step3.title'),
       placement: 'top',
@@ -57,15 +57,27 @@ const Tour: React.FC<TourProps> = ({ run, onComplete }) => {
       placement: 'top',
     },
     {
-      target: '.debt-card',
+      target: '.item-card',
       content: t('tour.step7.content'),
       title: t('tour.step7.title'),
       placement: 'top',
     },
     {
-      target: '.header-actions',
+      target: '.btn-notifications',
       content: t('tour.step8.content'),
       title: t('tour.step8.title'),
+      placement: 'bottom',
+    },
+    {
+      target: '.ai-agent-section',
+      content: t('tour.step9.content'),
+      title: t('tour.step9.title'),
+      placement: 'bottom',
+    },
+    {
+      target: '.header-actions',
+      content: t('tour.step10.content'),
+      title: t('tour.step10.title'),
       placement: 'bottom',
     },
   ];

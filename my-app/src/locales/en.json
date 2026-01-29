@@ -390,43 +390,51 @@
     }
   },
   "tour": {
-    "startTour": "Start Tour",
+    "startTour": "How to Use",
     "back": "Back",
     "next": "Next",
     "skip": "Skip",
     "close": "Close",
     "last": "Finish",
     "step1": {
-      "title": "Overview Summary",
-      "content": "Here you can see your total debt and monthly payments at a glance. This helps you understand your overall financial situation."
+      "title": "Financial Overview",
+      "content": "This is your complete financial dashboard! The overview shows your total debts, fixed expenses, assets, and income. Click to expand and see your Net Worth - the key metric for tracking wealth. Understanding this helps you see the full picture: what you owe vs what you own."
     },
     "step2": {
-      "title": "AI Assistant",
-      "content": "Use the AI Assistant to control the app with voice or text commands! You can create or edit debts, add payment commitments, complete commitments, delete debts, record calls, show overview, toggle hide amounts, and navigate to different pages. Just type or speak your command naturally."
+      "title": "Financial Categories",
+      "content": "Navigate between four key areas: Debts (what you owe), Fixed Expenses (recurring costs), Assets (what you own), and Income (money coming in). Track everything to understand your complete financial health and plan your path to wealth."
     },
     "step3": {
-      "title": "Add Your First Debt",
-      "content": "Click this button to add a new debt. You'll enter details like the bank name, debt type, amounts, and monthly fees."
+      "title": "Managing Debts",
+      "content": "Each debt card shows payment dates, interest rates, and cut dates (for credit cards). Click any field to edit inline - no need to open forms! Drag cards to prioritize which debts to pay first. Expand to see payment commitments and call history."
     },
     "step4": {
-      "title": "Your Debts",
-      "content": "Each card shows a debt with its details. You can expand it to see payment commitments, call history, and manage the debt. Drag and drop cards to reorder them by priority."
+      "title": "Getting Out of Debt",
+      "content": "To eliminate debt: 1) Track all debts here, 2) Create payment commitments when you negotiate with banks, 3) Record calls to track communication, 4) Complete commitments as you pay - totals update automatically. Focus on high-interest debts first by dragging them to the top!"
     },
     "step5": {
       "title": "Payment Commitments",
-      "content": "Create payment commitments to track agreements with your bank. You can set partial payments, full payments, or settlements. When you complete a commitment, your debt totals update automatically."
+      "content": "When you negotiate with banks, create commitments here. Set partial payments, full payments, or settlements. Completing commitments automatically reduces your debt totals. This is how you track progress toward becoming debt-free!"
     },
     "step6": {
-      "title": "Record Calls",
-      "content": "Track your communication with banks by recording calls. You can also create payment commitments directly from a call record."
+      "title": "Call Tracking",
+      "content": "Record every call with banks. Document what was discussed and create payment commitments directly from call records. This creates a paper trail and helps you stay organized during debt negotiations."
     },
     "step7": {
-      "title": "Complete Payments",
-      "content": "When you complete a payment commitment, the app automatically updates your debt totals based on the payment type (partial, full, or settlement). This keeps everything in sync."
+      "title": "Expenses, Assets & Income",
+      "content": "Track fixed expenses (rent, utilities), assets (property, savings), and income (salary, freelance). Edit any field inline by clicking. Set payment dates for expenses and income. Drag to reorder by priority. This complete picture helps you budget and build wealth."
     },
     "step8": {
-      "title": "Quick Actions",
-      "content": "Use these buttons to hide/show amounts, learn about the debt snowball method, or access your profile and preferences."
+      "title": "Notifications",
+      "content": "All important updates appear here: debt total changes, status updates, automatic recalculations. Check this regularly to stay informed about your financial changes without interrupting your workflow."
+    },
+    "step9": {
+      "title": "AI Assistant",
+      "content": "Control the app with voice or text! Say 'add debt', 'show overview', 'hide amounts', or 'navigate to profile'. The AI understands natural language - just speak or type what you want to do. Perfect for quick actions while managing your finances."
+    },
+    "step10": {
+      "title": "Building Wealth",
+      "content": "Use this app to: 1) Eliminate debts systematically, 2) Track expenses to reduce waste, 3) Monitor assets to grow net worth, 4) Plan income to increase savings. The overview shows your Net Worth - watch it grow as you pay off debts and accumulate assets!"
     }
   },
   "aiAgent": {

@@ -52,7 +52,8 @@ import {
   FaDollarSign,
   FaWallet,
   FaTag,
-  FaBell
+  FaBell,
+  FaQuestionCircle
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
@@ -2721,17 +2722,11 @@ const Dashboard: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-profile btn-notifications"
-              onClick={() => {
-                setIsNotificationsOpen(true);
-                updateUnreadNotificationsCount();
-              }}
-              title={t('notifications.title')}
+              className="btn-profile"
+              onClick={() => setTourRun(true)}
+              title={t('tour.startTour')}
             >
-              <Icon component={FaBell} />
-              {unreadNotificationsCount > 0 && (
-                <span className="header-notification-badge">{unreadNotificationsCount}</span>
-              )}
+              <Icon component={FaQuestionCircle} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -2746,19 +2741,25 @@ const Dashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-profile"
-              onClick={() => setTourRun(true)}
-              title={t('tour.startTour')}
-            >
-              <Icon component={FaStar} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-profile"
               onClick={() => navigate('/profile')}
               title={t('profile.title')}
             >
               <Icon component={FaUser} />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile btn-notifications"
+              onClick={() => {
+                setIsNotificationsOpen(true);
+                updateUnreadNotificationsCount();
+              }}
+              title={t('notifications.title')}
+            >
+              <Icon component={FaBell} />
+              {unreadNotificationsCount > 0 && (
+                <span className="header-notification-badge">{unreadNotificationsCount}</span>
+              )}
             </motion.button>
           </div>
         </div>
