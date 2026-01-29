@@ -60,6 +60,7 @@ export interface FixedExpense {
   localCurrency: string;
   category?: string;
   dueDate?: string; // Día del mes (1-31)
+  paymentDate?: string; // Fecha completa de pago (ISO string)
   notes?: string;
   createdAt: string;
   updatedAt: string;

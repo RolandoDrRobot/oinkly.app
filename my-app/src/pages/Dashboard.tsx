@@ -498,6 +498,11 @@ const Dashboard: React.FC = () => {
     if (numericFields.includes(field)) {
       newValue = parseFloat(editValue) || 0;
     }
+    
+    // Handle date fields - convert to ISO string if not empty
+    if (field === 'paymentDate') {
+      newValue = editValue ? new Date(editValue).toISOString() : '';
+    }
 
     const updated = {
       ...expense,
@@ -1852,6 +1857,30 @@ const Dashboard: React.FC = () => {
                                       {expense.name}
                                     </h3>
                                   )}
+                                  {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'paymentDate' ? (
+                                    <input
+                                      type="date"
+                                      value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={() => saveFixedExpenseEdit(expense.id, 'paymentDate')}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'paymentDate');
+                                        if (e.key === 'Escape') cancelEdit();
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-edit-input"
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    <p className="item-payment-date editable-field" onClick={(e) => {
+                                      e.stopPropagation();
+                                      const dateValue = expense.paymentDate ? (expense.paymentDate.includes('T') ? expense.paymentDate.split('T')[0] : expense.paymentDate) : '';
+                                      startEditingFixedExpense(expense.id, 'paymentDate', dateValue || '', e);
+                                    }}>
+                                      <Icon component={FaCalendarAlt} className="item-type-icon" />
+                                      {expense.paymentDate && expense.paymentDate.trim() !== '' ? new Date(expense.paymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                    </p>
+                                  )}
                                   <div className="item-type-row">
                                     {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'category' ? (
                                       <input
@@ -2388,7 +2417,7 @@ const Dashboard: React.FC = () => {
                                   {editingIncome?.incomeId === income.id && editingIncome?.field === 'nextPaymentDate' ? (
                                     <input
                                       type="date"
-                                      value={editValue.split('T')[0]}
+                                      value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
                                       onChange={(e) => setEditValue(e.target.value)}
                                       onBlur={() => saveIncomeEdit(income.id, 'nextPaymentDate')}
                                       onKeyDown={(e) => {
@@ -2402,11 +2431,11 @@ const Dashboard: React.FC = () => {
                                   ) : (
                                     <p className="item-payment-date editable-field" onClick={(e) => {
                                       e.stopPropagation();
-                                      const dateValue = income.nextPaymentDate ? income.nextPaymentDate.split('T')[0] : '';
+                                      const dateValue = income.nextPaymentDate ? (income.nextPaymentDate.includes('T') ? income.nextPaymentDate.split('T')[0] : income.nextPaymentDate) : '';
                                       startEditingIncome(income.id, 'nextPaymentDate', dateValue || '', e);
                                     }}>
                                       <Icon component={FaCalendarAlt} className="item-type-icon" />
-                                      {income.nextPaymentDate ? new Date(income.nextPaymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                      {income.nextPaymentDate && income.nextPaymentDate.trim() !== '' ? new Date(income.nextPaymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
                                     </p>
                                   )}
                                   <div className="item-type-row">
