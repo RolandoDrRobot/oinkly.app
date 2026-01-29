@@ -1110,18 +1110,6 @@ const Dashboard: React.FC = () => {
             >
               {t('dashboard.noDebtsSubtitle')}
             </motion.p>
-            <motion.button
-              className="btn-add-first-debt"
-              onClick={() => navigate('/add-debt')}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Icon component={FaPlus} style={{ marginRight: '8px' }} />
-              {t('dashboard.addFirstDebt')}
-            </motion.button>
           </motion.div>
         ) : (
           <>
