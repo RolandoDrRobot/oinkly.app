@@ -8,26 +8,28 @@ La app permite controlar acciones por **voz** y **texto**. El flujo es:
 
 Así se consigue un **mapeo lo más lenguaje natural posible**: la IA entiende frases como “tengo una deuda con BBVA de 15 mil pesos” o “registrar llamada con Santander” y devuelve el JSON de acción correcto.
 
-Con la IA configurada y el contexto completo (deudas, gastos fijos, activos, ingresos con id y nombre), **la app se puede manejar 100% por voz sin tocar botones**: agregar, editar, eliminar y completar deudas, compromisos, llamadas, gastos, activos e ingresos; navegar a cualquier pantalla; consultar resumen o listas.
+Con la IA configurada y el contexto completo (deudas, compromisos, llamadas, gastos fijos, activos, ingresos con id y nombre), **la app se puede manejar 100% por voz sin tocar botones**: agregar, editar, eliminar y completar deudas, compromisos, llamadas, gastos, activos e ingresos; navegar a cualquier pantalla; consultar resumen o listas.
 
 ---
 
 ## Cobertura: todo lo que la app permite por voz
 
-La IA recibe el estado actual (listas de deudas, gastos fijos, activos, ingresos con id y name) y puede ejecutar **todas** las acciones que la UI permite:
+La IA y el parser local reciben el estado actual (listas con id y nombre) y pueden ejecutar **todas** las acciones que la UI permite:
 
-| Área | Acciones por voz |
-|------|------------------|
-| **Deudas** | Agregar, editar, eliminar, marcar como pagada. Params: nombre, monto total, cuota mensual, fecha de pago, corte, interés, banco. |
-| **Compromisos** | Agregar, editar, eliminar, completar (por deuda). |
-| **Llamadas** | Agregar, editar, eliminar (por deuda). |
-| **Gastos fijos** | Agregar, editar, eliminar. Params: nombre, monto, categoría, día de pago. |
-| **Activos** | Agregar, editar, eliminar, liquidar. Params: nombre, valor, tipo, fecha de compra. |
-| **Ingresos** | Agregar, editar, eliminar. Params: nombre, monto, tipo, frecuencia. |
-| **Navegación** | Ir a dashboard, pantallas de agregar/editar/eliminar, perfil, preferencias, about, términos. |
-| **Consultas** | Resumen, listar deudas, ocultar/mostrar montos. |
+| Área | Crear | Editar | Eliminar | Completar / Marcar pagado | Eliminar todas |
+|------|--------|--------|----------|----------------------------|----------------|
+| **Deudas** | add_debt (nombre, monto, cuota, pago, corte, interés) | navigate /edit-debt/ID | delete_debt, delete_all_debts | complete_debt (marcar como pagada) | delete_all_debts |
+| **Compromisos** | add_commitment (deuda + monto); o navigate /add-commitment/ID | navigate /edit-commitment/ID o edit_commitment | delete_commitment | complete_commitment (pago realizado) | — |
+| **Llamadas** | add_call (deuda); o navigate /add-call/ID | navigate /edit-call/ID o edit_call | delete_call | — | — |
+| **Gastos fijos** | add_fixed_expense | navigate /edit-fixed-expense/ID | delete_fixed_expense, delete_all_fixed_expenses | — | delete_all_fixed_expenses |
+| **Activos** | add_asset | navigate /edit-asset/ID | delete_asset, delete_all_assets | complete_asset (liquidar) | delete_all_assets |
+| **Ingresos** | add_income | navigate /edit-income/ID | delete_income, delete_all_incomes | — | delete_all_incomes |
+| **Navegación** | — | — | — | — | — |
+| **Consultas / UI** | — | — | — | — | get_overview, get_debts, toggle_hide_amounts |
 
-Para editar o eliminar una entidad concreta, el usuario la identifica por nombre (ej. "eliminar el gasto de internet", "editar la deuda BBVA"). La IA usa el id de la lista que recibe en el contexto.
+Para editar o eliminar una entidad concreta, el usuario la identifica por nombre (ej. "eliminar el gasto de internet", "editar la deuda BBVA", "eliminar compromiso de BBVA", "eliminar llamada de Scotiabank"). El contexto incluye compromisos y llamadas (con commitmentId/callId por deuda) para poder resolver edit/delete por voz.
+
+**Atributos editables por voz (actualizaciones parciales):** La IA y el parser pueden actualizar uno o varios atributos sin abrir la pantalla. Ejemplos: "cambiar la cuota de BBVA a 50 mil" → edit_debt { debtId, localFee: 50000 }; "cambiar la fecha de pago de BBVA al día 20" → edit_debt { debtId, paymentDate: "20" }; "cambiar el monto del compromiso de BBVA a 4000" → edit_commitment { debtId, commitmentId, amountLocal: 4000 }; "actualizar las notas de la llamada de Scotiabank a 'acordé plazo'" → edit_call { debtId, callId, notes: "acordé plazo" }; "cambiar el gasto de internet a 60 dólares" → edit_fixed_expense { expenseId, amountDollars: 60 }; "cambiar el valor del activo casa a 2.5 millones" → edit_asset { assetId, valueLocal: 2500000 }; "cambiar mi ingreso de Forj a 6000" → edit_income { incomeId, amountLocal: 6000 }. Todos los atributos de cada entidad (nombre, montos, fechas, notas, tipo, frecuencia, etc.) están documentados en el prompt de la IA para crear y actualizar por voz.
 
 ---
 

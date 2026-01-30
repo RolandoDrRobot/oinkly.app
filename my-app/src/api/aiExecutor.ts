@@ -36,19 +36,24 @@ function str(p: unknown): string {
   return '';
 }
 
-/** Convierte fecha ISO o día del mes (1-31) a ISO string para paymentDate/cutDate. */
+/** Convierte fecha ISO o día del mes (1-31) a ISO string para paymentDate/cutDate. Evita UTC para que "día 30" no se convierta en 29. */
 function toDateISO(p: unknown): string | undefined {
   if (p == null || p === '') return undefined;
   const s = str(p).trim();
   if (!s) return undefined;
   const dayNum = parseInt(s, 10);
   if (dayNum >= 1 && dayNum <= 31 && s === String(dayNum)) {
-    const d = new Date();
-    d.setDate(dayNum);
-    return d.toISOString().slice(0, 10);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    return `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
   }
   const parsed = new Date(s);
-  return isNaN(parsed.getTime()) ? undefined : parsed.toISOString().slice(0, 10);
+  if (isNaN(parsed.getTime())) return undefined;
+  const y = parsed.getFullYear();
+  const m = parsed.getMonth() + 1;
+  const d = parsed.getDate();
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
 export interface AIExecutorContext {
@@ -169,6 +174,13 @@ export async function executeAIAction(
         return { success: true, message: 'Debt deleted' };
       }
 
+      case 'delete_all_debts': {
+        const allDebts = storage.getDebts();
+        for (const d of allDebts) storage.deleteDebt(d.id);
+        if (allDebts.length > 0) notify.overviewUpdated();
+        return { success: true, message: allDebts.length > 0 ? `Deleted ${allDebts.length} debt(s)` : 'No debts to delete' };
+      }
+
       case 'complete_debt': {
         const debtId = str(params.debtId);
         const debt = storage.getDebt(debtId);
@@ -223,11 +235,14 @@ export async function executeAIAction(
         if (!debt) return { success: false, error: 'Debt not found' };
         const commitment = debt.commitments?.find((c) => c.id === commitmentId);
         if (!commitment) return { success: false, error: 'Commitment not found' };
+        const paymentType = str(params.paymentType) as PaymentCommitment['paymentType'];
+        const validPaymentTypes: PaymentCommitment['paymentType'][] = ['partial', 'full', 'settlement'];
         const updatedCommitment: PaymentCommitment = {
           ...commitment,
           ...(params.date !== undefined && { date: new Date(str(params.date)).toISOString() }),
           ...(params.amountLocal !== undefined && { amountLocal: num(params.amountLocal) }),
           ...(params.amountDollars !== undefined && { amountDollars: num(params.amountDollars) }),
+          ...(params.paymentType !== undefined && validPaymentTypes.includes(paymentType) && { paymentType }),
           ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
         };
         const newList = debt.commitments?.map((c) => (c.id === commitmentId ? updatedCommitment : c)) || [];
@@ -360,6 +375,13 @@ export async function executeAIAction(
         return { success: true, message: 'Fixed expense deleted' };
       }
 
+      case 'delete_all_fixed_expenses': {
+        const allExpenses = storage.getFixedExpenses();
+        for (const e of allExpenses) storage.deleteFixedExpense(e.id);
+        if (allExpenses.length > 0) notify.overviewUpdated();
+        return { success: true, message: allExpenses.length > 0 ? `Deleted ${allExpenses.length} fixed expense(s)` : 'No fixed expenses to delete' };
+      }
+
       case 'add_asset': {
         const name = str(params.name);
         if (!name.trim()) return { success: false, error: 'Asset name required' };
@@ -410,6 +432,13 @@ export async function executeAIAction(
         storage.deleteAsset(assetId);
         notify.overviewUpdated();
         return { success: true, message: 'Asset deleted' };
+      }
+
+      case 'delete_all_assets': {
+        const allAssets = storage.getAssets();
+        for (const a of allAssets) storage.deleteAsset(a.id);
+        if (allAssets.length > 0) notify.overviewUpdated();
+        return { success: true, message: allAssets.length > 0 ? `Deleted ${allAssets.length} asset(s)` : 'No assets to delete' };
       }
 
       case 'complete_asset':
@@ -474,6 +503,13 @@ export async function executeAIAction(
         storage.deleteIncome(incomeId);
         notify.overviewUpdated();
         return { success: true, message: 'Income deleted' };
+      }
+
+      case 'delete_all_incomes': {
+        const allIncomes = storage.getIncomes();
+        for (const i of allIncomes) storage.deleteIncome(i.id);
+        if (allIncomes.length > 0) notify.overviewUpdated();
+        return { success: true, message: allIncomes.length > 0 ? `Deleted ${allIncomes.length} income(s)` : 'No incomes to delete' };
       }
 
       default:

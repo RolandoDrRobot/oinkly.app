@@ -774,22 +774,45 @@ const Dashboard: React.FC = () => {
     const lang = i18n.language.startsWith('es') ? 'es' : 'en';
     let action = null;
 
+    const voiceCommitments = debts.flatMap((d) =>
+      (d.commitments || []).map((c) => ({ debtId: d.id, debtName: d.name, commitmentId: c.id, date: c.date }))
+    );
+    const voiceCalls = debts.flatMap((d) =>
+      (d.callHistory || []).map((c) => ({ debtId: d.id, debtName: d.name, callId: c.id, date: c.date }))
+    );
+
     // Intentar primero interpretación con IA externa si está configurada
     if (isAIVoiceEnabled()) {
       action = await interpretWithAI(text, {
         lang,
         debts: debts.map((d) => ({ id: d.id, name: d.name })),
+        commitments: voiceCommitments,
+        calls: voiceCalls,
         fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
         assets: assets.map((a) => ({ id: a.id, name: a.name })),
         incomes: incomes.map((i) => ({ id: i.id, name: i.name })),
         overview: getSummaryText(lang),
       });
       console.log('[AI Voice] handleAIUserInput – action from AI:', action);
+
+      // Safeguard: si el usuario claramente pidió editar/eliminar/completar y la IA devolvió add_*, ignorar IA y usar parser local
+      const isEditDeleteCompleteIntent = /editar|modificar|cambiar|actualizar|eliminar|borrar|quitar|completar|liquidar|cerrar|dar de baja|edit|delete|modify|update|remove|complete/i.test(text.trim());
+      const isAddAction = action && ['add_debt', 'add_fixed_expense', 'add_asset', 'add_income'].includes(action.type);
+      if (isEditDeleteCompleteIntent && isAddAction) {
+        console.log('[AI Voice] handleAIUserInput – descartando add_* de IA (usuario pidió editar/eliminar/completar), usando parser local');
+        action = null;
+      }
     }
 
     // Fallback al parser local si la IA no devolvió acción
     if (!action) {
-      action = parseTextToAIAction(text, debts);
+      action = parseTextToAIAction(text, debts, {
+        commitments: voiceCommitments,
+        calls: voiceCalls,
+        fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
+        assets: assets.map((a) => ({ id: a.id, name: a.name })),
+        incomes: incomes.map((i) => ({ id: i.id, name: i.name })),
+      });
       console.log('[AI Voice] handleAIUserInput – action from parser:', action);
     }
 
@@ -802,10 +825,10 @@ const Dashboard: React.FC = () => {
       }
       // Refresh lists so new/updated/deleted entries appear without reload
       if (result.success) {
-        const debtRelated = ['add_debt', 'edit_debt', 'delete_debt', 'add_commitment', 'edit_commitment', 'delete_commitment', 'complete_commitment', 'add_call', 'edit_call', 'delete_call'].includes(action.type);
-        const fixedExpenseRelated = ['add_fixed_expense', 'edit_fixed_expense', 'delete_fixed_expense'].includes(action.type);
-        const assetRelated = ['add_asset', 'edit_asset', 'delete_asset'].includes(action.type);
-        const incomeRelated = ['add_income', 'edit_income', 'delete_income'].includes(action.type);
+        const debtRelated = ['add_debt', 'edit_debt', 'delete_debt', 'delete_all_debts', 'add_commitment', 'edit_commitment', 'delete_commitment', 'complete_commitment', 'add_call', 'edit_call', 'delete_call'].includes(action.type);
+        const fixedExpenseRelated = ['add_fixed_expense', 'edit_fixed_expense', 'delete_fixed_expense', 'delete_all_fixed_expenses'].includes(action.type);
+        const assetRelated = ['add_asset', 'edit_asset', 'delete_asset', 'delete_all_assets'].includes(action.type);
+        const incomeRelated = ['add_income', 'edit_income', 'delete_income', 'delete_all_incomes'].includes(action.type);
         if (debtRelated) loadDebts();
         if (fixedExpenseRelated) loadFixedExpenses();
         if (assetRelated) loadAssets();
@@ -815,7 +838,7 @@ const Dashboard: React.FC = () => {
       const message = getMessageForActionResult(action, result, lang);
       if (result.success && (action.type === 'get_overview' || action.type === 'get_debts')) {
         toast.success(message, { duration: 6000 });
-      } else if (result.success && ['add_debt', 'add_income', 'add_fixed_expense', 'add_asset'].includes(action.type)) {
+      } else if (result.success && (['add_debt', 'add_income', 'add_fixed_expense', 'add_asset'].includes(action.type) || ['delete_all_debts', 'delete_all_fixed_expenses', 'delete_all_assets', 'delete_all_incomes'].includes(action.type))) {
         toast.success(message, { duration: 4000 });
       } else if (!result.success && result.error) {
         toast.error(result.error);

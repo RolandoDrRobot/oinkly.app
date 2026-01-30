@@ -8,6 +8,7 @@ export type AIIntent =
   | 'add_debt'
   | 'edit_debt'
   | 'delete_debt'
+  | 'delete_all_debts'
   | 'complete_debt'
   // Compromisos
   | 'add_commitment'
@@ -22,15 +23,18 @@ export type AIIntent =
   | 'add_fixed_expense'
   | 'edit_fixed_expense'
   | 'delete_fixed_expense'
+  | 'delete_all_fixed_expenses'
   // Activos
   | 'add_asset'
   | 'edit_asset'
   | 'delete_asset'
+  | 'delete_all_assets'
   | 'complete_asset'
   // Ingresos
   | 'add_income'
   | 'edit_income'
   | 'delete_income'
+  | 'delete_all_incomes'
   // UI / lectura
   | 'navigate'
   | 'toggle_hide_amounts'

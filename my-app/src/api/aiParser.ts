@@ -64,6 +64,7 @@ type IncomeFrequency = 'monthly' | 'weekly' | 'biweekly' | 'yearly' | 'one-time'
  * "tengo un ingreso, trabajo en Forj y gano 5000 al mes"
  */
 function parseNaturalIncome(text: string): { name: string; amountLocal?: number; amountDollars?: number; type?: IncomeType; frequency?: IncomeFrequency } | null {
+  if (isEditDeleteCompleteIntent(text)) return null;
   const hasIncome =
     /tengo\s+(un\s+)?ingreso|I\s+have\s+(an\s+)?income|trabajo\s+en|work\s+at|gano\s+\$?\d|earn\s+\$?\d|recibo\s+(un\s+)?sueldo|mi\s+salario|me\s+pagan|ingreso\s+de\s+alquiler|ingreso\s+por\s+inversiones|salary|they\s+pay\s+me|empresa\s+se\s+llama|compañía\s+llamada|company\s+called|mi\s+ingreso/i.test(
       text
@@ -153,6 +154,11 @@ function parseDayOfMonth(text: string): string | undefined {
   return undefined;
 }
 
+/** Indica si el texto expresa intención de editar/eliminar/completar (no agregar). */
+function isEditDeleteCompleteIntent(text: string): boolean {
+  return /editar|modificar|cambiar|actualizar|eliminar|borrar|quitar|completar|liquidar|cerrar|dar de baja|edit|delete|modify|update|remove|complete/i.test(text);
+}
+
 /** Deuda en lenguaje natural: incluye cuota mensual, fecha de pago, corte, tasa de interés. */
 function parseNaturalDebt(text: string): {
   name: string;
@@ -166,6 +172,7 @@ function parseNaturalDebt(text: string): {
   cutDate?: string;
   interestRate?: number;
 } | null {
+  if (isEditDeleteCompleteIntent(text)) return null;
   const hasDebt =
     /tengo\s+(una\s+)?deuda|I\s+have\s+a\s+debt|debo\s+\d|I\s+owe|préstamo|crédito\s+con|tarjeta\s+de|credit\s+card|add\s+debt|nueva\s+deuda|deuda\s+con|loan/i.test(
       text
@@ -283,6 +290,7 @@ function parseNaturalDebt(text: string): {
 
 /** Gasto fijo en lenguaje natural: "tengo un gasto de renta", "pago 8000 de internet el día 5". */
 function parseNaturalExpense(text: string): { name: string; amountLocal?: number; amountDollars?: number; dueDate?: string; category?: string } | null {
+  if (isEditDeleteCompleteIntent(text)) return null;
   const hasExpense =
     /tengo\s+(un\s+)?gasto|I\s+have\s+a\s+fixed\s+expense|pago\s+\d|I\s+pay|gasto\s+fijo|fixed\s+expense|agregar\s+gasto|add\s+expense|mi\s+gasto\s+de|renta|internet|luz|seguro|colegiatura|gym|streaming|teléfono|phone\s+bill/i.test(
       text
@@ -329,6 +337,7 @@ type AssetType = 'property' | 'vehicle' | 'investment' | 'savings' | 'other';
 
 /** Activo en lenguaje natural: "tengo un activo, es mi casa, valuada en 2 millones". */
 function parseNaturalAsset(text: string): { name: string; valueLocal?: number; valueDollars?: number; type?: AssetType; purchaseDate?: string } | null {
+  if (isEditDeleteCompleteIntent(text)) return null;
   const hasAsset =
     /tengo\s+(un\s+)?activo|I\s+have\s+an\s+asset|vale\s+(?:aproximadamente\s+)?\d|worth\s+\d|valuada\s+en|valued\s+at|agregar\s+activo|add\s+asset|mi\s+(?:casa|carro|moto)|cuenta\s+de\s+ahorro|inversión|portafolio/i.test(
       text
@@ -435,15 +444,72 @@ function parseNaturalCall(text: string, debts: Debt[]): { debtId: string } | nul
   return { debtId: debt.id };
 }
 
-export function parseTextToAIAction(text: string, debts: Debt[]): AIAction | null {
+export interface ParseTextContext {
+  /** Compromisos (deuda + commitmentId) para editar/eliminar/completar por voz */
+  commitments?: { debtId: string; debtName: string; commitmentId: string; date?: string }[];
+  /** Llamadas al banco (deuda + callId) para editar/eliminar por voz */
+  calls?: { debtId: string; debtName: string; callId: string; date?: string }[];
+  fixedExpenses?: { id: string; name: string }[];
+  assets?: { id: string; name: string }[];
+  incomes?: { id: string; name: string }[];
+}
+
+export function parseTextToAIAction(
+  text: string,
+  debts: Debt[],
+  context?: ParseTextContext
+): AIAction | null {
   const lower = text.toLowerCase().trim();
   const trimmed = text.trim();
+  const fixedExpenses = context?.fixedExpenses ?? [];
+  const assets = context?.assets ?? [];
+  const incomes = context?.incomes ?? [];
+  const commitments = context?.commitments ?? [];
+  const calls = context?.calls ?? [];
+
+  // —— Navegación: inicio, agregar pantallas ——
+  if (/ir al inicio|abrir dashboard|volver al inicio|go to dashboard|dashboard/i.test(lower) && !/deuda|debt|gasto|income|asset/i.test(lower)) {
+    return { type: 'navigate', params: { route: '/dashboard' } };
+  }
+  if (/^(agregar|add|nueva|new)\s+(deuda|debt)$/i.test(trimmed) || /abrir (formulario |pantalla )?para agregar deuda/i.test(lower)) {
+    return { type: 'navigate', params: { route: '/add-debt' } };
+  }
+  if (/^(agregar|add)\s+(gasto|expense)$/i.test(trimmed) && !/\d/.test(trimmed)) {
+    return { type: 'navigate', params: { route: '/add-fixed-expense' } };
+  }
+  if (/^(agregar|add|nuevo|new)\s+(activo|asset)$/i.test(trimmed) && !/\d/.test(trimmed)) {
+    return { type: 'navigate', params: { route: '/add-asset' } };
+  }
+  if (/^(agregar|add|nuevo|new)\s+(ingreso|income)$/i.test(trimmed) && !/\d/.test(trimmed)) {
+    return { type: 'navigate', params: { route: '/add-income' } };
+  }
+  if (/^(agregar|add|crear)\s+(compromiso|commitment)$/i.test(trimmed) && !/\d/.test(trimmed) && debts.length > 0) {
+    return { type: 'navigate', params: { route: `/add-commitment/${debts[0].id}` } };
+  }
+  const addCommitmentForMatch = trimmed.match(/^(agregar|add|crear)\s+(compromiso|commitment)\s+(?:para|de|to|for)\s+([a-záéíóúñ\w\s]+?)$/i);
+  if (addCommitmentForMatch && !/\d/.test(trimmed) && debts.length > 0) {
+    const debtName = addCommitmentForMatch[3]?.trim();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+    if (debt) return { type: 'navigate', params: { route: `/add-commitment/${debt.id}` } };
+  }
+  if (/^(agregar|add|registrar)\s+(llamada|call)$/i.test(trimmed) && debts.length > 0) {
+    return { type: 'navigate', params: { route: `/add-call/${debts[0].id}` } };
+  }
+  const addCallForMatch = trimmed.match(/^(agregar|add|registrar)\s+(llamada|call)\s+(?:para|de|con|to|for)\s+([a-záéíóúñ\w\s]+?)$/i);
+  if (addCallForMatch && debts.length > 0) {
+    const debtName = addCallForMatch[3]?.trim();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+    if (debt) return { type: 'navigate', params: { route: `/add-call/${debt.id}` } };
+  }
 
   // —— Resumen y UI (sin captura de datos) ——
-  if (/resumen|overview|total|cuánto debo|how much|patrimonio|net worth/i.test(lower)) {
+  if (/resumen|overview|total|cuánto debo|how much|patrimonio|net worth|dame el resumen|ver resumen|cuál es mi patrimonio/i.test(lower)) {
     return { type: 'get_overview' };
   }
-  if (/ocultar montos|hide amounts|mostrar montos|show amounts/i.test(lower)) {
+  if (/listar (mis )?deudas|ver deudas|get debts/i.test(lower)) {
+    return { type: 'get_debts' };
+  }
+  if (/ocultar montos|hide amounts|mostrar montos|show amounts|no quiero ver los montos|quiero ver los montos/i.test(lower)) {
     return { type: 'toggle_hide_amounts' };
   }
   if (/sobre|about|método|method/i.test(lower)) {
@@ -454,6 +520,164 @@ export function parseTextToAIAction(text: string, debts: Debt[]): AIAction | nul
   }
   if (/preferencias|preferences/i.test(lower)) {
     return { type: 'navigate', params: { route: '/preferences' } };
+  }
+
+  // —— Eliminar TODAS las entidades (por voz: "eliminar todas las deudas", "borrar todos los gastos", etc.) ——
+  if (/eliminar\s+(todas?|todos)\s+(las?|los)\s+deudas?|borrar\s+(todas?|todos)\s+(las?|los)\s+deudas?|quitar\s+todas?\s+las?\s+deudas?|delete\s+all\s+debts?|remove\s+all\s+debts?/i.test(lower)) {
+    return { type: 'delete_all_debts', params: {} };
+  }
+  if (/eliminar\s+(todas?|todos)\s+(las?|los)\s+gastos?|borrar\s+(todas?|todos)\s+(las?|los)\s+gastos?|quitar\s+todas?\s+las?\s+gastos?|delete\s+all\s+(fixed\s+)?expenses?|remove\s+all\s+expenses?/i.test(lower)) {
+    return { type: 'delete_all_fixed_expenses', params: {} };
+  }
+  if (/eliminar\s+(todas?|todos)\s+(las?|los)\s+activos?|borrar\s+(todas?|todos)\s+(las?|los)\s+activos?|quitar\s+todas?\s+las?\s+activos?|delete\s+all\s+assets?|remove\s+all\s+assets?/i.test(lower)) {
+    return { type: 'delete_all_assets', params: {} };
+  }
+  if (/eliminar\s+(todas?|todos)\s+(las?|los)\s+ingresos?|borrar\s+(todas?|todos)\s+(las?|los)\s+ingresos?|quitar\s+todas?\s+las?\s+ingresos?|delete\s+all\s+incomes?|remove\s+all\s+incomes?/i.test(lower)) {
+    return { type: 'delete_all_incomes', params: {} };
+  }
+
+  // —— Editar / eliminar / completar DEUDA (ANTES de "agregar" para no crear en vez de editar) ——
+  const extractDebtName = (): string | null => {
+    const withCon = lower.match(/(?:deuda|debt)\s+con\s+([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (withCon?.[1]) return withCon[1].trim();
+    // "la deuda de BBVA", "deuda del Scotiabank", "la deuda BBVA"
+    const deLaDeuda = lower.match(/(?:deuda|debt)\s+(?:de\s+|del\s+)([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (deLaDeuda?.[1]) return deLaDeuda[1].trim();
+    const laDeudaDe = lower.match(/la\s+(?:deuda|debt)\s+de\s+([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (laDeudaDe?.[1]) return laDeudaDe[1].trim();
+    // "editar la deuda X", "modificar la deuda de X", "quiero editar la deuda X"
+    const afterVerb = lower.match(/(?:quiero\s+|necesito\s+|puedo\s+)?(?:editar|modificar|cambiar|actualizar|eliminar|borrar|completar|edit|delete|complete)\s+(?:la\s+|mi\s+)?(?:deuda\s+)?(?:de\s+)?(?:la\s+)?(?:tarjeta\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (afterVerb?.[1]) return afterVerb[1].trim();
+    const deDeuda = lower.match(/(?:deuda|debt)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (deDeuda?.[1]) return deDeuda[1].trim();
+    // "editar la tarjeta BBVA", "modificar tarjeta Scotiabank"
+    const tarjetaMatch = lower.match(/(?:la\s+)?(?:tarjeta\s+)(?:de\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (tarjetaMatch?.[1]) return tarjetaMatch[1].trim();
+    return null;
+  };
+
+  const isEditDebtIntent = /(?:quiero\s+|necesito\s+|puedo\s+)?(?:editar|modificar|cambiar|actualizar|corregir|arreglar|edit|modify|update)/i.test(lower);
+  const mentionsDebt = /deuda|debt|tarjeta|préstamo/i.test(lower);
+
+  if (isEditDebtIntent && mentionsDebt) {
+    const debtName = extractDebtName();
+    let debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
+    if (!debt && debts.length > 0) debt = debts[0]; // "editar una deuda" / "editar la deuda" sin nombre → primera
+    if (debt) return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
+  }
+  if (/eliminar|borrar|quitar|delete|remove/i.test(lower) && mentionsDebt) {
+    const debtName = extractDebtName();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
+    if (debt) return { type: 'delete_debt', params: { debtId: debt.id } };
+  }
+  if (/completar|cerrar|liquidar|complete|paid|pagada|marcar\s+(?:la\s+)?(?:deuda\s+)?como\s+pagada|ya\s+pagu[eé]/i.test(lower) && mentionsDebt) {
+    const debtName = extractDebtName();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+    if (debt) return { type: 'complete_debt', params: { debtId: debt.id } };
+  }
+
+  // —— Actualizaciones parciales por voz: "cambiar la cuota de X a N", "cambiar el gasto X a N", etc. ——
+  const updateAmount = parseAmountFromText(trimmed);
+  if (updateAmount != null) {
+    if (/(?:cambiar|actualizar|poner)\s+(?:la\s+)?(?:cuota|pago\s+mensual)\s+(?:de\s+)?(?:la\s+)?(?:deuda\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i.test(lower) && mentionsDebt) {
+      const debtNameMatch = lower.match(/(?:cuota|pago\s+mensual)\s+(?:de\s+)?(?:la\s+)?(?:deuda\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
+      const debtName = debtNameMatch?.[1]?.trim();
+      const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+      if (debt) {
+        const isDollars = isDollarsMentioned(trimmed);
+        return { type: 'edit_debt', params: { debtId: debt.id, ...(isDollars ? { dollarFee: updateAmount } : { localFee: updateAmount }) } };
+      }
+    }
+    if (/(?:cambiar|actualizar)\s+(?:la\s+)?fecha\s+(?:de\s+pago)?\s+(?:de\s+)?(?:la\s+)?(?:deuda\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+(?:al\s+)?d[ií]a\s+/i.test(lower)) {
+      const dayMatch = trimmed.match(/(?:al\s+)?d[ií]a\s+(\d{1,2})\b/i) ?? trimmed.match(/\b(\d{1,2})\s*$/);
+      const day = dayMatch ? parseInt(dayMatch[1], 10) : undefined;
+      const debtNameMatch = lower.match(/(?:deuda\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+(?:al\s+)?d[ií]a/i);
+      const debtName = debtNameMatch?.[1]?.trim();
+      const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+      if (debt && day != null && day >= 1 && day <= 31) return { type: 'edit_debt', params: { debtId: debt.id, paymentDate: String(day) } };
+    }
+    if (/(?:cambiar|actualizar)\s+(?:el\s+)?monto\s+(?:del\s+)?(?:compromiso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i.test(lower) && commitments.length > 0) {
+      const debtNameMatch = lower.match(/(?:compromiso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
+      const debtName = debtNameMatch?.[1]?.trim();
+      const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
+      if (debt) {
+        const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
+        if (commitmentForDebt) {
+          const isDollars = isDollarsMentioned(trimmed);
+          return { type: 'edit_commitment', params: { debtId: debt.id, commitmentId: commitmentForDebt.commitmentId, ...(isDollars ? { amountDollars: updateAmount } : { amountLocal: updateAmount }) } };
+        }
+      }
+    }
+    if (/(?:cambiar|actualizar)\s+(?:el\s+)?(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+\d/i.test(lower) && fixedExpenses.length > 0) {
+      const nameMatch = lower.match(/(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
+      const name = nameMatch?.[1]?.trim();
+      const expense = name ? fixedExpenses.find((e) => e.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (expense) {
+        const isDollars = isDollarsMentioned(trimmed);
+        return { type: 'edit_fixed_expense', params: { expenseId: expense.id, ...(isDollars ? { amountDollars: updateAmount } : { amountLocal: updateAmount }) } };
+      }
+    }
+    if (/(?:cambiar|actualizar)\s+(?:el\s+)?valor\s+(?:del\s+)?(?:activo\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+\d/i.test(lower) && assets.length > 0) {
+      const nameMatch = lower.match(/(?:activo\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
+      const name = nameMatch?.[1]?.trim();
+      const asset = name ? assets.find((a) => a.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (asset) {
+        const isDollars = isDollarsMentioned(trimmed);
+        return { type: 'edit_asset', params: { assetId: asset.id, ...(isDollars ? { valueDollars: updateAmount } : { valueLocal: updateAmount }) } };
+      }
+    }
+    if (/(?:cambiar|actualizar)\s+(?:mi\s+)?(?:ingreso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+\d/i.test(lower) && incomes.length > 0) {
+      const nameMatch = lower.match(/(?:ingreso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
+      const name = nameMatch?.[1]?.trim();
+      const income = name ? incomes.find((i) => i.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (income) {
+        const isDollars = isDollarsMentioned(trimmed);
+        return { type: 'edit_income', params: { incomeId: income.id, ...(isDollars ? { amountDollars: updateAmount } : { amountLocal: updateAmount }) } };
+      }
+    }
+  }
+
+  // —— Compromisos: editar, eliminar, completar (por nombre de deuda; requiere context.commitments para ID) ——
+  const extractDebtNameFromCommitmentOrCall = (): string | null => {
+    const m = lower.match(/(?:compromiso|commitment|llamada|call)\s+(?:de\s+|del\s+)?(?:la\s+deuda\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (m?.[1]) return m[1].trim();
+    const m2 = lower.match(/(?:editar|eliminar|borrar|completar|edit|delete|complete)\s+(?:el\s+)?(?:compromiso|commitment|llamada|call)\s+(?:de\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
+    if (m2?.[1]) return m2[1].trim();
+    return null;
+  };
+  if (/(?:editar|modificar|edit)\s+(?:el\s+)?(?:compromiso|commitment)/i.test(lower)) {
+    const debtName = extractDebtNameFromCommitmentOrCall();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+    if (debt) {
+      const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
+      if (commitmentForDebt) return { type: 'navigate', params: { route: `/edit-commitment/${debt.id}/${commitmentForDebt.commitmentId}` } };
+      return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
+    }
+  }
+  if (/(?:eliminar|borrar|quitar|delete|remove)\s+(?:el\s+)?(?:compromiso|commitment)/i.test(lower)) {
+    const debtName = extractDebtNameFromCommitmentOrCall();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
+    if (debt) {
+      const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
+      if (commitmentForDebt) return { type: 'delete_commitment', params: { debtId: debt.id, commitmentId: commitmentForDebt.commitmentId } };
+    }
+  }
+  if (/(?:editar|modificar|edit)\s+(?:la\s+)?(?:llamada|call)/i.test(lower)) {
+    const debtName = extractDebtNameFromCommitmentOrCall();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
+    if (debt) {
+      const callForDebt = calls.find((c) => c.debtId === debt.id);
+      if (callForDebt) return { type: 'navigate', params: { route: `/edit-call/${debt.id}/${callForDebt.callId}` } };
+      return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
+    }
+  }
+  if (/(?:eliminar|borrar|quitar|delete|remove)\s+(?:la\s+)?(?:llamada|call)/i.test(lower)) {
+    const debtName = extractDebtNameFromCommitmentOrCall();
+    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
+    if (debt) {
+      const callForDebt = calls.find((c) => c.debtId === debt.id);
+      if (callForDebt) return { type: 'delete_call', params: { debtId: debt.id, callId: callForDebt.callId } };
+    }
   }
 
   // —— Agregar deuda: comando directo primero (para "agregar deuda" sin más -> abrir formulario) ——
@@ -573,8 +797,8 @@ export function parseTextToAIAction(text: string, debts: Debt[]): AIAction | nul
 
   // —— Completar compromiso: "completar compromiso [deuda]" ——
   if (/completar compromiso|complete commitment|pago realizado|payment made/i.test(lower)) {
-    const debtMatch = lower.match(/(?:para|to|de|for)?\s*(.+?)(?:\s+compromiso|\s+commitment)?$/i);
-    const debtName = debtMatch?.[1]?.trim();
+    const deMatch = lower.match(/(?:completar|complete)\s+(?:compromiso|commitment)\s+(?:de\s+|del\s+|para\s+|to\s+|for\s+)([a-záéíóúñ\w\s]+?)$/i);
+    const debtName = deMatch?.[1]?.trim() ?? lower.match(/(?:para|to|de|for)\s+([a-záéíóúñ\w\s]+?)(?:\s+compromiso|\s+commitment)?$/i)?.[1]?.trim();
     const debt = debtName
       ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
       : debts[0];
@@ -584,18 +808,6 @@ export function parseTextToAIAction(text: string, debts: Debt[]): AIAction | nul
         return { type: 'complete_commitment', params: { debtId: debt.id, commitmentId: pending.id } };
       }
       return { type: 'navigate', params: { route: `/complete-commitment/${debt.id}/${debt.commitments[0].id}` } };
-    }
-  }
-
-  // —— Eliminar deuda ——
-  if (/eliminar deuda|delete debt|borrar deuda/i.test(lower)) {
-    const debtMatch = lower.match(/(?:deuda|debt)?\s*(.+?)$/i);
-    const debtName = debtMatch?.[1]?.trim();
-    const debt = debtName
-      ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
-      : null;
-    if (debt) {
-      return { type: 'delete_debt', params: { debtId: debt.id } };
     }
   }
 
@@ -617,27 +829,57 @@ export function parseTextToAIAction(text: string, debts: Debt[]): AIAction | nul
     }
   }
 
-  // —— Editar deuda (abrir pantalla) ——
-  if (/editar deuda|edit debt/i.test(lower)) {
-    const debtMatch = lower.match(/(?:deuda|debt)?\s*(.+?)$/i);
-    const debtName = debtMatch?.[1]?.trim();
-    const debt = debtName
-      ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
-      : null;
-    if (debt) {
-      return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
+  // —— Editar / eliminar gasto fijo (por nombre, requiere context.fixedExpenses) ——
+  if (fixedExpenses.length > 0) {
+    if (/editar (el )?gasto|edit (fixed )?expense|modificar gasto|actualizar gasto/i.test(lower)) {
+      const nameMatch = lower.match(/(?:gasto|expense)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:editar|edit|modificar|actualizar)\s+(?:el\s+)?(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const expense = name ? fixedExpenses.find((e) => e.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (expense) return { type: 'navigate', params: { route: `/edit-fixed-expense/${expense.id}` } };
+    }
+    if (/eliminar (el )?gasto|borrar gasto|delete (fixed )?expense|quitar (el )?gasto/i.test(lower)) {
+      const nameMatch = lower.match(/(?:gasto|expense)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:eliminar|borrar|delete|quitar)\s+(?:el\s+)?(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const expense = name ? fixedExpenses.find((e) => e.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (expense) return { type: 'delete_fixed_expense', params: { expenseId: expense.id } };
     }
   }
 
-  // —— Marcar deuda como pagada ——
-  if (/completar deuda|complete debt|deuda pagada|debt paid/i.test(lower)) {
-    const debtMatch = lower.match(/(?:deuda|debt)?\s*(.+?)$/i);
-    const debtName = debtMatch?.[1]?.trim();
-    const debt = debtName
-      ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
-      : null;
-    if (debt) {
-      return { type: 'complete_debt', params: { debtId: debt.id } };
+  // —— Editar / eliminar / liquidar activo (por nombre, requiere context.assets) ——
+  if (assets.length > 0) {
+    if (/editar (el )?activo|edit asset|modificar activo|actualizar activo|cambiar (valor del )?activo/i.test(lower)) {
+      const nameMatch = lower.match(/(?:activo|asset)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:editar|edit|modificar|actualizar)\s+(?:el\s+)?(?:activo\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const asset = name ? assets.find((a) => a.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (asset) return { type: 'navigate', params: { route: `/edit-asset/${asset.id}` } };
+    }
+    if (/eliminar (el )?activo|borrar activo|delete asset|quitar (el )?activo/i.test(lower)) {
+      const nameMatch = lower.match(/(?:activo|asset)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:eliminar|borrar|delete|quitar)\s+(?:el\s+)?(?:activo\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const asset = name ? assets.find((a) => a.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (asset) return { type: 'delete_asset', params: { assetId: asset.id } };
+    }
+    if (/liquidar (el )?activo|completar activo|complete asset|vender (el )?activo|dar de baja activo/i.test(lower)) {
+      const nameMatch = lower.match(/(?:activo|asset)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:liquidar|completar|complete|vender)\s+(?:el\s+)?(?:activo\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const asset = name ? assets.find((a) => a.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (asset) return { type: 'complete_asset', params: { assetId: asset.id } };
+    }
+  }
+
+  // —— Editar / eliminar ingreso (por nombre, requiere context.incomes) ——
+  if (incomes.length > 0) {
+    if (/editar (el )?ingreso|edit income|modificar ingreso|actualizar ingreso|cambiar ingreso/i.test(lower)) {
+      const nameMatch = lower.match(/(?:ingreso|income)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:editar|edit|modificar|actualizar)\s+(?:el\s+)?(?:ingreso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const income = name ? incomes.find((i) => i.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (income) return { type: 'navigate', params: { route: `/edit-income/${income.id}` } };
+    }
+    if (/eliminar (el )?ingreso|borrar ingreso|delete income|quitar (el )?ingreso/i.test(lower)) {
+      const nameMatch = lower.match(/(?:ingreso|income)\s+(?:de\s+|del\s+)?([a-záéíóúñ\w\s]+?)(?:\s+$|\.|,)/i) ?? lower.match(/(?:eliminar|borrar|delete|quitar)\s+(?:el\s+)?(?:ingreso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+)/i);
+      const name = nameMatch?.[1]?.trim();
+      const income = name ? incomes.find((i) => i.name.toLowerCase().includes(name.toLowerCase())) : null;
+      if (income) return { type: 'delete_income', params: { incomeId: income.id } };
     }
   }
 
@@ -667,5 +909,9 @@ export function getMessageForActionResult(
     const route = (action.params?.route as string) || '';
     return lang === 'es' ? `Navegando a ${route}.` : `Navigating to ${route}.`;
   }
+  if (action.type === 'delete_all_debts') return lang === 'es' ? 'Se eliminaron todas las deudas.' : (result.message as string) || 'All debts deleted.';
+  if (action.type === 'delete_all_fixed_expenses') return lang === 'es' ? 'Se eliminaron todos los gastos fijos.' : (result.message as string) || 'All fixed expenses deleted.';
+  if (action.type === 'delete_all_assets') return lang === 'es' ? 'Se eliminaron todos los activos.' : (result.message as string) || 'All assets deleted.';
+  if (action.type === 'delete_all_incomes') return lang === 'es' ? 'Se eliminaron todos los ingresos.' : (result.message as string) || 'All incomes deleted.';
   return (result.message as string) || (lang === 'es' ? 'Listo.' : 'Done.');
 }
