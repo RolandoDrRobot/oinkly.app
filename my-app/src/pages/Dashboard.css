@@ -158,10 +158,9 @@
 
 .ai-agent-locked {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 20px 16px;
   text-align: center;
 }
 
@@ -177,6 +176,14 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.4;
+  text-align: center;
+}
+
+.card-lock {
+  gap: 4px;
+  padding: 0 0 0 30px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ai-agent-locked-cta {

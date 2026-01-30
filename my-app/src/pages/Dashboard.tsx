@@ -2976,7 +2976,6 @@ const Dashboard: React.FC = () => {
           transition={{ delay: 0.25 }}
           className={`ai-agent-section ${!isPremium ? 'ai-agent-section-locked' : ''}`}
         >
-          <h3 className="ai-agent-section-title">{t('aiAgent.title')}</h3>
           {isPremium ? (
             <form onSubmit={handleAISubmit} className="ai-agent-input-container">
               <input
@@ -3011,6 +3010,8 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="ai-agent-locked">
               <Icon component={FaLock} className="ai-agent-locked-icon" />
+              <div className='card-lock'>
+              <h3 className="ai-agent-section-title">{t('aiAgent.title')}</h3>
               <p className="ai-agent-locked-message">{t('subscription.aiLockedMessage')}</p>
               <motion.button
                 type="button"
@@ -3021,6 +3022,7 @@ const Dashboard: React.FC = () => {
               >
                 {t('subscription.aiLockedCta')}
               </motion.button>
+              </div>
             </div>
           )}
         </motion.div>
