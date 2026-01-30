@@ -397,7 +397,7 @@
     "activated": "Premium activated. You can now use the Voice AI Assistant.",
     "errorActivating": "Error activating. Please try again.",
     "aiLockedTitle": "Voice AI Assistant",
-    "aiLockedMessage": "Unlock voice control with Premium.",
+    "aiLockedMessage": "Unlock voice control.",
     "aiLockedCta": "View plans",
     "cancelSubscription": "Cancel subscription",
     "canceled": "Subscription canceled. You no longer have Premium."

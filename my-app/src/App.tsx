@@ -247,7 +247,30 @@ function App() {
         <SubscriptionProvider>
           <Router>
             <AppRoutes />
-            <Toaster />
+            <Toaster
+              position="top-center"
+              gutter={12}
+              toastOptions={{
+                className: 'app-toast',
+                style: {
+                  background: 'var(--dark-section)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--bg-tertiary, rgba(255,255,255,0.08))',
+                  borderRadius: '12px',
+                  padding: '14px 18px',
+                  fontSize: '14px',
+                  fontFamily: 'var(--font-family, "DynaPuff", system-ui)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                },
+                success: {
+                  iconTheme: { primary: 'var(--primary)', secondary: 'var(--text-primary)' },
+                },
+                error: {
+                  iconTheme: { primary: 'var(--error)', secondary: 'var(--text-primary)' },
+                },
+                duration: 4000,
+              }}
+            />
           </Router>
         </SubscriptionProvider>
       </AuthProvider>

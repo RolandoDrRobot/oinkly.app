@@ -398,7 +398,7 @@
     "activated": "Premium activado. Tu asistente por voz está listo.",
     "errorActivating": "Error al activar. Intenta de nuevo.",
     "aiLockedTitle": "Tu asistente financiero por voz",
-    "aiLockedMessage": "Control por voz. Desbloquea con Premium.",
+    "aiLockedMessage": "Desbloquea control por voz.",
     "aiLockedCta": "Ver planes",
     "cancelSubscription": "Cancelar suscripción",
     "canceled": "Suscripción cancelada. Ya no tienes Premium."

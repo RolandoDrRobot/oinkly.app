@@ -36,7 +36,6 @@ import {
   FaMicrophone,
   FaMicrophoneSlash,
   FaPaperPlane,
-  FaLock,
   FaHome,
   FaCar,
   FaPiggyBank,
@@ -3010,9 +3009,8 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="ai-agent-locked">
               <div className="ai-agent-locked-row">
-                <Icon component={FaLock} className="ai-agent-locked-icon" />
+                <Icon component={FaMicrophone} className="ai-agent-locked-icon" />
                 <div className="card-lock">
-                  <p className="ai-agent-locked-message">{t('subscription.aiLockedMessage')}</p>
                   <motion.button
                     type="button"
                     className="ai-agent-locked-cta"
@@ -3020,7 +3018,7 @@ const Dashboard: React.FC = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => navigate('/subscription')}
                   >
-                    {t('subscription.aiLockedCta')}
+                    {t('subscription.aiLockedMessage')}
                   </motion.button>
                 </div>
               </div>

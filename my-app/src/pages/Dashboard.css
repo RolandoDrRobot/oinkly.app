@@ -139,7 +139,7 @@
 /* AI Agent Section */
 .ai-agent-section {
   margin-bottom: 24px;
-  padding: 20px 30px;
+  padding: 20px 15px;
   background: var(--dark-section);
   border-radius: 12px;
 }
@@ -220,17 +220,9 @@
   text-align: left;
 }
 
-.ai-agent-locked-message {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  text-align: center;
-}
-
 .ai-agent-locked-cta {
   width: 100%;
-  padding: 14px 28px;
+  padding: 14px 4px;
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
