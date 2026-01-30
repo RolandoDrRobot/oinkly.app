@@ -9,7 +9,6 @@ import {
   FaFileContract,
   FaDownload,
   FaCrown,
-  FaChevronRight,
   FaSignOutAlt,
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
@@ -50,20 +49,24 @@ const Profile: React.FC = () => {
       transition={{ duration: 0.25 }}
       className="profile"
     >
-      <header className="profile-header">
-        <motion.button
-          type="button"
-          aria-label={t('common.back')}
-          className="profile-back"
-          onClick={() => navigate('/dashboard')}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Icon component={FaArrowLeft} size={20} />
-        </motion.button>
-        <h1 className="profile-header-title">{t('profile.title')}</h1>
-        <div className="profile-header-spacer" />
-      </header>
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="page-header"
+      >
+        <div className="header-content">
+          <h1>{t('profile.title')}</h1>
+          <motion.button
+            type="button"
+            className="btn-back"
+            onClick={() => navigate('/dashboard')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
+          </motion.button>
+        </div>
+      </motion.header>
 
       <div className="profile-content">
         <motion.section
@@ -112,13 +115,11 @@ const Profile: React.FC = () => {
                   type="button"
                   className="profile-action-btn"
                   onClick={item.onClick}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span className="profile-action-icon">
-                    <Icon component={item.icon} size={20} />
-                  </span>
-                  <span className="profile-action-label">{item.label}</span>
-                  <Icon component={FaChevronRight} className="profile-action-chevron" size={14} />
+                  <Icon component={item.icon} style={{ marginRight: '8px' }} size={20} />
+                  {item.label}
                 </motion.button>
               </li>
             ))}
@@ -135,12 +136,11 @@ const Profile: React.FC = () => {
                 console.error(e);
               }
             }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="profile-action-icon profile-logout-icon">
-              <Icon component={FaSignOutAlt} size={20} />
-            </span>
-            <span className="profile-action-label">{t('profile.logout')}</span>
+            <Icon component={FaSignOutAlt} style={{ marginRight: '8px' }} size={20} />
+            {t('profile.logout')}
           </motion.button>
         </motion.section>
       </div>

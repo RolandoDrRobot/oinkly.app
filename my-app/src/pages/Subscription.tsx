@@ -78,7 +78,7 @@ const Subscription: React.FC = () => {
         >
           <div className="plan-badge">{t('subscription.recommended')}</div>
           <h3 className="plan-name">
-            <Icon component={FaMicrophone} style={{ marginRight: '8px' }} />
+            <Icon component={FaMicrophone} className="plan-icon-mic" style={{ marginRight: '8px' }} />
             {t('subscription.planPremium')}
           </h3>
           <p className="plan-price">{t('subscription.premiumPrice')}</p>

@@ -1,4 +1,4 @@
-/* Profile — modern, sober UI */
+/* Profile — same header UI as Preferences, Terms */
 
 .profile {
   min-height: 100vh;
@@ -6,44 +6,43 @@
   padding-bottom: env(safe-area-inset-bottom, 24px);
 }
 
-.profile-header {
+.profile .page-header {
+  color: var(--text-primary);
+  padding: 20px 20px 0 20px;
+  padding-bottom: 0;
+}
+
+.profile .header-content {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 24px;
-  gap: 12px;
+  align-items: center;
+  max-width: 100%;
 }
 
-.profile-back {
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--dark-section, rgba(255, 255, 255, 0.06));
+.profile .page-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -1px;
+}
+
+.profile .btn-back {
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.profile-back:hover {
-  background: var(--overlay-light, rgba(255, 255, 255, 0.08));
-  color: var(--primary);
-}
-
-.profile-header-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  background: transparent;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
 }
 
-.profile-header-spacer {
-  width: 44px;
-  flex-shrink: 0;
+.profile .btn-back:hover {
+  background: var(--overlay-light);
 }
 
 .profile-content {
@@ -134,68 +133,47 @@
   border-bottom: 0;
 }
 
+/* Same UI as header btn-back (Preferences / Terms) */
 .profile-action-btn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
+  padding: 10px 16px;
   border: 0;
+  border-radius: 10px;
   background: transparent;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .profile-action-btn:hover {
-  background: var(--overlay-light, rgba(255, 255, 255, 0.06));
+  background: var(--overlay-light);
 }
 
-.profile-action-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--overlay-light, rgba(255, 255, 255, 0.06));
+.profile-action-btn svg {
+  flex-shrink: 0;
   color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
-.profile-action-btn:hover .profile-action-icon {
-  background: var(--primary-overlay, rgba(86, 154, 60, 0.15));
-}
-
-.profile-action-label {
-  flex: 1;
-}
-
-.profile-action-chevron {
-  color: var(--text-muted);
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-/* Logout */
+/* Logout: same structure, destructive style */
 .profile-logout-btn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
+  padding: 10px 16px;
   border: 1px solid var(--bg-tertiary, rgba(255, 255, 255, 0.08));
-  border-radius: 16px;
+  border-radius: 10px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition: all 0.2s;
 }
 
 .profile-logout-btn:hover {
@@ -204,12 +182,11 @@
   color: var(--error);
 }
 
-.profile-logout-icon {
-  background: var(--overlay-light, rgba(255, 255, 255, 0.06));
+.profile-logout-btn svg {
+  flex-shrink: 0;
   color: var(--text-muted);
 }
 
-.profile-logout-btn:hover .profile-logout-icon {
-  background: var(--error-light, rgba(220, 38, 38, 0.15));
+.profile-logout-btn:hover svg {
   color: var(--error);
 }
