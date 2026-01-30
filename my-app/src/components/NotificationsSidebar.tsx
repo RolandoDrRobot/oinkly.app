@@ -49,10 +49,8 @@ const NotificationsSidebar: React.FC<NotificationsSidebarProps> = ({ isOpen, onC
   };
 
   const handleClearAll = () => {
-    if (window.confirm(t('notifications.clearAllConfirm'))) {
-      storage.clearAllNotifications();
-      loadNotifications();
-    }
+    storage.clearAllNotifications();
+    loadNotifications();
   };
 
   const formatDate = (dateString: string) => {
