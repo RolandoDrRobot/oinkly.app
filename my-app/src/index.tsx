@@ -12,3 +12,10 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const base = process.env.PUBLIC_URL || '';
+    navigator.serviceWorker.register(`${base}/service-worker.js`).catch(() => {});
+  });
+}
