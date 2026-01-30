@@ -346,6 +346,7 @@
   },
   "preferences": {
     "title": "Preferences",
+    "goToDashboard": "Go to Dashboard",
     "appearance": "Appearance",
     "themeMode": "Theme Mode",
     "light": "Light",

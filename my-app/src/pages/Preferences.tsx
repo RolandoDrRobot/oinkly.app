@@ -35,6 +35,7 @@ const Preferences: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [localCurrency, setLocalCurrencyState] = useState<string>(storage.getLocalCurrency());
   const [language, setLanguageState] = useState<string>(storage.getLanguage());
+  const isFirstTime = !localStorage.getItem('hasSeenInitialSetup');
 
   useEffect(() => {
     setLocalCurrencyState(storage.getLocalCurrency());
@@ -50,6 +51,15 @@ const Preferences: React.FC = () => {
     storage.setLanguage(lang);
     i18n.changeLanguage(lang);
     setLanguageState(lang);
+  };
+
+  const handleHeaderAction = () => {
+    if (isFirstTime) {
+      localStorage.setItem('hasSeenInitialSetup', '1');
+      navigate('/dashboard', { replace: true });
+    } else {
+      navigate('/profile');
+    }
   };
 
   return (
@@ -69,13 +79,18 @@ const Preferences: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-back"
-              onClick={() => {
-                localStorage.setItem('hasSeenInitialSetup', '1');
-                navigate('/profile');
-              }}
+              className={isFirstTime ? 'btn-go-dashboard' : 'btn-back'}
+              onClick={handleHeaderAction}
             >
-              <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
+              {isFirstTime ? (
+                <>
+                  <Icon component={FaCheck} style={{ marginRight: '8px' }} /> {t('preferences.goToDashboard')}
+                </>
+              ) : (
+                <>
+                  <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
+                </>
+              )}
             </motion.button>
           </div>
         </motion.header>

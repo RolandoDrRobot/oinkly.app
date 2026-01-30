@@ -347,6 +347,7 @@
   },
   "preferences": {
     "title": "Preferencias",
+    "goToDashboard": "Ir al inicio",
     "appearance": "Apariencia",
     "themeMode": "Modo de Tema",
     "light": "Claro",

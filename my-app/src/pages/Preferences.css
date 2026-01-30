@@ -24,23 +24,35 @@
   letter-spacing: -1px;
 }
 
-.btn-back {
+.btn-back,
+.btn-go-dashboard {
   border: 0;
-  
-  background: transparent;
-  
-  color: var(--text-primary);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
 }
 
+.btn-back {
+  background: transparent;
+  color: var(--text-primary);
+}
+
 .btn-back:hover {
-  
+  background: var(--overlay-light);
+}
+
+.btn-go-dashboard {
+  background: var(--primary);
+  color: var(--text-primary);
+}
+
+.btn-go-dashboard:hover {
+  filter: brightness(1.1);
 }
 
 .preferences-content {
