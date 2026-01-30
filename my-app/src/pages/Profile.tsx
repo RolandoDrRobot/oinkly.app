@@ -97,9 +97,9 @@ const Profile: React.FC = () => {
               <Icon component={FaUser} size={40} />
             </span>
           </div>
-          <div>
-          <h2 className="profile-name">{displayUser?.name ?? '—'}</h2>
-          <p className="profile-email">{displayUser?.email ?? '—'}</p>
+          <div className="profile-user-info">
+            <h2 className="profile-name">{displayUser?.name ?? '—'}</h2>
+            <p className="profile-email">{displayUser?.email ?? '—'}</p>
           </div>
         </motion.section>
 

@@ -3009,19 +3009,20 @@ const Dashboard: React.FC = () => {
             </form>
           ) : (
             <div className="ai-agent-locked">
-              <Icon component={FaLock} className="ai-agent-locked-icon" />
-              <div className='card-lock'>
-              <h3 className="ai-agent-section-title">{t('aiAgent.title')}</h3>
-              <p className="ai-agent-locked-message">{t('subscription.aiLockedMessage')}</p>
-              <motion.button
-                type="button"
-                className="ai-agent-locked-cta"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate('/subscription')}
-              >
-                {t('subscription.aiLockedCta')}
-              </motion.button>
+              <div className="ai-agent-locked-row">
+                <Icon component={FaLock} className="ai-agent-locked-icon" />
+                <div className="card-lock">
+                  <p className="ai-agent-locked-message">{t('subscription.aiLockedMessage')}</p>
+                  <motion.button
+                    type="button"
+                    className="ai-agent-locked-cta"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/subscription')}
+                  >
+                    {t('subscription.aiLockedCta')}
+                  </motion.button>
+                </div>
               </div>
             </div>
           )}

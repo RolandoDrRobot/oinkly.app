@@ -2,7 +2,7 @@
   min-height: 100vh;
   max-height: 100vh;
   background: var(--dark-bg);
-  padding-bottom: 70px;
+  padding-bottom: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -182,10 +182,22 @@
 
 .ai-agent-locked {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.ai-agent-section-title {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.ai-agent-locked-row {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  gap: 0;
 }
 
 .ai-agent-locked-icon {
@@ -197,21 +209,23 @@
   animation: ai-lock-float 2.2s ease-in-out infinite, ai-lock-glow 1.8s ease-in-out infinite;
 }
 
-.ai-agent-locked-message {
-  margin: 0 autp 16px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  text-align: center;
-}
-
 .card-lock {
-  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
   padding: 0 0 0 24px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+}
+
+.ai-agent-locked-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  text-align: center;
 }
 
 .ai-agent-locked-cta {

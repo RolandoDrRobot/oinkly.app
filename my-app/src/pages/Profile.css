@@ -91,6 +91,11 @@
   justify-content: center;
 }
 
+.profile-user-info {
+  overflow: hidden;
+  min-width: 0;
+}
+
 .profile-name {
   margin: 0 0 4px;
   padding: 0 0 0 15px;
@@ -98,6 +103,9 @@
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-email {
@@ -105,6 +113,9 @@
   padding: 0 0 0 15px;
   font-size: 14px;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Actions list */
