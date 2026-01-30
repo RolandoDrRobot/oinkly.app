@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaMicrophone, FaLock, FaCreditCard } from 'react-icons/fa';
@@ -13,10 +13,8 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Subscribe: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const plan = searchParams.get('plan') || 'premium';
   const { activatePremium } = useSubscription();
-  const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
+  const [interval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePay = async () => {
@@ -77,7 +75,7 @@ const Subscribe: React.FC = () => {
             <button
               type="button"
               className={`interval-btn ${interval === 'monthly' ? 'active' : ''}`}
-              onClick={() => setInterval('monthly')}
+              onClick={() => setBillingInterval('monthly')}
             >
               <span>{t('subscription.monthly')}</span>
               <span className="interval-price">{priceMonthly}</span>
@@ -85,7 +83,7 @@ const Subscribe: React.FC = () => {
             <button
               type="button"
               className={`interval-btn ${interval === 'yearly' ? 'active' : ''}`}
-              onClick={() => setInterval('yearly')}
+              onClick={() => setBillingInterval('yearly')}
             >
               <span>{t('subscription.yearly')}</span>
               <span className="interval-price">{priceYearly}</span>

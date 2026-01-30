@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { FaTimes } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
-import { formatCurrencyInput, parseCurrencyInput, formatNumberWithSeparators, getCurrencyForField } from '../utils/currencyFormatter';
+import { formatCurrencyInput, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import { notify } from '../utils/notifications';
-import { FaCheckCircle } from 'react-icons/fa';
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -166,39 +165,6 @@ const EditCommitmentModal: React.FC<EditCommitmentModalProps> = ({
     const value = formData[field as keyof typeof formData];
     if (value === undefined || value === null || value === 0) return '';
     return formatCurrencyInput(value, currency);
-  };
-
-  const formatCurrency = (amount: number, currency: string) => {
-    const currencyMap: { [key: string]: string } = {
-      'USD': 'USD',
-      'MXN': 'MXN',
-      'ARS': 'ARS',
-      'CLP': 'CLP',
-      'COP': 'COP',
-      'PEN': 'PEN',
-      'BRL': 'BRL',
-      'CRC': 'CRC',
-      'GTQ': 'GTQ',
-      'PAB': 'PAB',
-      'DOP': 'DOP',
-      'VES': 'VES',
-      'UYU': 'UYU',
-      'PYG': 'PYG',
-      'BOB': 'BOB',
-      'HNL': 'HNL',
-      'NIO': 'NIO',
-    };
-    
-    const currencyCode = currencyMap[currency] || 'USD';
-    
-    try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currencyCode,
-      }).format(amount);
-    } catch (e) {
-      return `${currencyCode} ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    }
   };
 
   if (!isOpen) return null;

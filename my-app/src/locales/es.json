@@ -279,10 +279,11 @@
     "title": "Editar Compromiso",
     "subtitle": "Actualicemos el compromiso para {{debtName}}",
     "date": "Fecha",
-    "amountLocal": "Monto",
+    "amountLocal": "Monto (Local)",
     "amountDollar": "Monto (USD)",
     "notesOptional": "Notas (opcional)",
-    "notesPlaceholder": "Notas adicionales sobre este compromiso"
+    "notesPlaceholder": "Agregar notas...",
+    "cannotEditCompleted": "No puedes editar un compromiso completado. Si necesitas ajustar el total de la deuda, por favor edita la deuda directamente y crea un nuevo compromiso."
   },
   "addCall": {
     "title": "Registrar Llamada",
@@ -394,15 +395,6 @@
     "deleteConfirm": "¿Estás seguro de que quieres eliminar este compromiso?",
     "editCommitment": "Editar compromiso",
     "completedOn": "Completado:"
-  },
-  "editCommitment": {
-    "title": "Editar Compromiso",
-    "date": "Fecha",
-    "amountLocal": "Monto (Local)",
-    "amountDollar": "Monto (USD)",
-    "notesOptional": "Notas (opcional)",
-    "notesPlaceholder": "Agregar notas...",
-    "cannotEditCompleted": "No puedes editar un compromiso completado. Si necesitas ajustar el total de la deuda, por favor edita la deuda directamente y crea un nuevo compromiso."
   },
   "notifications": {
     "title": "Notificaciones",

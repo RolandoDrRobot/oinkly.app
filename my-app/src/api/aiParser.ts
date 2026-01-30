@@ -381,7 +381,7 @@ function parseNaturalAsset(text: string): { name: string; valueLocal?: number; v
   if (!name) name = 'Activo';
 
   let purchaseDate: string | undefined;
-  const fechaCompraMatch = text.match(/(?:comprado|compra|adquirido)\s+(?:el\s+)?(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/i);
+  const fechaCompraMatch = text.match(/(?:comprado|compra|adquirido)\s+(?:el\s+)?(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/i);
   if (fechaCompraMatch) {
     const [, d, m, y] = fechaCompraMatch;
     const year = y.length === 2 ? 2000 + parseInt(y, 10) : parseInt(y, 10);
