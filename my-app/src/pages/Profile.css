@@ -64,6 +64,33 @@
   align-items: center;
 }
 
+/* Premium: efecto caja destacada cuando la suscripción está activa */
+@keyframes profile-card-premium-shine {
+  0%, 100% { border-color: rgba(244, 192, 50, 0.35); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(244, 192, 50, 0.2); }
+  50% { border-color: rgba(244, 192, 50, 0.55); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 20px rgba(244, 192, 50, 0.15); }
+}
+
+.profile-card-premium {
+  border: 2px solid rgba(244, 192, 50, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(244, 192, 50, 0.15);
+  animation: profile-card-premium-shine 2.5s ease-in-out infinite;
+}
+
+.profile-card-premium:hover {
+  animation: none;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12), 0 0 24px rgba(244, 192, 50, 0.2);
+}
+
+.profile-card-premium .profile-avatar-wrap {
+  border: 3px solid rgba(244, 192, 50, 0.5);
+  box-shadow: 0 0 0 1px rgba(244, 192, 50, 0.2), inset 0 0 0 1px rgba(244, 192, 50, 0.1);
+}
+
+.profile-card-premium:hover .profile-avatar-wrap {
+  animation: none;
+  border-color: rgba(244, 192, 50, 0.6);
+}
+
 .profile-avatar-wrap {
   width: 88px;
   height: 88px;
@@ -77,6 +104,9 @@
   justify-content: center;
   overflow: hidden;
   color: var(--primary);
+  border: 3px solid transparent;
+  box-shadow: none;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
   flex-shrink: 0;
 }
 
@@ -116,6 +146,37 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Badge Premium en la tarjeta de perfil: solo texto e icono dorados, sin fondo */
+@keyframes profile-premium-badge-glow {
+  0%, 100% { opacity: 0.9; filter: drop-shadow(0 0 4px rgba(244, 192, 50, 0.4)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(244, 192, 50, 0.6)); }
+}
+
+.profile-premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0 15px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #f4c032;
+  background: none;
+  white-space: nowrap;
+  animation: profile-premium-badge-glow 2s ease-in-out infinite;
+}
+
+.profile-premium-badge-icon {
+  flex-shrink: 0;
+  color: #f4c032;
+}
+
+.profile-card-premium:hover .profile-premium-badge {
+  animation: none;
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(244, 192, 50, 0.5));
 }
 
 /* Actions list */
@@ -190,7 +251,7 @@
   opacity: 0.7;
 }
 
-/* Subscription button: incentiva la compra (pulse, destacado) */
+/* Subscription button: incentiva la compra (pulse, destacado) + icono micrófono con animación */
 @keyframes profile-subscription-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(86, 154, 60, 0.35); }
   50% { box-shadow: 0 0 0 10px rgba(86, 154, 60, 0); }
@@ -199,6 +260,16 @@
 @keyframes profile-subscription-shine {
   0%, 100% { border-color: rgba(244, 192, 50, 0.3); }
   50% { border-color: rgba(244, 192, 50, 0.6); }
+}
+
+@keyframes profile-subscription-icon-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.05); }
+}
+
+@keyframes profile-subscription-icon-glow {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 6px rgba(244, 192, 50, 0.4)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 12px rgba(244, 192, 50, 0.7)); }
 }
 
 .profile-action-subscription {
@@ -212,6 +283,7 @@
 .profile-action-subscription .profile-action-icon {
   background: #f4c032;
   color: var(--dark-bg, #1a1a0f);
+  animation: profile-subscription-icon-float 2.2s ease-in-out infinite, profile-subscription-icon-glow 1.8s ease-in-out infinite;
 }
 
 .profile-action-subscription:hover {

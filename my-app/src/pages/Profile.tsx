@@ -8,11 +8,13 @@ import {
   FaCog,
   FaFileContract,
   FaDownload,
-  FaCrown,
+  FaMicrophone,
   FaChevronRight,
   FaSignOutAlt,
+  FaCrown,
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { exportAllDataToCSV } from '../utils/export';
 import './Profile.css';
 
@@ -22,6 +24,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Profile: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+  const { isPremium } = useSubscription();
   const navigate = useNavigate();
   const displayUser =
     user ||
@@ -38,7 +41,7 @@ const Profile: React.FC = () => {
 
   const actions = [
     { id: 'preferences', icon: FaCog, label: t('profile.preferences'), onClick: () => navigate('/preferences') },
-    { id: 'subscription', icon: FaCrown, label: t('profile.subscription'), onClick: () => navigate('/subscription') },
+    { id: 'subscription', icon: FaMicrophone, label: t('profile.subscription'), onClick: () => navigate('/subscription', { state: { from: 'profile' } }) },
     { id: 'terms', icon: FaFileContract, label: t('profile.termsAndConditions'), onClick: () => navigate('/terms') },
     { id: 'export', icon: FaDownload, label: t('profile.exportData'), onClick: exportAllDataToCSV },
   ];
@@ -74,7 +77,7 @@ const Profile: React.FC = () => {
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.05 }}
-          className="profile-card"
+          className={`profile-card ${isPremium ? 'profile-card-premium' : ''}`}
         >
           <div className="profile-avatar-wrap">
             {displayUser?.avatarUrl ? (
@@ -100,6 +103,12 @@ const Profile: React.FC = () => {
           <div className="profile-user-info">
             <h2 className="profile-name">{displayUser?.name ?? '—'}</h2>
             <p className="profile-email">{displayUser?.email ?? '—'}</p>
+            {isPremium && (
+              <span className="profile-premium-badge">
+                <Icon component={FaCrown} className="profile-premium-badge-icon" size={14} />
+                {t('profile.premiumBadge')}
+              </span>
+            )}
           </div>
         </motion.section>
 
@@ -114,7 +123,7 @@ const Profile: React.FC = () => {
               <li key={item.id}>
                 <motion.button
                   type="button"
-                  className={`profile-action-btn ${item.id === 'subscription' ? 'profile-action-subscription' : ''}`}
+                  className={`profile-action-btn ${item.id === 'subscription' && !isPremium ? 'profile-action-subscription' : ''}`}
                   onClick={item.onClick}
                   whileTap={{ scale: 0.98 }}
                 >

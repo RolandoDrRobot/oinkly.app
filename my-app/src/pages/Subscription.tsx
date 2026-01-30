@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaMicrophone, FaCheck, FaCrown, FaTimes } from 'react-icons/fa';
@@ -13,7 +13,14 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Subscription: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { subscription, isPremium, cancelSubscription } = useSubscription();
+
+  const handleBack = () => {
+    const from = (location.state as { from?: string } | null)?.from;
+    if (from === 'profile') navigate('/profile');
+    else navigate('/dashboard');
+  };
 
   const handleCancelSubscription = () => {
     cancelSubscription();
@@ -38,7 +45,7 @@ const Subscription: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="btn-back"
-            onClick={() => navigate('/profile')}
+            onClick={handleBack}
           >
             <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
           </motion.button>

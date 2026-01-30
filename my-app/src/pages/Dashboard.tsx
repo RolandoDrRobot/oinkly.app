@@ -3016,7 +3016,7 @@ const Dashboard: React.FC = () => {
                     className="ai-agent-locked-cta"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate('/subscription')}
+                    onClick={() => navigate('/subscription', { state: { from: 'dashboard' } })}
                   >
                     {t('subscription.aiLockedMessage')}
                   </motion.button>
