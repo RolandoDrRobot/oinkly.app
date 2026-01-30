@@ -45,8 +45,10 @@ export async function executeAIAction(
   context: AIExecutorContext
 ): Promise<AIActionResult> {
   const { navigate } = context;
+  console.log('[AI Executor] executeAIAction – type:', action.type, 'params:', action.params);
 
   if (!action.type || !isValidAIIntent(action.type)) {
+    console.log('[AI Executor] invalid action type:', action.type);
     return { success: false, error: 'Invalid action type' };
   }
 
@@ -105,6 +107,7 @@ export async function executeAIAction(
         };
         storage.saveDebt(newDebt);
         notify.overviewUpdated();
+        notify.entryCreated('debt', newDebt.name);
         return { success: true, message: 'Debt created', data: { debtId: newDebt.id } };
       }
 
@@ -311,6 +314,7 @@ export async function executeAIAction(
         };
         storage.saveFixedExpense(newExpense);
         notify.overviewUpdated();
+        notify.entryCreated('fixed_expense', newExpense.name);
         return { success: true, message: 'Fixed expense created', data: { expenseId: newExpense.id } };
       }
 
@@ -420,6 +424,8 @@ export async function executeAIAction(
         };
         storage.saveIncome(newIncome);
         notify.overviewUpdated();
+        notify.entryCreated('income', newIncome.name);
+        console.log('[AI Executor] add_income OK – id:', newIncome.id, 'name:', newIncome.name);
         return { success: true, message: 'Income created', data: { incomeId: newIncome.id } };
       }
 

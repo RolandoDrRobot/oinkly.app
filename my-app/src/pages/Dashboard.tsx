@@ -121,6 +121,7 @@ const Dashboard: React.FC = () => {
   const [aiInputText, setAiInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const speechTranscriptRef = useRef('');
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
 
@@ -766,25 +767,45 @@ const Dashboard: React.FC = () => {
   const handleAIUserInput = async (text: string) => {
     if (!text.trim()) return;
 
+    console.log('[AI Voice] handleAIUserInput – text:', JSON.stringify(text), 'debts.length:', debts.length);
     setAiInputText('');
     setIsProcessing(true);
 
     const action = parseTextToAIAction(text, debts);
+    console.log('[AI Voice] handleAIUserInput – action from parser:', action);
+
     const lang = i18n.language.startsWith('es') ? 'es' : 'en';
 
     if (action) {
+      console.log('[AI Voice] handleAIUserInput – executing action:', action.type, action.params);
       const result = await executeAIAction(action, { navigate });
+      console.log('[AI Voice] handleAIUserInput – result:', result);
       if (action.type === 'toggle_hide_amounts') {
         toggleHideAmounts();
+      }
+      // Refresh lists so new/updated/deleted entries appear without reload
+      if (result.success) {
+        const debtRelated = ['add_debt', 'edit_debt', 'delete_debt', 'add_commitment', 'edit_commitment', 'delete_commitment', 'complete_commitment', 'add_call', 'edit_call', 'delete_call'].includes(action.type);
+        const fixedExpenseRelated = ['add_fixed_expense', 'edit_fixed_expense', 'delete_fixed_expense'].includes(action.type);
+        const assetRelated = ['add_asset', 'edit_asset', 'delete_asset'].includes(action.type);
+        const incomeRelated = ['add_income', 'edit_income', 'delete_income'].includes(action.type);
+        if (debtRelated) loadDebts();
+        if (fixedExpenseRelated) loadFixedExpenses();
+        if (assetRelated) loadAssets();
+        if (incomeRelated) loadIncomes();
+        updateUnreadNotificationsCount();
       }
       const message = getMessageForActionResult(action, result, lang);
       if (result.success && (action.type === 'get_overview' || action.type === 'get_debts')) {
         toast.success(message, { duration: 6000 });
+      } else if (result.success && ['add_debt', 'add_income', 'add_fixed_expense', 'add_asset'].includes(action.type)) {
+        toast.success(message, { duration: 4000 });
       } else if (!result.success && result.error) {
         toast.error(result.error);
       }
       setIsProcessing(false);
     } else {
+      console.log('[AI Voice] handleAIUserInput – no action (parser returned null)');
       toast.error(t('aiAgent.notUnderstood'));
       setIsProcessing(false);
     }
@@ -794,20 +815,25 @@ const Dashboard: React.FC = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
       const recognition = new SpeechRecognition();
-      
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      // Permite pausas al hablar: no se corta hasta que el usuario pulse parar
+      recognition.continuous = true;
+      recognition.interimResults = true;
       recognition.lang = i18n.language === 'es' ? 'es-ES' : 'en-US';
 
       recognition.onstart = () => {
+        speechTranscriptRef.current = '';
+        setAiInputText('');
         setIsListening(true);
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setAiInputText(transcript);
-        handleAIUserInput(transcript);
-        setIsListening(false);
+        let fullTranscript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          fullTranscript += event.results[i][0].transcript;
+          if (i < event.results.length - 1) fullTranscript += ' ';
+        }
+        speechTranscriptRef.current = fullTranscript;
+        setAiInputText(fullTranscript);
       };
 
       recognition.onerror = (event: any) => {
@@ -847,6 +873,14 @@ const Dashboard: React.FC = () => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
+      const transcript = speechTranscriptRef.current.trim();
+      console.log('[AI Voice] stopListening – transcript:', transcript, 'length:', transcript.length);
+      if (transcript) {
+        handleAIUserInput(transcript);
+      } else {
+        console.log('[AI Voice] stopListening – transcript vacío, no se llama handleAIUserInput');
+      }
+      speechTranscriptRef.current = '';
     }
   };
 

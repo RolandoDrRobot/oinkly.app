@@ -149,6 +149,13 @@ export const notify = {
     // Only save to sidebar, don't show toast
     saveNotification(message, 'info');
   },
+
+  // When an entry is created (debt, income, fixed expense, asset) – e.g. via AI
+  entryCreated: (entryType: 'debt' | 'income' | 'fixed_expense' | 'asset', name: string) => {
+    const key = `notifications.entryCreated${entryType === 'fixed_expense' ? 'FixedExpense' : entryType.charAt(0).toUpperCase() + entryType.slice(1)}`;
+    const message = t(key, { name });
+    saveNotification(message, 'success');
+  },
 };
 
 export { Toaster };
