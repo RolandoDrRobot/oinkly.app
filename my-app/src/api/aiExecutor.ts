@@ -36,6 +36,21 @@ function str(p: unknown): string {
   return '';
 }
 
+/** Convierte fecha ISO o día del mes (1-31) a ISO string para paymentDate/cutDate. */
+function toDateISO(p: unknown): string | undefined {
+  if (p == null || p === '') return undefined;
+  const s = str(p).trim();
+  if (!s) return undefined;
+  const dayNum = parseInt(s, 10);
+  if (dayNum >= 1 && dayNum <= 31 && s === String(dayNum)) {
+    const d = new Date();
+    d.setDate(dayNum);
+    return d.toISOString().slice(0, 10);
+  }
+  const parsed = new Date(s);
+  return isNaN(parsed.getTime()) ? undefined : parsed.toISOString().slice(0, 10);
+}
+
 export interface AIExecutorContext {
   navigate: (path: string) => void;
 }
@@ -97,9 +112,9 @@ export async function executeAIAction(
           currentPlan: str(params.currentPlan),
           bankName: str(params.bankName),
           bankPhone: str(params.bankPhone) || undefined,
-          paymentDate: params.paymentDate ? new Date(str(params.paymentDate)).toISOString() : undefined,
-          cutDate: params.cutDate ? new Date(str(params.cutDate)).toISOString() : undefined,
-          interestRate: typeof params.interestRate === 'number' ? params.interestRate : undefined,
+          paymentDate: toDateISO(params.paymentDate),
+          cutDate: toDateISO(params.cutDate),
+          interestRate: (params.interestRate !== undefined && params.interestRate !== null) ? num(params.interestRate) : undefined,
           hasCallTask: Boolean(params.hasCallTask),
           callCompleted: false,
           createdAt: now,
@@ -127,8 +142,8 @@ export async function executeAIAction(
           ...(params.feeToUpdate !== undefined && { feeToUpdate: num(params.feeToUpdate) }),
           ...(params.feeToUpdateDollars !== undefined && { feeToUpdateDollars: num(params.feeToUpdateDollars) }),
           ...(params.currentPlan !== undefined && { currentPlan: str(params.currentPlan) }),
-          ...(params.paymentDate !== undefined && { paymentDate: new Date(str(params.paymentDate)).toISOString() }),
-          ...(params.cutDate !== undefined && { cutDate: new Date(str(params.cutDate)).toISOString() }),
+          ...(params.paymentDate !== undefined && toDateISO(params.paymentDate) && { paymentDate: toDateISO(params.paymentDate)! }),
+          ...(params.cutDate !== undefined && toDateISO(params.cutDate) && { cutDate: toDateISO(params.cutDate)! }),
           ...(params.interestRate !== undefined && { interestRate: num(params.interestRate) }),
           ...(params.hasCallTask !== undefined && { hasCallTask: Boolean(params.hasCallTask) }),
           ...(params.callCompleted !== undefined && { callCompleted: Boolean(params.callCompleted) }),

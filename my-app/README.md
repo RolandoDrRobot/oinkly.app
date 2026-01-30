@@ -30,6 +30,15 @@ Este proyecto utiliza Supabase para autenticación con Google OAuth.
 - El archivo `.env` está en `.gitignore` y no se subirá al repositorio
 - Asegúrate de tener las variables de entorno configuradas antes de ejecutar la aplicación
 
+## Control por voz y IA (opcional)
+
+Para que la app interprete instrucciones en lenguaje natural con una IA externa (OpenAI u compatible), añade en `.env`:
+
+- `REACT_APP_OPENAI_API_KEY` (o `REACT_APP_AI_VOICE_API_KEY`) — API key del servicio.
+- Opcional: `REACT_APP_AI_VOICE_API_URL` (endpoint de chat), `REACT_APP_OPENAI_MODEL` (p. ej. `gpt-4o-mini`).
+
+Sin estas variables, la app sigue funcionando con el parser local (keywords en español/inglés). Ver [docs/VOZ_Y_IA.md](docs/VOZ_Y_IA.md) para el mapeo lenguaje natural → acciones.
+
 ## Scripts disponibles
 
 En el directorio del proyecto, puedes ejecutar:

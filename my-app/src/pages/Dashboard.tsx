@@ -62,7 +62,7 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
-import { executeAIAction, parseTextToAIAction, getMessageForActionResult } from '../api';
+import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
 import toast from 'react-hot-toast';
 import './Dashboard.css';
 
@@ -771,10 +771,27 @@ const Dashboard: React.FC = () => {
     setAiInputText('');
     setIsProcessing(true);
 
-    const action = parseTextToAIAction(text, debts);
-    console.log('[AI Voice] handleAIUserInput – action from parser:', action);
-
     const lang = i18n.language.startsWith('es') ? 'es' : 'en';
+    let action = null;
+
+    // Intentar primero interpretación con IA externa si está configurada
+    if (isAIVoiceEnabled()) {
+      action = await interpretWithAI(text, {
+        lang,
+        debts: debts.map((d) => ({ id: d.id, name: d.name })),
+        fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
+        assets: assets.map((a) => ({ id: a.id, name: a.name })),
+        incomes: incomes.map((i) => ({ id: i.id, name: i.name })),
+        overview: getSummaryText(lang),
+      });
+      console.log('[AI Voice] handleAIUserInput – action from AI:', action);
+    }
+
+    // Fallback al parser local si la IA no devolvió acción
+    if (!action) {
+      action = parseTextToAIAction(text, debts);
+      console.log('[AI Voice] handleAIUserInput – action from parser:', action);
+    }
 
     if (action) {
       console.log('[AI Voice] handleAIUserInput – executing action:', action.type, action.params);
@@ -806,7 +823,24 @@ const Dashboard: React.FC = () => {
       setIsProcessing(false);
     } else {
       console.log('[AI Voice] handleAIUserInput – no action (parser returned null)');
-      toast.error(t('aiAgent.notUnderstood'));
+      const apiError = getLastAIVoiceError();
+      if (apiError === 'quota') {
+        toast.error(
+          lang === 'es'
+            ? 'Cuota de OpenAI agotada. Revisa tu plan y facturación en platform.openai.com'
+            : 'OpenAI quota exceeded. Check your plan and billing at platform.openai.com',
+          { duration: 8000 }
+        );
+      } else if (apiError === 'model_not_found') {
+        toast.error(
+          lang === 'es'
+            ? 'Modelo no disponible en tu cuenta. Prueba REACT_APP_OPENAI_MODEL=gpt-4o-mini en .env'
+            : 'Model not available on your account. Try REACT_APP_OPENAI_MODEL=gpt-4o-mini in .env',
+          { duration: 6000 }
+        );
+      } else {
+        toast.error(t('aiAgent.notUnderstood'));
+      }
       setIsProcessing(false);
     }
   };
