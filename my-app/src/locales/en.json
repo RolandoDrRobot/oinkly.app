@@ -290,6 +290,7 @@
   },
   "editCommitment": {
     "title": "Edit Commitment",
+    "subtitle": "Let's update the commitment for {{debtName}}",
     "date": "Date",
     "amountLocal": "Amount (Local)",
     "amountDollar": "Amount (USD)",
@@ -360,6 +361,8 @@
     "title": "Profile",
     "preferences": "Preferences",
     "subscription": "Subscription",
+    "installApp": "Install app",
+    "contact": "Contact",
     "premiumBadge": "Premium",
     "logout": "Logout",
     "termsAndConditions": "Terms & Privacy",
@@ -529,6 +532,7 @@
   "deleteCommitment": {
     "title": "Delete Commitment",
     "subtitle": "Are you sure you want to delete this commitment?",
+    "confirm": "Are you sure you want to delete this commitment?",
     "confirmMessage": "This action cannot be undone.",
     "success": "Commitment deleted successfully"
   },
@@ -674,5 +678,42 @@
     "childrenPrivacyText": "Oinkly is not intended for use by individuals under the age of 18. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.",
     "contactTitle": "9. Contact Us",
     "contactText": "If you have any questions about these Terms and Conditions or Privacy Policy, please contact us through the application's support channels or your preferred method of communication."
+  },
+  "contact": {
+    "title": "Contact",
+    "mapHeading": "Location",
+    "infoHeading": "Contact information",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "socialHeading": "Social media",
+    "formHeading": "Send a message",
+    "formName": "Name",
+    "formEmail": "Your email",
+    "formMessage": "Message",
+    "send": "Send",
+    "successMessage": "Message sent. We'll get back to you soon.",
+    "fillAllFields": "Please fill in all fields.",
+    "placeholderPhone": "506 7161 2344",
+    "placeholderEmail": "neodeveloper.eth@gmail.com",
+    "placeholderAddress": "Ulloa, Heredia, Costa Rica"
+  },
+  "installApp": {
+    "title": "Install Oinkly",
+    "subtitle": "Save the app to your home screen and open it like a native app. No store, no waiting.",
+    "installButton": "Install on this device",
+    "orManual": "Or add to home screen manually:",
+    "iosTitle": "On iPhone or iPad (Safari)",
+    "iosStep1": "Open Oinkly in Safari (not Chrome).",
+    "iosStep2": "Tap the Share button (square with arrow up) at the bottom or top.",
+    "iosStep3": "Scroll and tap «Add to Home Screen». Confirm with «Add».",
+    "androidTitle": "On Android (Chrome)",
+    "androidStep1": "Open Oinkly in Chrome.",
+    "androidStep2": "Tap the menu (three dots) at the top right.",
+    "androidStep3": "Tap «Install app» or «Add to Home Screen». Confirm.",
+    "benefit1": "Icon on your home screen",
+    "benefit2": "Opens full screen, no browser bar",
+    "benefit3": "Quick access like any other app",
+    "alreadyInstalled": "It looks like Oinkly is already installed. Find it on your home screen."
   }
 }

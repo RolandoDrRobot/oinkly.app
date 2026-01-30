@@ -28,6 +28,8 @@ import Preferences from './pages/Preferences';
 import Subscription from './pages/Subscription';
 import Subscribe from './pages/Subscribe';
 import TermsAndConditions from './pages/TermsAndConditions';
+import Contact from './pages/Contact';
+import InstallApp from './pages/InstallApp';
 import { Toaster } from './utils/notifications';
 import './App.css';
 
@@ -229,6 +231,22 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <TermsAndConditions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <ProtectedRoute>
+            <Contact />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/install-app"
+        element={
+          <ProtectedRoute>
+            <InstallApp />
           </ProtectedRoute>
         }
       />

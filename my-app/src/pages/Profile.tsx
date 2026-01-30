@@ -12,6 +12,8 @@ import {
   FaChevronRight,
   FaSignOutAlt,
   FaCrown,
+  FaEnvelope,
+  FaMobileAlt,
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -42,6 +44,8 @@ const Profile: React.FC = () => {
   const actions = [
     { id: 'preferences', icon: FaCog, label: t('profile.preferences'), onClick: () => navigate('/preferences') },
     { id: 'subscription', icon: FaMicrophone, label: t('profile.subscription'), onClick: () => navigate('/subscription', { state: { from: 'profile' } }) },
+    { id: 'installApp', icon: FaMobileAlt, label: t('profile.installApp'), onClick: () => navigate('/install-app') },
+    { id: 'contact', icon: FaEnvelope, label: t('profile.contact'), onClick: () => navigate('/contact') },
     { id: 'terms', icon: FaFileContract, label: t('profile.termsAndConditions'), onClick: () => navigate('/terms') },
     { id: 'export', icon: FaDownload, label: t('profile.exportData'), onClick: exportAllDataToCSV },
   ];

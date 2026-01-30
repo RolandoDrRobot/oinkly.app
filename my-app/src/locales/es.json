@@ -78,7 +78,7 @@
     "addPhone": "Agregar teléfono",
     "hideAmounts": "Ocultar montos",
     "showAmounts": "Mostrar montos",
-    "commitmentsNeedAttention": "{{count}} compromiso{{count, plural, one {} other {s}}} necesita{{count, plural, one {n} other {n}}} atención",
+    "commitmentsNeedAttention": "{{count}} compromiso{{count, plural, one {} other {s}}} necesita{{count, plural, one {} other {n}}} atención",
     "addFixedExpense": "Agregar Gasto Fijo",
     "expenseName": "Nombre del gasto",
     "category": "Categoría (opcional)",
@@ -361,6 +361,8 @@
     "title": "Perfil",
     "preferences": "Preferencias",
     "subscription": "Suscripción",
+    "installApp": "Instalar app",
+    "contact": "Contacto",
     "premiumBadge": "Premium",
     "logout": "Cerrar Sesión",
     "termsAndConditions": "Términos y Privacidad",
@@ -530,6 +532,7 @@
   "deleteCommitment": {
     "title": "Eliminar Compromiso",
     "subtitle": "¿Estás seguro de que quieres eliminar este compromiso?",
+    "confirm": "¿Estás seguro de que quieres eliminar este compromiso?",
     "confirmMessage": "Esta acción no se puede deshacer.",
     "success": "Compromiso eliminado exitosamente"
   },
@@ -675,5 +678,42 @@
     "childrenPrivacyText": "Oinkly no está destinado para uso por parte de personas menores de 18 años. No recopilamos conscientemente información personal de menores. Si eres padre o tutor y crees que tu hijo nos ha proporcionado información personal, por favor contáctanos inmediatamente.",
     "contactTitle": "9. Contáctanos",
     "contactText": "Si tienes alguna pregunta sobre estos Términos y Condiciones o la Política de Privacidad, por favor contáctanos a través de los canales de soporte de la aplicación o tu método preferido de comunicación."
+  },
+  "contact": {
+    "title": "Contacto",
+    "mapHeading": "Ubicación",
+    "infoHeading": "Información de contacto",
+    "phone": "Teléfono",
+    "email": "Correo electrónico",
+    "address": "Dirección",
+    "socialHeading": "Redes sociales",
+    "formHeading": "Enviar un mensaje",
+    "formName": "Nombre",
+    "formEmail": "Tu correo",
+    "formMessage": "Mensaje",
+    "send": "Enviar",
+    "successMessage": "Mensaje enviado. Te responderemos pronto.",
+    "fillAllFields": "Completa todos los campos.",
+    "placeholderPhone": "506 7161 2344",
+    "placeholderEmail": "neodeveloper.eth@gmail.com",
+    "placeholderAddress": "Ulloa, Heredia, Costa Rica"
+  },
+  "installApp": {
+    "title": "Instalar Oinkly",
+    "subtitle": "Guarda la app en tu pantalla de inicio y ábrela como una app nativa. Sin tienda, sin esperas.",
+    "installButton": "Instalar en este dispositivo",
+    "orManual": "O bien, añade a pantalla de inicio manualmente:",
+    "iosTitle": "En iPhone o iPad (Safari)",
+    "iosStep1": "Abre Oinkly en Safari (no en Chrome).",
+    "iosStep2": "Toca el botón Compartir (cuadrado con flecha hacia arriba) abajo o arriba.",
+    "iosStep3": "Desplázate y toca «Añadir a pantalla de inicio». Confirma con «Añadir».",
+    "androidTitle": "En Android (Chrome)",
+    "androidStep1": "Abre Oinkly en Chrome.",
+    "androidStep2": "Toca el menú (tres puntos) arriba a la derecha.",
+    "androidStep3": "Toca «Instalar app» o «Añadir a pantalla de inicio». Confirma.",
+    "benefit1": "Icono en tu pantalla de inicio",
+    "benefit2": "Se abre en pantalla completa, sin barra del navegador",
+    "benefit3": "Acceso rápido como una app más",
+    "alreadyInstalled": "Parece que ya tienes Oinkly instalado. Búscalo en tu pantalla de inicio."
   }
 }
