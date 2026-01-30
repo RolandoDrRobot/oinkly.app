@@ -57,6 +57,17 @@ export interface User {
   avatarUrl?: string; // Profile picture URL (e.g. from Google)
 }
 
+export type SubscriptionPlan = 'free' | 'premium';
+export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing';
+
+export interface Subscription {
+  plan: SubscriptionPlan;
+  status?: SubscriptionStatus;
+  endsAt?: string; // ISO date
+  /** For display: e.g. "monthly", "yearly" */
+  interval?: string;
+}
+
 export interface FixedExpense {
   id: string;
   name: string;

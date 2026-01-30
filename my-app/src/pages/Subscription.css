@@ -1,0 +1,181 @@
+.subscription-page {
+  min-height: 100vh;
+  background: var(--dark-bg);
+}
+
+.subscription-page .page-header {
+  color: var(--text-primary);
+  padding: 20px 20px 0 20px;
+}
+
+.subscription-content {
+  padding: 24px 20px 40px;
+  max-width: 420px;
+  margin: 20px 0 auto;
+}
+
+.subscription-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.subscription-badge.premium-active {
+  background: var(--color-primary, #569a3c);
+  color: #f4e3c5;
+  border: 1px solid var(--color-primary-dark, #538e37);
+}
+
+.subscription-badge svg {
+  flex-shrink: 0;
+}
+
+.subscription-badge.premium-active .subscription-ends {
+  opacity: 0.9;
+}
+
+.subscription-ends {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.subscription-premium-block {
+  margin-bottom: 24px;
+}
+
+.btn-cancel-subscription {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 52px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-subscription:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.plan-card {
+  background: var(--dark-section);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.plan-card.plan-premium {
+  border-color: var(--color-primary, #569a3c);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: var(--color-primary, #569a3c);
+  color: #f4e3c5;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.plan-name {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.plan-price {
+  margin: 0 0 16px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.plan-price + .plan-features {
+  margin-top: 0;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.plan-features li svg {
+  flex-shrink: 0;
+  color: var(--success, #22c55e);
+}
+
+.btn-plan {
+  width: 100%;
+  min-height: 56px;
+  padding: 18px 24px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-plan:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.btn-plan-free {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.btn-plan-premium {
+  background: var(--color-primary, #569a3c);
+  color: #f4e3c5;
+}
+
+.btn-plan-premium:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+/* Plan actual (pagado): mismo verde marca de fondo */
+.btn-plan-premium.btn-plan-current,
+.btn-plan-premium:disabled {
+  background: var(--color-primary, #569a3c);
+  color: #f4e3c5;
+  cursor: default;
+}

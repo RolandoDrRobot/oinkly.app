@@ -1,4 +1,4 @@
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import i18next from 'i18next';
 import { Debt, Notification, NotificationMeta } from '../types';
 import { storage } from './storage';
@@ -111,8 +111,48 @@ export const ensureReminders = (debts: Debt[]): void => {
   }
 };
 
-// Notification helpers with i18n support
+// Standard: save to storage (shows in NotificationsSidebar) + show toast
+const saveAndToast = (
+  message: string,
+  type: 'success' | 'info' | 'warning' | 'error' = 'success',
+  options?: { duration?: number }
+) => {
+  saveNotification(message, type);
+  const duration = options?.duration ?? 4000;
+  if (type === 'success') toast.success(message, { duration });
+  else if (type === 'error') toast.error(message, { duration });
+  else if (type === 'warning') toast(message, { icon: '⚠️', duration });
+  else toast(message, { icon: 'ℹ️', duration });
+};
+
+// Notification helpers with i18n support – all persist to storage and show in NotificationsSidebar
 export const notify = {
+  // Save + toast (for user actions that should appear in sidebar and as toast)
+  saveAndToast,
+
+  // Suscripción cancelada (solo en panel, como editar deuda / overviewUpdated)
+  subscriptionCanceled: () => {
+    const message = t('notifications.subscriptionCanceled');
+    saveNotification(message, 'success');
+  },
+  // Premium activado
+  subscriptionActivated: () => {
+    saveAndToast(t('notifications.subscriptionActivated'), 'success');
+  },
+  // Error al activar Premium
+  subscriptionError: (message?: string) => {
+    const msg = message ?? t('notifications.subscriptionError');
+    saveAndToast(msg, 'error');
+  },
+  // Llamada editada
+  callSaved: () => {
+    saveAndToast(t('notifications.callSaved'), 'success');
+  },
+  // Llamada eliminada
+  callDeleted: () => {
+    saveAndToast(t('notifications.callDeleted'), 'success');
+  },
+
   // When debt totals are automatically updated
   debtTotalUpdated: (debtName: string, amount: string, currency: string) => {
     const message = t('notifications.debtTotalUpdated', { debtName, amount, currency });

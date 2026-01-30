@@ -137,6 +137,49 @@
   font-family: var(--font-family, "DynaPuff", system-ui);
 }
 
+.ai-agent-section-locked {
+  position: relative;
+}
+
+.ai-agent-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.ai-agent-locked-icon {
+  width: 40px;
+  height: 40px;
+  color: #f4c032;
+  margin-bottom: 12px;
+}
+
+.ai-agent-locked-message {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.ai-agent-locked-cta {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-agent-locked-cta:hover {
+  filter: brightness(1.1);
+}
+
 .ai-agent-input-container {
   display: flex;
   align-items: center;

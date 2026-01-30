@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
 import { Debt, CallRecord } from '../types';
 import { storage } from '../utils/storage';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -70,7 +70,7 @@ const DeleteCall: React.FC = () => {
         };
         
         storage.saveDebt(updatedDebt);
-        toast.success(t('deleteCall.success'));
+        notify.callDeleted();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);

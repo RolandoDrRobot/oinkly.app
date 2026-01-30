@@ -1,6 +1,7 @@
-import { Debt, User, FixedExpense, Asset, Income, Notification } from '../types';
+import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription } from '../types';
 
 const DEBTS_KEY = 'debts';
+const SUBSCRIPTION_PREFIX = 'subscription_';
 const FIXED_EXPENSES_KEY = 'fixedExpenses';
 const ASSETS_KEY = 'assets';
 const INCOMES_KEY = 'incomes';
@@ -29,8 +30,19 @@ export const storage = {
   },
 
   logout: () => {
+    const user = storage.getUser();
+    if (user?.id) localStorage.removeItem(SUBSCRIPTION_PREFIX + user.id);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(IS_LOGGED_IN_KEY);
+  },
+
+  // Subscription (per user)
+  getSubscription: (userId: string): Subscription | null => {
+    const raw = localStorage.getItem(SUBSCRIPTION_PREFIX + userId);
+    return raw ? JSON.parse(raw) : null;
+  },
+  setSubscription: (userId: string, data: Subscription) => {
+    localStorage.setItem(SUBSCRIPTION_PREFIX + userId, JSON.stringify(data));
   },
 
   // Debts management

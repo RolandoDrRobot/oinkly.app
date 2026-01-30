@@ -36,6 +36,7 @@ import {
   FaMicrophone,
   FaMicrophoneSlash,
   FaPaperPlane,
+  FaLock,
   FaHome,
   FaCar,
   FaPiggyBank,
@@ -62,8 +63,8 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
+import { useSubscription } from '../context/SubscriptionContext';
 import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
-import toast from 'react-hot-toast';
 import './Dashboard.css';
 
 // Extend Window interface for Speech Recognition
@@ -124,6 +125,7 @@ const Dashboard: React.FC = () => {
   const speechTranscriptRef = useRef('');
   // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     loadDebts();
@@ -837,33 +839,37 @@ const Dashboard: React.FC = () => {
       }
       const message = getMessageForActionResult(action, result, lang);
       if (result.success && (action.type === 'get_overview' || action.type === 'get_debts')) {
-        toast.success(message, { duration: 6000 });
+        notify.saveAndToast(message, 'success', { duration: 6000 });
       } else if (result.success && (['add_debt', 'add_income', 'add_fixed_expense', 'add_asset'].includes(action.type) || ['delete_all_debts', 'delete_all_fixed_expenses', 'delete_all_assets', 'delete_all_incomes'].includes(action.type))) {
-        toast.success(message, { duration: 4000 });
+        notify.saveAndToast(message, 'success', { duration: 4000 });
       } else if (!result.success && result.error) {
-        toast.error(result.error);
+        notify.saveAndToast(result.error, 'error');
       }
+      updateUnreadNotificationsCount();
       setIsProcessing(false);
     } else {
       console.log('[AI Voice] handleAIUserInput – no action (parser returned null)');
       const apiError = getLastAIVoiceError();
       if (apiError === 'quota') {
-        toast.error(
+        notify.saveAndToast(
           lang === 'es'
             ? 'Cuota de OpenAI agotada. Revisa tu plan y facturación en platform.openai.com'
             : 'OpenAI quota exceeded. Check your plan and billing at platform.openai.com',
+          'error',
           { duration: 8000 }
         );
       } else if (apiError === 'model_not_found') {
-        toast.error(
+        notify.saveAndToast(
           lang === 'es'
             ? 'Modelo no disponible en tu cuenta. Prueba REACT_APP_OPENAI_MODEL=gpt-4o-mini en .env'
             : 'Model not available on your account. Try REACT_APP_OPENAI_MODEL=gpt-4o-mini in .env',
+          'error',
           { duration: 6000 }
         );
       } else {
-        toast.error(t('aiAgent.notUnderstood'));
+        notify.saveAndToast(t('aiAgent.notUnderstood'), 'error');
       }
+      updateUnreadNotificationsCount();
       setIsProcessing(false);
     }
   };
@@ -2910,44 +2916,60 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* AI Agent Section */}
+        {/* AI Agent Section – Premium: habilitado; Free: bloqueado con CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="ai-agent-section"
+          className={`ai-agent-section ${!isPremium ? 'ai-agent-section-locked' : ''}`}
         >
           <h3 className="ai-agent-section-title">{t('aiAgent.title')}</h3>
-          <form onSubmit={handleAISubmit} className="ai-agent-input-container">
-            <input
-              type="text"
-              value={aiInputText}
-              onChange={(e) => setAiInputText(e.target.value)}
-              placeholder={t('aiAgent.placeholder')}
-              className="ai-agent-input"
-              disabled={isProcessing}
-            />
-            <motion.button
-              type="submit"
-              className="ai-agent-send"
-              disabled={!aiInputText.trim() || isProcessing}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Icon component={FaPaperPlane} />
-            </motion.button>
-            <motion.button
-              type="button"
-              className={`ai-agent-mic ${isListening ? 'listening' : ''}`}
-              onClick={isListening ? stopListening : startListening}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
-              disabled={isProcessing}
-            >
-              <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
-            </motion.button>
-          </form>
+          {isPremium ? (
+            <form onSubmit={handleAISubmit} className="ai-agent-input-container">
+              <input
+                type="text"
+                value={aiInputText}
+                onChange={(e) => setAiInputText(e.target.value)}
+                placeholder={t('aiAgent.placeholder')}
+                className="ai-agent-input"
+                disabled={isProcessing}
+              />
+              <motion.button
+                type="submit"
+                className="ai-agent-send"
+                disabled={!aiInputText.trim() || isProcessing}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Icon component={FaPaperPlane} />
+              </motion.button>
+              <motion.button
+                type="button"
+                className={`ai-agent-mic ${isListening ? 'listening' : ''}`}
+                onClick={isListening ? stopListening : startListening}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
+                disabled={isProcessing}
+              >
+                <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
+              </motion.button>
+            </form>
+          ) : (
+            <div className="ai-agent-locked">
+              <Icon component={FaLock} className="ai-agent-locked-icon" />
+              <p className="ai-agent-locked-message">{t('subscription.aiLockedMessage')}</p>
+              <motion.button
+                type="button"
+                className="ai-agent-locked-cta"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/subscription')}
+              >
+                {t('subscription.aiLockedCta')}
+              </motion.button>
+            </div>
+          )}
         </motion.div>
 
         {/* Menu de 4 botones */}

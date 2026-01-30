@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SubscriptionProvider } from './context/SubscriptionContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
@@ -24,6 +25,8 @@ import AddIncome from './pages/AddIncome';
 import EditIncome from './pages/EditIncome';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
+import Subscription from './pages/Subscription';
+import Subscribe from './pages/Subscribe';
 import TermsAndConditions from './pages/TermsAndConditions';
 import { Toaster } from './utils/notifications';
 import './App.css';
@@ -206,6 +209,22 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/subscription"
+        element={
+          <ProtectedRoute>
+            <Subscription />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/subscribe"
+        element={
+          <ProtectedRoute>
+            <Subscribe />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/terms"
         element={
           <ProtectedRoute>
@@ -225,10 +244,12 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <AppRoutes />
-          <Toaster />
-        </Router>
+        <SubscriptionProvider>
+          <Router>
+            <AppRoutes />
+            <Toaster />
+          </Router>
+        </SubscriptionProvider>
       </AuthProvider>
     </ThemeProvider>
   );
