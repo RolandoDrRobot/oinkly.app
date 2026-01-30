@@ -62,6 +62,8 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
+import { executeAIAction, parseTextToAIAction, getMessageForActionResult } from '../api';
+import toast from 'react-hot-toast';
 import './Dashboard.css';
 
 // Extend Window interface for Speech Recognition
@@ -82,21 +84,6 @@ interface SpeechRecognition extends EventTarget {
   onresult: ((this: SpeechRecognition, ev: any) => any) | null;
   onerror: ((this: SpeechRecognition, ev: Event) => any) | null;
   onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-}
-
-interface AgentAction {
-  type: 'add_debt' | 'add_commitment' | 'complete_commitment' | 'delete_debt' | 'edit_debt' | 'record_call' | 'navigate' | 'toggle_hide_amounts' | 'show_info' | 'calculate';
-  params?: {
-    debtId?: string;
-    debtName?: string;
-    amount?: number;
-    currency?: string;
-    date?: string;
-    notes?: string;
-    route?: string;
-    field?: string;
-    value?: any;
-  };
 }
 
 // Type assertion helper for icons
@@ -776,195 +763,29 @@ const Dashboard: React.FC = () => {
   };
 
   // AI Agent functions
-  const calculateAITotals = () => {
-    const allDebts = storage.getDebts();
-    let totalLocal = 0;
-    let totalDollars = 0;
-    let monthlyLocal = 0;
-    let monthlyDollars = 0;
-    const currencyCount: { [key: string]: number } = {};
-
-    allDebts.forEach(debt => {
-      totalLocal += debt.totalLocal || 0;
-      totalDollars += debt.totalDollars || 0;
-      monthlyLocal += debt.localFee || 0;
-      monthlyDollars += debt.dollarFee || 0;
-      
-      const currency = debt.localCurrency || storage.getLocalCurrency();
-      currencyCount[currency] = (currencyCount[currency] || 0) + 1;
-    });
-
-    const mostCommonCurrency = Object.keys(currencyCount).reduce((a, b) =>
-      currencyCount[a] > currencyCount[b] ? a : b, storage.getLocalCurrency());
-
-    return {
-      totalLocal,
-      totalDollars,
-      monthlyLocal,
-      monthlyDollars,
-      mostCommonCurrency,
-    };
-  };
-
-  const parseAICommand = (text: string): AgentAction | null => {
-    const lowerText = text.toLowerCase().trim();
-
-    // Add debt
-    if (lowerText.includes('agregar deuda') || lowerText.includes('add debt') || lowerText.includes('nueva deuda') || lowerText.includes('new debt')) {
-      return { type: 'navigate', params: { route: '/add-debt' } };
-    }
-
-    // Show overview/info
-    if (lowerText.includes('resumen') || lowerText.includes('overview') || lowerText.includes('total') || lowerText.includes('cuánto debo') || lowerText.includes('how much')) {
-      const totals = calculateAITotals();
-      const response = t('aiAgent.overviewResponse', {
-        totalLocal: totals.totalLocal.toLocaleString(),
-        currency: totals.mostCommonCurrency,
-        totalDollars: totals.totalDollars.toLocaleString(),
-        monthlyLocal: totals.monthlyLocal.toLocaleString(),
-        monthlyDollars: totals.monthlyDollars.toLocaleString(),
-      });
-      return { type: 'show_info', params: { value: response } };
-    }
-
-    // Toggle hide amounts
-    if (lowerText.includes('ocultar montos') || lowerText.includes('hide amounts') || lowerText.includes('mostrar montos') || lowerText.includes('show amounts')) {
-      return { type: 'toggle_hide_amounts' };
-    }
-
-    // Navigate to about
-    if (lowerText.includes('sobre') || lowerText.includes('about') || lowerText.includes('método') || lowerText.includes('method')) {
-      return { type: 'navigate', params: { route: '/about' } };
-    }
-
-    // Navigate to profile
-    if (lowerText.includes('perfil') || lowerText.includes('profile')) {
-      return { type: 'navigate', params: { route: '/profile' } };
-    }
-
-    // Add commitment to a debt
-    const commitmentMatch = lowerText.match(/(?:agregar|add|crear|create).*?(?:compromiso|commitment).*?(?:para|to|de|for)?\s*(.+?)(?:\s+con|\s+with|\s+de|\s+of)?\s*(\d+)/i);
-    if (commitmentMatch) {
-      const debtName = commitmentMatch[1]?.trim();
-      const amount = parseFloat(commitmentMatch[2]);
-      const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-      if (debt && amount) {
-        return {
-          type: 'add_commitment',
-          params: { debtId: debt.id, amount: amount },
-        };
-      }
-    }
-
-    // Complete commitment
-    if (lowerText.includes('completar compromiso') || lowerText.includes('complete commitment') || lowerText.includes('pago realizado') || lowerText.includes('payment made')) {
-      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)(?:\s+compromiso|\s+commitment)?/i);
-      if (debtMatch) {
-        const debtName = debtMatch[1]?.trim();
-        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-        if (debt && debt.commitments && debt.commitments.length > 0) {
-          const pendingCommitment = debt.commitments.find(c => c.status === 'pending');
-          if (pendingCommitment) {
-            return {
-              type: 'complete_commitment',
-              params: { debtId: debt.id },
-            };
-          }
-        }
-      }
-    }
-
-    // Delete debt
-    if (lowerText.includes('eliminar deuda') || lowerText.includes('delete debt') || lowerText.includes('borrar deuda')) {
-      const debtMatch = lowerText.match(/(?:deuda|debt)?\s*(.+?)$/i);
-      if (debtMatch) {
-        const debtName = debtMatch[1]?.trim();
-        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-        if (debt) {
-          return {
-            type: 'delete_debt',
-            params: { debtId: debt.id },
-          };
-        }
-      }
-    }
-
-    // Record call
-    if (lowerText.includes('registrar llamada') || lowerText.includes('record call') || lowerText.includes('llamada')) {
-      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)$/i);
-      if (debtMatch) {
-        const debtName = debtMatch[1]?.trim();
-        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-        if (debt) {
-          return {
-            type: 'record_call',
-            params: { debtId: debt.id },
-          };
-        }
-      }
-    }
-
-    return null;
-  };
-
-  const handleAIAction = (action: AgentAction) => {
-    switch (action.type) {
-      case 'navigate':
-        if (action.params?.route) {
-          navigate(action.params.route);
-        }
-        break;
-      case 'add_commitment':
-        if (action.params?.debtId) {
-          navigate(`/add-commitment/${action.params.debtId}`);
-        }
-        break;
-      case 'complete_commitment':
-        if (action.params?.debtId) {
-          const debt = debts.find(d => d.id === action.params?.debtId);
-          if (debt) {
-            const pendingCommitment = debt.commitments?.find(c => c.status === 'pending');
-            if (pendingCommitment) {
-              navigate(`/complete-commitment/${debt.id}/${pendingCommitment.id}`);
-            }
-          }
-        }
-        break;
-      case 'delete_debt':
-        if (action.params?.debtId) {
-          navigate(`/delete-debt/${action.params.debtId}`);
-        }
-        break;
-      case 'record_call':
-        if (action.params?.debtId) {
-          navigate(`/add-call/${action.params.debtId}`);
-        }
-        break;
-      case 'toggle_hide_amounts':
-        toggleHideAmounts();
-        break;
-      case 'show_info':
-        // Info is already shown in the chat
-        break;
-      default:
-        break;
-    }
-  };
-
   const handleAIUserInput = async (text: string) => {
     if (!text.trim()) return;
 
     setAiInputText('');
     setIsProcessing(true);
 
-    // Parse and execute command
-    const action = parseAICommand(text);
+    const action = parseTextToAIAction(text, debts);
+    const lang = i18n.language.startsWith('es') ? 'es' : 'en';
 
     if (action) {
-      handleAIAction(action);
+      const result = await executeAIAction(action, { navigate });
+      if (action.type === 'toggle_hide_amounts') {
+        toggleHideAmounts();
+      }
+      const message = getMessageForActionResult(action, result, lang);
+      if (result.success && (action.type === 'get_overview' || action.type === 'get_debts')) {
+        toast.success(message, { duration: 6000 });
+      } else if (!result.success && result.error) {
+        toast.error(result.error);
+      }
       setIsProcessing(false);
     } else {
-      // No command recognized
+      toast.error(t('aiAgent.notUnderstood'));
       setIsProcessing(false);
     }
   };

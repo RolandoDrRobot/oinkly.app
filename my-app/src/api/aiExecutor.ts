@@ -1,0 +1,465 @@
+/**
+ * Ejecutor único de acciones IA: recibe AIAction y ejecuta (storage + notify + navigate).
+ */
+
+import type { Debt, PaymentCommitment, CallRecord, FixedExpense, Asset, Income } from '../types';
+import type { AIAction, AIActionResult } from '../types/ai';
+import { isValidAIIntent } from './aiActions';
+import { getFullState, getOverviewForAI } from './aiContext';
+import { storage } from '../utils/storage';
+import { notify } from '../utils/notifications';
+
+const genId = () => Date.now().toString() + Math.random().toString(36).slice(2, 9);
+
+function calculateInOrder(debt: Debt): boolean {
+  if (!debt.commitments || debt.commitments.length === 0) return true;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const hasPendingOrOverdue = debt.commitments.some((c) => {
+    if (c.status === 'completed') return false;
+    const d = new Date(c.date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() < today.getTime() || c.status === 'pending';
+  });
+  return !hasPendingOrOverdue;
+}
+
+function num(p: unknown): number {
+  if (typeof p === 'number' && !isNaN(p)) return p;
+  if (typeof p === 'string') return parseFloat(p) || 0;
+  return 0;
+}
+
+function str(p: unknown): string {
+  if (typeof p === 'string') return p;
+  if (p != null) return String(p);
+  return '';
+}
+
+export interface AIExecutorContext {
+  navigate: (path: string) => void;
+}
+
+export async function executeAIAction(
+  action: AIAction,
+  context: AIExecutorContext
+): Promise<AIActionResult> {
+  const { navigate } = context;
+
+  if (!action.type || !isValidAIIntent(action.type)) {
+    return { success: false, error: 'Invalid action type' };
+  }
+
+  const params = action.params || {};
+
+  try {
+    switch (action.type) {
+      case 'get_state': {
+        const state = getFullState();
+        return { success: true, data: state };
+      }
+      case 'get_overview':
+      case 'get_debts': {
+        const overview = getOverviewForAI();
+        return { success: true, data: overview };
+      }
+
+      case 'navigate': {
+        const route = str(params.route);
+        if (!route) return { success: false, error: 'Missing route' };
+        navigate(route.startsWith('/') ? route : '/' + route);
+        return { success: true, message: 'Navigated' };
+      }
+
+      case 'toggle_hide_amounts':
+        return { success: true, message: 'toggle_hide_amounts', data: { type: 'toggle_hide_amounts' } };
+      // Caller (Dashboard) must handle actual toggle; we only return success so UI updates
+
+      case 'add_debt': {
+        const name = str(params.name);
+        if (!name.trim()) return { success: false, error: 'Debt name required' };
+        const now = new Date().toISOString();
+        const localCurrency = str(params.localCurrency) || storage.getLocalCurrency();
+        const newDebt: Debt = {
+          id: genId(),
+          name: name.trim(),
+          type: (str(params.type) === 'tarjeta' ? 'tarjeta' : 'prestamo') as Debt['type'],
+          localCurrency,
+          localFee: num(params.localFee),
+          dollarFee: num(params.dollarFee),
+          totalLocal: num(params.totalLocal),
+          totalDollars: num(params.totalDollars),
+          feeToUpdate: 0,
+          feeToUpdateDollars: 0,
+          inOrder: true,
+          currentPlan: str(params.currentPlan),
+          bankName: str(params.bankName),
+          bankPhone: str(params.bankPhone) || undefined,
+          paymentDate: params.paymentDate ? new Date(str(params.paymentDate)).toISOString() : undefined,
+          cutDate: params.cutDate ? new Date(str(params.cutDate)).toISOString() : undefined,
+          interestRate: typeof params.interestRate === 'number' ? params.interestRate : undefined,
+          hasCallTask: Boolean(params.hasCallTask),
+          callCompleted: false,
+          createdAt: now,
+          updatedAt: now,
+        };
+        storage.saveDebt(newDebt);
+        notify.overviewUpdated();
+        return { success: true, message: 'Debt created', data: { debtId: newDebt.id } };
+      }
+
+      case 'edit_debt': {
+        const debtId = str(params.debtId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const updated: Debt = {
+          ...debt,
+          ...(params.name !== undefined && { name: str(params.name) }),
+          ...(params.type !== undefined && { type: str(params.type) as Debt['type'] }),
+          ...(params.bankName !== undefined && { bankName: str(params.bankName) }),
+          ...(params.localFee !== undefined && { localFee: num(params.localFee) }),
+          ...(params.dollarFee !== undefined && { dollarFee: num(params.dollarFee) }),
+          ...(params.totalLocal !== undefined && { totalLocal: num(params.totalLocal) }),
+          ...(params.totalDollars !== undefined && { totalDollars: num(params.totalDollars) }),
+          ...(params.feeToUpdate !== undefined && { feeToUpdate: num(params.feeToUpdate) }),
+          ...(params.feeToUpdateDollars !== undefined && { feeToUpdateDollars: num(params.feeToUpdateDollars) }),
+          ...(params.currentPlan !== undefined && { currentPlan: str(params.currentPlan) }),
+          ...(params.paymentDate !== undefined && { paymentDate: new Date(str(params.paymentDate)).toISOString() }),
+          ...(params.cutDate !== undefined && { cutDate: new Date(str(params.cutDate)).toISOString() }),
+          ...(params.interestRate !== undefined && { interestRate: num(params.interestRate) }),
+          ...(params.hasCallTask !== undefined && { hasCallTask: Boolean(params.hasCallTask) }),
+          ...(params.callCompleted !== undefined && { callCompleted: Boolean(params.callCompleted) }),
+          ...(params.bankPhone !== undefined && { bankPhone: str(params.bankPhone) || undefined }),
+          updatedAt: new Date().toISOString(),
+        };
+        if (updated.totalLocal === 0 && updated.totalDollars === 0) {
+          updated.closedAt = new Date().toISOString();
+          updated.localFee = 0;
+          updated.dollarFee = 0;
+        }
+        storage.saveDebt(updated);
+        notify.overviewUpdated();
+        return { success: true, message: 'Debt updated' };
+      }
+
+      case 'delete_debt': {
+        const debtId = str(params.debtId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        storage.deleteDebt(debtId);
+        notify.overviewUpdated();
+        return { success: true, message: 'Debt deleted' };
+      }
+
+      case 'complete_debt': {
+        const debtId = str(params.debtId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const updated: Debt = {
+          ...debt,
+          totalLocal: 0,
+          totalDollars: 0,
+          localFee: 0,
+          dollarFee: 0,
+          inOrder: true,
+          closedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updated);
+        notify.overviewUpdated();
+        return { success: true, message: 'Debt marked as paid off' };
+      }
+
+      case 'add_commitment': {
+        const debtId = str(params.debtId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const date = params.date ? new Date(str(params.date)).toISOString() : new Date().toISOString();
+        const paymentType = (str(params.paymentType) as 'partial' | 'full' | 'settlement') || 'partial';
+        const newCommitment: PaymentCommitment = {
+          id: genId(),
+          debtId,
+          date,
+          amountLocal: num(params.amountLocal),
+          amountDollars: num(params.amountDollars),
+          status: 'pending',
+          paymentType: paymentType === 'full' || paymentType === 'settlement' ? paymentType : 'partial',
+          notes: str(params.notes) || undefined,
+          createdAt: new Date().toISOString(),
+        };
+        const updatedDebt: Debt = {
+          ...debt,
+          commitments: [...(debt.commitments || []), newCommitment],
+          inOrder: calculateInOrder({ ...debt, commitments: [...(debt.commitments || []), newCommitment] }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updatedDebt);
+        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+        return { success: true, message: 'Commitment added', data: { commitmentId: newCommitment.id } };
+      }
+
+      case 'edit_commitment': {
+        const debtId = str(params.debtId);
+        const commitmentId = str(params.commitmentId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const commitment = debt.commitments?.find((c) => c.id === commitmentId);
+        if (!commitment) return { success: false, error: 'Commitment not found' };
+        const updatedCommitment: PaymentCommitment = {
+          ...commitment,
+          ...(params.date !== undefined && { date: new Date(str(params.date)).toISOString() }),
+          ...(params.amountLocal !== undefined && { amountLocal: num(params.amountLocal) }),
+          ...(params.amountDollars !== undefined && { amountDollars: num(params.amountDollars) }),
+          ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
+        };
+        const newList = debt.commitments?.map((c) => (c.id === commitmentId ? updatedCommitment : c)) || [];
+        const updatedDebt: Debt = {
+          ...debt,
+          commitments: newList,
+          inOrder: calculateInOrder({ ...debt, commitments: newList }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updatedDebt);
+        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+        return { success: true, message: 'Commitment updated' };
+      }
+
+      case 'delete_commitment': {
+        const debtId = str(params.debtId);
+        const commitmentId = str(params.commitmentId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const newList = debt.commitments?.filter((c) => c.id !== commitmentId) || [];
+        const updatedDebt: Debt = {
+          ...debt,
+          commitments: newList,
+          inOrder: calculateInOrder({ ...debt, commitments: newList }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updatedDebt);
+        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
+        return { success: true, message: 'Commitment deleted' };
+      }
+
+      case 'complete_commitment':
+        navigate(`/complete-commitment/${params.debtId}/${params.commitmentId}`);
+        return { success: true, message: 'Opening complete commitment' };
+
+      case 'add_call': {
+        const debtId = str(params.debtId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const newCall: CallRecord = {
+          id: genId(),
+          debtId,
+          date: params.date ? new Date(str(params.date)).toISOString() : new Date().toISOString(),
+          notes: str(params.notes),
+          createdAt: new Date().toISOString(),
+        };
+        const updatedDebt: Debt = {
+          ...debt,
+          callHistory: [...(debt.callHistory || []), newCall],
+          lastCallDate: newCall.date,
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveDebt(updatedDebt);
+        return { success: true, message: 'Call recorded', data: { callId: newCall.id } };
+      }
+
+      case 'edit_call': {
+        const debtId = str(params.debtId);
+        const callId = str(params.callId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const call = debt.callHistory?.find((c) => c.id === callId);
+        if (!call) return { success: false, error: 'Call not found' };
+        const updatedCall: CallRecord = {
+          ...call,
+          ...(params.date !== undefined && { date: new Date(str(params.date)).toISOString() }),
+          ...(params.notes !== undefined && { notes: str(params.notes) }),
+        };
+        const newList = debt.callHistory?.map((c) => (c.id === callId ? updatedCall : c)) || [];
+        storage.saveDebt({ ...debt, callHistory: newList, updatedAt: new Date().toISOString() });
+        return { success: true, message: 'Call updated' };
+      }
+
+      case 'delete_call': {
+        const debtId = str(params.debtId);
+        const callId = str(params.callId);
+        const debt = storage.getDebt(debtId);
+        if (!debt) return { success: false, error: 'Debt not found' };
+        const newList = debt.callHistory?.filter((c) => c.id !== callId) || [];
+        storage.saveDebt({ ...debt, callHistory: newList, updatedAt: new Date().toISOString() });
+        return { success: true, message: 'Call deleted' };
+      }
+
+      case 'add_fixed_expense': {
+        const name = str(params.name);
+        if (!name.trim()) return { success: false, error: 'Expense name required' };
+        const now = new Date().toISOString();
+        const newExpense: FixedExpense = {
+          id: genId(),
+          name: name.trim(),
+          amountLocal: num(params.amountLocal),
+          amountDollars: num(params.amountDollars),
+          localCurrency: str(params.localCurrency) || storage.getLocalCurrency(),
+          category: str(params.category) || undefined,
+          dueDate: params.dueDate != null ? str(params.dueDate) : undefined,
+          notes: str(params.notes) || undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        storage.saveFixedExpense(newExpense);
+        notify.overviewUpdated();
+        return { success: true, message: 'Fixed expense created', data: { expenseId: newExpense.id } };
+      }
+
+      case 'edit_fixed_expense': {
+        const expenseId = str(params.expenseId);
+        const expense = storage.getFixedExpense(expenseId);
+        if (!expense) return { success: false, error: 'Expense not found' };
+        const updated: FixedExpense = {
+          ...expense,
+          ...(params.name !== undefined && { name: str(params.name) }),
+          ...(params.amountLocal !== undefined && { amountLocal: num(params.amountLocal) }),
+          ...(params.amountDollars !== undefined && { amountDollars: num(params.amountDollars) }),
+          ...(params.category !== undefined && { category: str(params.category) || undefined }),
+          ...(params.dueDate !== undefined && { dueDate: str(params.dueDate) || undefined }),
+          ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveFixedExpense(updated);
+        notify.overviewUpdated();
+        return { success: true, message: 'Fixed expense updated' };
+      }
+
+      case 'delete_fixed_expense': {
+        const expenseId = str(params.expenseId);
+        if (!storage.getFixedExpense(expenseId)) return { success: false, error: 'Expense not found' };
+        storage.deleteFixedExpense(expenseId);
+        notify.overviewUpdated();
+        return { success: true, message: 'Fixed expense deleted' };
+      }
+
+      case 'add_asset': {
+        const name = str(params.name);
+        if (!name.trim()) return { success: false, error: 'Asset name required' };
+        const now = new Date().toISOString();
+        const type = (str(params.type) || 'other') as Asset['type'];
+        const validTypes: Asset['type'][] = ['property', 'vehicle', 'investment', 'savings', 'other'];
+        const newAsset: Asset = {
+          id: genId(),
+          name: name.trim(),
+          type: validTypes.includes(type) ? type : 'other',
+          valueLocal: num(params.valueLocal),
+          valueDollars: num(params.valueDollars),
+          localCurrency: str(params.localCurrency) || storage.getLocalCurrency(),
+          purchaseDate: params.purchaseDate ? new Date(str(params.purchaseDate)).toISOString().slice(0, 10) : undefined,
+          notes: str(params.notes) || undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        storage.saveAsset(newAsset);
+        notify.overviewUpdated();
+        return { success: true, message: 'Asset created', data: { assetId: newAsset.id } };
+      }
+
+      case 'edit_asset': {
+        const assetId = str(params.assetId);
+        const asset = storage.getAsset(assetId);
+        if (!asset) return { success: false, error: 'Asset not found' };
+        const type = (str(params.type) || asset.type) as Asset['type'];
+        const validTypes: Asset['type'][] = ['property', 'vehicle', 'investment', 'savings', 'other'];
+        const updated: Asset = {
+          ...asset,
+          ...(params.name !== undefined && { name: str(params.name) }),
+          ...(params.type !== undefined && { type: validTypes.includes(type) ? type : asset.type }),
+          ...(params.valueLocal !== undefined && { valueLocal: num(params.valueLocal) }),
+          ...(params.valueDollars !== undefined && { valueDollars: num(params.valueDollars) }),
+          ...(params.purchaseDate !== undefined && { purchaseDate: str(params.purchaseDate) || undefined }),
+          ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveAsset(updated);
+        notify.overviewUpdated();
+        return { success: true, message: 'Asset updated' };
+      }
+
+      case 'delete_asset': {
+        const assetId = str(params.assetId);
+        if (!storage.getAsset(assetId)) return { success: false, error: 'Asset not found' };
+        storage.deleteAsset(assetId);
+        notify.overviewUpdated();
+        return { success: true, message: 'Asset deleted' };
+      }
+
+      case 'complete_asset':
+        navigate(`/complete-asset/${params.assetId}`);
+        return { success: true, message: 'Opening liquidate asset' };
+
+      case 'add_income': {
+        const name = str(params.name);
+        if (!name.trim()) return { success: false, error: 'Income name required' };
+        const now = new Date().toISOString();
+        const type = (str(params.type) || 'salary') as Income['type'];
+        const frequency = (str(params.frequency) || 'monthly') as Income['frequency'];
+        const validTypes: Income['type'][] = ['salary', 'freelance', 'investment', 'rental', 'other'];
+        const validFreq: Income['frequency'][] = ['monthly', 'weekly', 'biweekly', 'yearly', 'one-time'];
+        const newIncome: Income = {
+          id: genId(),
+          name: name.trim(),
+          amountLocal: num(params.amountLocal),
+          amountDollars: num(params.amountDollars),
+          localCurrency: str(params.localCurrency) || storage.getLocalCurrency(),
+          type: validTypes.includes(type) ? type : 'salary',
+          frequency: validFreq.includes(frequency) ? frequency : 'monthly',
+          nextPaymentDate: params.nextPaymentDate ? new Date(str(params.nextPaymentDate)).toISOString().slice(0, 10) : undefined,
+          notes: str(params.notes) || undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        storage.saveIncome(newIncome);
+        notify.overviewUpdated();
+        return { success: true, message: 'Income created', data: { incomeId: newIncome.id } };
+      }
+
+      case 'edit_income': {
+        const incomeId = str(params.incomeId);
+        const income = storage.getIncome(incomeId);
+        if (!income) return { success: false, error: 'Income not found' };
+        const type = (str(params.type) || income.type) as Income['type'];
+        const frequency = (str(params.frequency) || income.frequency) as Income['frequency'];
+        const validTypes: Income['type'][] = ['salary', 'freelance', 'investment', 'rental', 'other'];
+        const validFreq: Income['frequency'][] = ['monthly', 'weekly', 'biweekly', 'yearly', 'one-time'];
+        const updated: Income = {
+          ...income,
+          ...(params.name !== undefined && { name: str(params.name) }),
+          ...(params.amountLocal !== undefined && { amountLocal: num(params.amountLocal) }),
+          ...(params.amountDollars !== undefined && { amountDollars: num(params.amountDollars) }),
+          ...(params.type !== undefined && { type: validTypes.includes(type) ? type : income.type }),
+          ...(params.frequency !== undefined && { frequency: validFreq.includes(frequency) ? frequency : income.frequency }),
+          ...(params.nextPaymentDate !== undefined && { nextPaymentDate: str(params.nextPaymentDate) || undefined }),
+          ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
+          updatedAt: new Date().toISOString(),
+        };
+        storage.saveIncome(updated);
+        notify.overviewUpdated();
+        return { success: true, message: 'Income updated' };
+      }
+
+      case 'delete_income': {
+        const incomeId = str(params.incomeId);
+        if (!storage.getIncome(incomeId)) return { success: false, error: 'Income not found' };
+        storage.deleteIncome(incomeId);
+        notify.overviewUpdated();
+        return { success: true, message: 'Income deleted' };
+      }
+
+      default:
+        return { success: false, error: 'Action not implemented' };
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error: message };
+  }
+}

@@ -1,0 +1,147 @@
+/**
+ * Especificación de intents y parámetros para validación y documentación.
+ * Cualquier IA que envíe JSON debe respetar estos tipos y params.
+ */
+
+import type { AIIntent } from '../types/ai';
+
+export const AI_ACTION_TYPES: AIIntent[] = [
+  'add_debt',
+  'edit_debt',
+  'delete_debt',
+  'complete_debt',
+  'add_commitment',
+  'edit_commitment',
+  'delete_commitment',
+  'complete_commitment',
+  'add_call',
+  'edit_call',
+  'delete_call',
+  'add_fixed_expense',
+  'edit_fixed_expense',
+  'delete_fixed_expense',
+  'add_asset',
+  'edit_asset',
+  'delete_asset',
+  'complete_asset',
+  'add_income',
+  'edit_income',
+  'delete_income',
+  'navigate',
+  'toggle_hide_amounts',
+  'get_overview',
+  'get_debts',
+  'get_state',
+];
+
+/** Parámetros requeridos/opcionales por intent (para validación y docs). */
+export const AI_ACTION_PARAMS: Record<
+  AIIntent,
+  { required?: string[]; optional?: string[] }
+> = {
+  add_debt: {
+    required: ['name'],
+    optional: [
+      'type',
+      'bankName',
+      'localCurrency',
+      'localFee',
+      'dollarFee',
+      'totalLocal',
+      'totalDollars',
+      'currentPlan',
+      'paymentDate',
+      'cutDate',
+      'interestRate',
+      'hasCallTask',
+      'bankPhone',
+    ],
+  },
+  edit_debt: {
+    required: ['debtId'],
+    optional: [
+      'name',
+      'type',
+      'bankName',
+      'localFee',
+      'dollarFee',
+      'totalLocal',
+      'totalDollars',
+      'feeToUpdate',
+      'feeToUpdateDollars',
+      'currentPlan',
+      'paymentDate',
+      'cutDate',
+      'interestRate',
+      'hasCallTask',
+      'callCompleted',
+      'bankPhone',
+    ],
+  },
+  delete_debt: { required: ['debtId'] },
+  complete_debt: { required: ['debtId'] },
+  add_commitment: {
+    required: ['debtId'],
+    optional: ['amountLocal', 'amountDollars', 'date', 'paymentType', 'notes'],
+  },
+  edit_commitment: {
+    required: ['debtId', 'commitmentId'],
+    optional: ['date', 'amountLocal', 'amountDollars', 'notes'],
+  },
+  delete_commitment: { required: ['debtId', 'commitmentId'] },
+  complete_commitment: { required: ['debtId', 'commitmentId'] },
+  add_call: {
+    required: ['debtId'],
+    optional: ['date', 'notes'],
+  },
+  edit_call: {
+    required: ['debtId', 'callId'],
+    optional: ['date', 'notes'],
+  },
+  delete_call: { required: ['debtId', 'callId'] },
+  add_fixed_expense: {
+    required: ['name'],
+    optional: ['amountLocal', 'amountDollars', 'localCurrency', 'category', 'dueDate', 'notes'],
+  },
+  edit_fixed_expense: {
+    required: ['expenseId'],
+    optional: ['name', 'amountLocal', 'amountDollars', 'category', 'dueDate', 'notes'],
+  },
+  delete_fixed_expense: { required: ['expenseId'] },
+  add_asset: {
+    required: ['name'],
+    optional: ['type', 'valueLocal', 'valueDollars', 'localCurrency', 'purchaseDate', 'notes'],
+  },
+  edit_asset: {
+    required: ['assetId'],
+    optional: ['name', 'type', 'valueLocal', 'valueDollars', 'purchaseDate', 'notes'],
+  },
+  delete_asset: { required: ['assetId'] },
+  complete_asset: { required: ['assetId'] },
+  add_income: {
+    required: ['name'],
+    optional: [
+      'amountLocal',
+      'amountDollars',
+      'localCurrency',
+      'type',
+      'frequency',
+      'nextPaymentDate',
+      'notes',
+    ],
+  },
+  edit_income: {
+    required: ['incomeId'],
+    optional: ['name', 'amountLocal', 'amountDollars', 'type', 'frequency', 'nextPaymentDate', 'notes'],
+  },
+  delete_income: { required: ['incomeId'] },
+  navigate: { required: ['route'] },
+  toggle_hide_amounts: {},
+  get_overview: {},
+  get_debts: {},
+  get_state: {},
+};
+
+export function isValidAIIntent(type: string): type is AIIntent {
+  return AI_ACTION_TYPES.includes(type as AIIntent);
+}
