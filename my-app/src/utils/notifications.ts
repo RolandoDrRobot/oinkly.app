@@ -1,6 +1,6 @@
 import { Toaster, toast } from 'react-hot-toast';
 import i18next from 'i18next';
-import { Debt, Notification, NotificationMeta } from '../types';
+import { Debt, FixedExpense, Notification, NotificationMeta } from '../types';
 import { storage } from './storage';
 
 // Type assertion helper for i18next.t with interpolation
@@ -30,9 +30,11 @@ const hasReminderNotification = (existing: Notification[], meta: NotificationMet
   return existing.some(
     (n) =>
       n.meta?.reminderType === meta.reminderType &&
-      n.meta.debtId === meta.debtId &&
-      (meta.commitmentId ? n.meta?.commitmentId === meta.commitmentId : true) &&
-      (meta.paymentDate ? n.meta?.paymentDate === meta.paymentDate : true)
+      (meta.reminderType === 'fixed_expense_overdue'
+        ? n.meta?.expenseId === meta.expenseId && n.meta?.paymentDate === meta.paymentDate
+        : n.meta?.debtId === meta.debtId &&
+          (meta.commitmentId ? n.meta?.commitmentId === meta.commitmentId : true) &&
+          (meta.paymentDate ? n.meta?.paymentDate === meta.paymentDate : true))
   );
 };
 
@@ -107,6 +109,42 @@ export const ensureReminders = (debts: Debt[]): void => {
         saveNotification(message, 'info', meta);
         existing.push({ meta } as Notification);
       }
+    }
+  }
+};
+
+/** Current month as YYYY-MM */
+const currentMonth = (): string => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
+
+/** Create reminders for overdue fixed expenses (due day passed, not marked paid this month) */
+export const ensureFixedExpenseReminders = (fixedExpenses: FixedExpense[]): void => {
+  const existing = storage.getNotifications();
+  const today = new Date();
+  const dayOfMonth = today.getDate();
+  const month = currentMonth();
+
+  for (const expense of fixedExpenses) {
+    const dueDay = expense.dueDate ? parseInt(String(expense.dueDate).replace(/\D/g, ''), 10) : 0;
+    if (dueDay < 1 || dueDay > 31) continue;
+    const isPaidThisMonth = expense.paidForMonth === month;
+    if (isPaidThisMonth) continue;
+    if (dayOfMonth < dueDay) continue; // not yet due
+    const meta: NotificationMeta = {
+      reminderType: 'fixed_expense_overdue',
+      expenseId: expense.id,
+      expenseName: expense.name,
+      paymentDate: month,
+    };
+    if (!hasReminderNotification(existing, meta)) {
+      const message = t('notifications.fixedExpenseOverdue', {
+        expenseName: expense.name,
+        day: dueDay,
+      });
+      saveNotification(message, 'error', meta);
+      existing.push({ meta } as Notification);
     }
   }
 };

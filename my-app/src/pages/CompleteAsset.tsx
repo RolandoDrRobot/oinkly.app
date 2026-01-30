@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { 
   FaCheckCircle,
-  FaGift,
   FaArrowLeft
 } from 'react-icons/fa';
 import { Asset } from '../types';
@@ -52,7 +51,7 @@ const CompleteAsset: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('completeAsset.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 

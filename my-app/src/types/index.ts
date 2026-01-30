@@ -77,6 +77,8 @@ export interface FixedExpense {
   category?: string;
   dueDate?: string; // Día del mes (1-31)
   paymentDate?: string; // Fecha completa de pago (ISO string)
+  /** Month this expense was last marked "up to date" (YYYY-MM) */
+  paidForMonth?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -110,10 +112,12 @@ export interface Income {
 }
 
 export interface NotificationMeta {
-  reminderType: 'payment_reminder' | 'overdue_commitment' | 'call_reminder';
-  debtId: string;
+  reminderType: 'payment_reminder' | 'overdue_commitment' | 'call_reminder' | 'fixed_expense_overdue';
+  debtId?: string;
   commitmentId?: string;
   paymentDate?: string;
+  expenseId?: string;
+  expenseName?: string;
 }
 
 export interface Notification {

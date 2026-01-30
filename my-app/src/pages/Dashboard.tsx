@@ -58,7 +58,8 @@ import {
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
-import { notify, ensureReminders } from '../utils/notifications';
+import { formatDateLocal } from '../utils/dateUtils';
+import { notify, ensureReminders, ensureFixedExpenseReminders } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
@@ -128,6 +129,10 @@ const Dashboard: React.FC = () => {
   const { isPremium } = useSubscription();
 
   useEffect(() => {
+    if (!localStorage.getItem('hasSeenInitialSetup')) {
+      navigate('/preferences', { replace: true });
+      return;
+    }
     loadDebts();
     loadFixedExpenses();
     loadAssets();
@@ -169,6 +174,8 @@ const Dashboard: React.FC = () => {
     }
     
     setFixedExpenses(orderedExpenses);
+    ensureFixedExpenseReminders(orderedExpenses);
+    updateUnreadNotificationsCount();
   };
 
   const loadAssets = () => {
@@ -391,6 +398,38 @@ const Dashboard: React.FC = () => {
       d.setHours(0, 0, 0, 0);
       return d.getTime() < today.getTime();
     }).length;
+  };
+
+  /** Current month YYYY-MM */
+  const getCurrentMonth = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  /** Fixed expense status: upToDate | overdue | dueDay (and day number for dueDay) */
+  const getFixedExpenseStatus = (expense: FixedExpense): { status: 'upToDate' | 'overdue' | 'dueDay'; day?: number } => {
+    const month = getCurrentMonth();
+    if (expense.paidForMonth === month) return { status: 'upToDate' };
+    const dueDay = expense.dueDate ? parseInt(String(expense.dueDate).replace(/\D/g, ''), 10) : 0;
+    if (dueDay < 1 || dueDay > 31) return { status: 'dueDay', day: 0 };
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+    if (dayOfMonth >= dueDay) return { status: 'overdue', day: dueDay };
+    return { status: 'dueDay', day: dueDay };
+  };
+
+  const handleMarkFixedExpenseUpToDate = (expenseId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const expense = fixedExpenses.find(e => e.id === expenseId);
+    if (!expense) return;
+    const updated = {
+      ...expense,
+      paidForMonth: getCurrentMonth(),
+      updatedAt: new Date().toISOString(),
+    };
+    storage.updateFixedExpense(updated);
+    loadFixedExpenses();
+    notify.saveAndToast(t('dashboard.expenseMarkedUpToDate', { name: expense.name }), 'success');
   };
 
   const sensors = useSensors(
@@ -618,9 +657,9 @@ const Dashboard: React.FC = () => {
       newValue = parseFloat(editValue) || 0;
     }
     
-    // Handle date fields - convert to ISO string if not empty
+    // Handle date fields - store YYYY-MM-DD only (no ISO to avoid timezone shift)
     if (field === 'nextPaymentDate') {
-      newValue = editValue ? new Date(editValue).toISOString() : '';
+      newValue = editValue ? editValue.trim().split('T')[0] : '';
     }
 
     const updated = {
@@ -1007,8 +1046,8 @@ const Dashboard: React.FC = () => {
         totalDollars: incomesTotals.totalDollars,
       },
       netWorth: {
-        totalLocal: assetsTotals.totalLocal - totals.totalLocal - fixedExpensesTotals.totalLocal + incomesTotals.totalLocal,
-        totalDollars: assetsTotals.totalDollars - totals.totalDollars - fixedExpensesTotals.totalDollars + incomesTotals.totalDollars,
+        totalLocal: assetsTotals.totalLocal - totals.totalLocal,
+        totalDollars: assetsTotals.totalDollars - totals.totalDollars,
       },
       mostCommonCurrency: localCurrency,
     };
@@ -1091,14 +1130,6 @@ const Dashboard: React.FC = () => {
               transition={{ delay: 0.5 }}
             >
               {t('dashboard.noDebts')}
-            </motion.p>
-            <motion.p
-              className="empty-subtitle"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              {t('dashboard.noDebtsSubtitle')}
             </motion.p>
           </motion.div>
         ) : (
@@ -1368,6 +1399,7 @@ const Dashboard: React.FC = () => {
                                         {editingField?.debtId === debt.id && editingField?.field === 'localFee' ? (
                                           <input
                                             type="number"
+                                            inputMode="decimal"
                                             step="0.01"
                                             value={editValue}
                                             onChange={(e) => setEditValue(e.target.value)}
@@ -1394,6 +1426,7 @@ const Dashboard: React.FC = () => {
                                         {editingField?.debtId === debt.id && editingField?.field === 'dollarFee' ? (
                                           <input
                                             type="number"
+                                            inputMode="decimal"
                                             step="0.01"
                                             value={editValue}
                                             onChange={(e) => setEditValue(e.target.value)}
@@ -1449,7 +1482,7 @@ const Dashboard: React.FC = () => {
                                             const dateValue = debt.paymentDate ? (debt.paymentDate.includes('T') ? debt.paymentDate.split('T')[0] : debt.paymentDate) : '';
                                             startEditing(debt.id, 'paymentDate', dateValue || '', e);
                                           }}>
-                                            {debt.paymentDate && debt.paymentDate.trim() !== '' ? new Date(debt.paymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                            {debt.paymentDate && debt.paymentDate.trim() !== '' ? formatDateLocal(debt.paymentDate) : t('dashboard.noPaymentDate')}
                                           </span>
                                         )}
                                       </div>
@@ -1476,7 +1509,7 @@ const Dashboard: React.FC = () => {
                                               const dateValue = debt.cutDate ? (debt.cutDate.includes('T') ? debt.cutDate.split('T')[0] : debt.cutDate) : '';
                                               startEditing(debt.id, 'cutDate', dateValue || '', e);
                                             }}>
-                                              {debt.cutDate && debt.cutDate.trim() !== '' ? new Date(debt.cutDate).toLocaleDateString() : t('dashboard.noCutDate')}
+                                              {debt.cutDate && debt.cutDate.trim() !== '' ? formatDateLocal(debt.cutDate) : t('dashboard.noCutDate')}
                                             </span>
                                           )}
                                         </div>
@@ -1486,6 +1519,7 @@ const Dashboard: React.FC = () => {
                                         {editingField?.debtId === debt.id && editingField?.field === 'interestRate' ? (
                                           <input
                                             type="number"
+                                            inputMode="decimal"
                                             step="0.01"
                                             value={editValue}
                                             onChange={(e) => setEditValue(e.target.value)}
@@ -1540,7 +1574,7 @@ const Dashboard: React.FC = () => {
                                                       startEditingCommitment(debt.id, commitment.id, 'date', commitment.date.split('T')[0], e);
                                                     }}
                                                   >
-                                                    {new Date(commitment.date).toLocaleDateString()}
+                                                    {formatDateLocal(commitment.date)}
                                                   </span>
                                                 )}
                                                 <span className={`commitment-status ${commitment.status}`}>
@@ -1555,6 +1589,7 @@ const Dashboard: React.FC = () => {
                                                     {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'amountLocal' ? (
                                                       <input
                                                         type="number"
+                                                        inputMode="decimal"
                                                         step="0.01"
                                                         value={editValue}
                                                         onChange={(e) => setEditValue(e.target.value)}
@@ -1581,6 +1616,7 @@ const Dashboard: React.FC = () => {
                                                     {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'amountDollars' ? (
                                                       <input
                                                         type="number"
+                                                        inputMode="decimal"
                                                         step="0.01"
                                                         value={editValue}
                                                         onChange={(e) => setEditValue(e.target.value)}
@@ -1702,7 +1738,7 @@ const Dashboard: React.FC = () => {
                                                   }}
                                                 >
                                                   <Icon component={FaPhone} style={{ marginRight: '6px', fontSize: '12px' }} />
-                                                  {new Date(call.date).toLocaleDateString()}
+                                                  {formatDateLocal(call.date)}
                                                 </span>
                                               )}
                                             </div>
@@ -1846,14 +1882,6 @@ const Dashboard: React.FC = () => {
             >
               {t('dashboard.noFixedExpenses')}
             </motion.p>
-            <motion.p
-              className="empty-subtitle"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              {t('dashboard.noFixedExpensesSubtitle')}
-            </motion.p>
           </motion.div>
         ) : (
           <>
@@ -1949,7 +1977,7 @@ const Dashboard: React.FC = () => {
                                       startEditingFixedExpense(expense.id, 'paymentDate', dateValue || '', e);
                                     }}>
                                       <Icon component={FaCalendarAlt} className="item-type-icon" />
-                                      {expense.paymentDate && expense.paymentDate.trim() !== '' ? new Date(expense.paymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                      {expense.paymentDate && expense.paymentDate.trim() !== '' ? formatDateLocal(expense.paymentDate) : t('dashboard.noPaymentDate')}
                                     </p>
                                   )}
                                   <div className="item-type-row">
@@ -1973,10 +2001,32 @@ const Dashboard: React.FC = () => {
                                         startEditingFixedExpense(expense.id, 'category', expense.category || '', e);
                                       }}>
                                         <Icon component={FaTag} className="item-type-icon" />
-                                        {expense.category || ''}
+                                        {expense.category ? (expense.category === 'other' ? t('dashboard.other') : t(`addFixedExpense.cat${expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}`)) : ''}
                                       </p>
                                     )}
                                   </div>
+                                  {(() => {
+                                    const { status, day } = getFixedExpenseStatus(expense);
+                                    return (
+                                      <div className="item-status-row">
+                                        {status === 'upToDate' && (
+                                          <span className="fixed-expense-badge fixed-expense-up-to-date">
+                                            <Icon component={FaCheck} size={12} /> {t('dashboard.expenseUpToDate')}
+                                          </span>
+                                        )}
+                                        {status === 'overdue' && (
+                                          <span className="fixed-expense-badge fixed-expense-overdue">
+                                            <Icon component={FaTimes} size={12} /> {t('dashboard.expenseOverdue')}
+                                          </span>
+                                        )}
+                                        {status === 'dueDay' && day != null && day > 0 && (
+                                          <span className="fixed-expense-badge fixed-expense-due-day">
+                                            <Icon component={FaCalendarAlt} size={12} /> {t('dashboard.dueDay', { day })}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                               {!hideAmounts && (
@@ -2029,6 +2079,7 @@ const Dashboard: React.FC = () => {
                                     {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountLocal' ? (
                                       <input
                                         type="number"
+                                        inputMode="decimal"
                                         step="0.01"
                                         value={editValue}
                                         onChange={(e) => setEditValue(e.target.value)}
@@ -2055,6 +2106,7 @@ const Dashboard: React.FC = () => {
                                       {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountDollars' ? (
                                         <input
                                           type="number"
+                                          inputMode="decimal"
                                           step="0.01"
                                           value={editValue}
                                           onChange={(e) => setEditValue(e.target.value)}
@@ -2078,6 +2130,19 @@ const Dashboard: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="item-header-actions">
+                                    {getFixedExpenseStatus(expense).status !== 'upToDate' && (
+                                      <motion.button
+                                        type="button"
+                                        className="btn-mark-up-to-date"
+                                        onClick={(e) => handleMarkFixedExpenseUpToDate(expense.id, e)}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        title={t('dashboard.markUpToDate')}
+                                      >
+                                        <Icon component={FaCheck} size={14} />
+                                        <span>{t('dashboard.markUpToDate')}</span>
+                                      </motion.button>
+                                    )}
                                     <motion.button
                                       className="btn-delete"
                                       onClick={(e) => {
@@ -2140,14 +2205,6 @@ const Dashboard: React.FC = () => {
               transition={{ delay: 0.5 }}
             >
               {t('dashboard.noAssets')}
-            </motion.p>
-            <motion.p
-              className="empty-subtitle"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              {t('dashboard.noAssetsSubtitle')}
             </motion.p>
           </motion.div>
         ) : (
@@ -2281,6 +2338,7 @@ const Dashboard: React.FC = () => {
                                     {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueLocal' ? (
                                       <input
                                         type="number"
+                                        inputMode="decimal"
                                         step="0.01"
                                         value={editValue}
                                         onChange={(e) => setEditValue(e.target.value)}
@@ -2307,6 +2365,7 @@ const Dashboard: React.FC = () => {
                                       {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueDollars' ? (
                                         <input
                                           type="number"
+                                          inputMode="decimal"
                                           step="0.01"
                                           value={editValue}
                                           onChange={(e) => setEditValue(e.target.value)}
@@ -2405,14 +2464,6 @@ const Dashboard: React.FC = () => {
             >
               {t('dashboard.noIncomes')}
             </motion.p>
-            <motion.p
-              className="empty-subtitle"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              {t('dashboard.noIncomesSubtitle')}
-            </motion.p>
           </motion.div>
         ) : (
           <>
@@ -2508,7 +2559,7 @@ const Dashboard: React.FC = () => {
                                       startEditingIncome(income.id, 'nextPaymentDate', dateValue || '', e);
                                     }}>
                                       <Icon component={FaCalendarAlt} className="item-type-icon" />
-                                      {income.nextPaymentDate && income.nextPaymentDate.trim() !== '' ? new Date(income.nextPaymentDate).toLocaleDateString() : t('dashboard.noPaymentDate')}
+                                      {income.nextPaymentDate && income.nextPaymentDate.trim() !== '' ? formatDateLocal(income.nextPaymentDate) : t('dashboard.noPaymentDate')}
                                     </p>
                                   )}
                                   <div className="item-type-row">
@@ -2573,6 +2624,7 @@ const Dashboard: React.FC = () => {
                                     {editingIncome?.incomeId === income.id && editingIncome?.field === 'amountLocal' ? (
                                       <input
                                         type="number"
+                                        inputMode="decimal"
                                         step="0.01"
                                         value={editValue}
                                         onChange={(e) => setEditValue(e.target.value)}
@@ -2599,6 +2651,7 @@ const Dashboard: React.FC = () => {
                                       {editingIncome?.incomeId === income.id && editingIncome?.field === 'amountDollars' ? (
                                         <input
                                           type="number"
+                                          inputMode="decimal"
                                           step="0.01"
                                           value={editValue}
                                           onChange={(e) => setEditValue(e.target.value)}

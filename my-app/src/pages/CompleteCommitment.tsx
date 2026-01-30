@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
 import { 
   FaCheckCircle,
-  FaGift,
   FaArrowLeft
 } from 'react-icons/fa';
 import { Debt, PaymentCommitment } from '../types';
@@ -62,7 +61,7 @@ const CompleteCommitment: React.FC = () => {
         id: 'complete',
         title: t('common.allDone'),
         subtitle: t('completeCommitment.success'),
-        icon: FaGift,
+        icon: FaCheckCircle,
       },
     ];
   };

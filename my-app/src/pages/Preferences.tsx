@@ -70,7 +70,10 @@ const Preferences: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-back"
-              onClick={() => navigate('/profile')}
+              onClick={() => {
+                localStorage.setItem('hasSeenInitialSetup', '1');
+                navigate('/profile');
+              }}
             >
               <Icon component={FaArrowLeft} style={{ marginRight: '8px' }} /> {t('common.back')}
             </motion.button>

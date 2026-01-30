@@ -1,8 +1,20 @@
 .dashboard {
   min-height: 100vh;
+  max-height: 100vh;
   background: var(--dark-bg);
   padding-bottom: 70px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .dashboard {
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.2);
+  }
 }
 
 .dashboard-header {
@@ -111,6 +123,9 @@
 .dashboard-content {
   padding: 20px;
   max-width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .dashboard-content-two {
@@ -426,7 +441,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 20vh;
+  min-height: 24vh;
+  padding: 32px 24px;
 }
 
 .empty-state-image {
@@ -492,11 +508,10 @@
 
 .debt-card {
   background: var(--dark-card, #014a3a);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 20px;
-  
-  transition: all 0.3s;
-  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -504,12 +519,11 @@
 
 .debt-card[data-dragging="true"] {
   opacity: 0.5;
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .debt-card:hover {
-  
-  
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -724,34 +738,36 @@
 .btn-edit,
 .btn-delete {
   border: 0;
-  background: transparent;
-  
-  font-size: 16px;
+  background: var(--overlay-light, rgba(0, 0, 0, 0.15));
+  font-size: 18px;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 4px;
+  padding: 10px;
+  border-radius: 8px;
   transition: all 0.2s;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
 .btn-edit:hover {
   background: var(--primary-overlay);
   color: var(--primary);
+  transform: scale(1.05);
 }
 
 .btn-delete:hover {
   background: var(--error-light);
   color: var(--error);
+  transform: scale(1.05);
 }
-
 
 .btn-delete {
   display: flex;
-  justify-content: end;
-  font-size: 16px;
+  justify-content: center;
   cursor: pointer;
 }
 
@@ -1832,6 +1848,9 @@
 /* Screen Container */
 .screen-container {
   width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .screen-header {
@@ -1886,19 +1905,23 @@
 
 .item-card {
   background: var(--dark-card, #014a3a);
-  border-radius: 8px;
-  padding: 10px 24px 15px;
-  transition: all 0.3s;
+  border-radius: 12px;
+  padding: 14px 20px 16px;
+  transition: all 0.25s ease;
   cursor: pointer;
   user-select: none;
   position: relative;
   border: 1px solid var(--bg-tertiary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 .item-card[data-dragging="true"] {
   opacity: 0.5;
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .item-card:hover {
@@ -2041,11 +2064,66 @@
   gap: 8px;
 }
 
+.item-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.fixed-expense-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fixed-expense-up-to-date {
+  background: rgba(86, 154, 60, 0.25);
+  color: var(--primary-bright, #7cbd6a);
+}
+
+.fixed-expense-overdue {
+  background: rgba(244, 67, 54, 0.2);
+  color: var(--error, #f44336);
+}
+
+.fixed-expense-due-day {
+  background: rgba(244, 192, 50, 0.2);
+  color: #f4c032;
+}
+
+.item-card .btn-mark-up-to-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 0;
+  background: var(--primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.item-card .btn-mark-up-to-date:hover {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
 .item-header-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .item-card-actions {

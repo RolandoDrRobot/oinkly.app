@@ -7,9 +7,8 @@ import {
   FaCalendarAlt,
   FaClipboardList,
   FaPhoneAlt,
-  FaGift,
-  FaArrowLeft,
   FaCheckCircle,
+  FaArrowLeft,
   FaFileInvoiceDollar,
   FaDollarSign,
   FaMoneyBill
@@ -144,7 +143,7 @@ const AddCall: React.FC = () => {
           id: 'complete',
           title: t('common.allDone'),
           subtitle: t('addCall.success'),
-          icon: FaGift,
+          icon: FaCheckCircle,
         },
       ];
     }
@@ -156,7 +155,7 @@ const AddCall: React.FC = () => {
         id: 'complete',
         title: t('common.allDone'),
         subtitle: t('addCall.success'),
-        icon: FaGift,
+        icon: FaCheckCircle,
       },
     ];
   };

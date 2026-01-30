@@ -9,14 +9,14 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaGift,
   FaArrowLeft,
   FaCalendarAlt,
   FaHome,
   FaCar,
   FaChartLine,
   FaPiggyBank,
-  FaEllipsisH
+  FaEllipsisH,
+  FaCheckCircle
 } from 'react-icons/fa';
 import { Asset } from '../types';
 import { storage } from '../utils/storage';
@@ -146,7 +146,7 @@ const AddAsset: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('addAsset.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 
@@ -348,7 +348,8 @@ const AddAsset: React.FC = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   type={currentStepData.type === 'number' ? 'text' : (currentStepData.type || 'text')}
-                  placeholder={currentStepData.placeholder}
+                  inputMode={currentStepData.type === 'number' ? 'decimal' : undefined}
+                  placeholder={currentStepData.type === 'number' ? t('common.amountPlaceholder') : currentStepData.placeholder}
                   value={
                     currentStepData.type === 'number'
                       ? getCurrencyInputValue()

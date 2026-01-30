@@ -9,7 +9,7 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaGift,
+  FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
   FaBriefcase,
@@ -22,6 +22,7 @@ import {
 import { Income } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
+import { toLocalYYYYMMDD } from '../utils/dateUtils';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 
@@ -82,7 +83,7 @@ const EditIncome: React.FC = () => {
           frequency: foundIncome.frequency,
           amountLocal: foundIncome.amountLocal,
           amountDollars: foundIncome.amountDollars,
-          nextPaymentDate: foundIncome.nextPaymentDate || '',
+          nextPaymentDate: foundIncome.nextPaymentDate ? toLocalYYYYMMDD(foundIncome.nextPaymentDate) : '',
           notes: foundIncome.notes || '',
         });
       } else {
@@ -183,7 +184,7 @@ const EditIncome: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('editIncome.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 
@@ -266,6 +267,7 @@ const EditIncome: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete' && income) {
       const timer = setTimeout(() => {
+        const nextDate = formData.nextPaymentDate?.trim();
         const updatedIncome: Income = {
           ...income,
           name: formData.name || '',
@@ -273,7 +275,7 @@ const EditIncome: React.FC = () => {
           frequency: formData.frequency || 'monthly',
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
-          nextPaymentDate: formData.nextPaymentDate || undefined,
+          nextPaymentDate: nextDate ? nextDate.split('T')[0] : undefined,
           notes: formData.notes || undefined,
           updatedAt: new Date().toISOString(),
         };

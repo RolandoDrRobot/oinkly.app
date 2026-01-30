@@ -9,7 +9,7 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaGift,
+  FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
   FaTag
@@ -157,7 +157,7 @@ const EditFixedExpense: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('editFixedExpense.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 

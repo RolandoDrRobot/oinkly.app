@@ -7,7 +7,7 @@ import {
   FaCalendarAlt,
   FaClipboardList,
   FaPhoneAlt,
-  FaGift,
+  FaCheckCircle,
   FaArrowLeft,
 } from 'react-icons/fa';
 import { CallRecord, Debt } from '../types';
@@ -92,7 +92,7 @@ const EditCall: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('editCall.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 

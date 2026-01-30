@@ -9,7 +9,7 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaGift,
+  FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
   FaBriefcase,
@@ -161,7 +161,7 @@ const AddIncome: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('addIncome.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 
@@ -244,6 +244,7 @@ const AddIncome: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
+        const nextDate = formData.nextPaymentDate?.trim();
         const newIncome: Income = {
           id: Date.now().toString(),
           name: formData.name || '',
@@ -252,7 +253,7 @@ const AddIncome: React.FC = () => {
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
           localCurrency: storage.getLocalCurrency(),
-          nextPaymentDate: formData.nextPaymentDate || undefined,
+          nextPaymentDate: nextDate ? nextDate.split('T')[0] : undefined,
           notes: formData.notes || undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -366,7 +367,8 @@ const AddIncome: React.FC = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   type={currentStepData.type === 'number' ? 'text' : (currentStepData.type || 'text')}
-                  placeholder={currentStepData.placeholder}
+                  inputMode={currentStepData.type === 'number' ? 'decimal' : undefined}
+                  placeholder={currentStepData.type === 'number' ? t('common.amountPlaceholder') : currentStepData.placeholder}
                   value={
                     currentStepData.type === 'number'
                       ? getCurrencyInputValue()

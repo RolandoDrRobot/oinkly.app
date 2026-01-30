@@ -9,10 +9,19 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList, 
-  FaGift,
+  FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
-  FaTag
+  FaTag,
+  FaHome,
+  FaBolt,
+  FaShieldAlt,
+  FaCar,
+  FaUtensils,
+  FaHeart,
+  FaGraduationCap,
+  FaFilm,
+  FaEllipsisH
 } from 'react-icons/fa';
 import { FixedExpense } from '../types';
 import { storage } from '../utils/storage';
@@ -72,6 +81,7 @@ const AddFixedExpense: React.FC = () => {
     placeholder?: string;
     type?: string;
     optional?: boolean;
+    options?: Array<{ value: string; label: string; icon: IconType }>;
   }> = [
     {
       id: 'welcome',
@@ -93,7 +103,7 @@ const AddFixedExpense: React.FC = () => {
       subtitle: t('addFixedExpense.amountLocalSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
       icon: FaMoneyBill,
       field: 'amountLocal' as keyof StepData,
-      placeholder: '0.00',
+      placeholder: t('common.amountPlaceholder'),
       type: 'number',
     },
     {
@@ -102,7 +112,7 @@ const AddFixedExpense: React.FC = () => {
       subtitle: t('addFixedExpense.amountDollarSubtitle'),
       icon: FaDollarSign,
       field: 'amountDollars' as keyof StepData,
-      placeholder: '0.00',
+      placeholder: t('common.amountPlaceholder'),
       type: 'number',
     },
     {
@@ -111,8 +121,18 @@ const AddFixedExpense: React.FC = () => {
       subtitle: t('addFixedExpense.categorySubtitle'),
       icon: FaTag,
       field: 'category' as keyof StepData,
-      placeholder: t('addFixedExpense.categoryPlaceholder'),
       optional: true,
+      options: [
+        { value: 'housing', label: t('addFixedExpense.catHousing'), icon: FaHome },
+        { value: 'utilities', label: t('addFixedExpense.catUtilities'), icon: FaBolt },
+        { value: 'insurance', label: t('addFixedExpense.catInsurance'), icon: FaShieldAlt },
+        { value: 'transport', label: t('addFixedExpense.catTransport'), icon: FaCar },
+        { value: 'food', label: t('addFixedExpense.catFood'), icon: FaUtensils },
+        { value: 'health', label: t('addFixedExpense.catHealth'), icon: FaHeart },
+        { value: 'education', label: t('addFixedExpense.catEducation'), icon: FaGraduationCap },
+        { value: 'entertainment', label: t('addFixedExpense.catEntertainment'), icon: FaFilm },
+        { value: 'other', label: t('dashboard.other'), icon: FaEllipsisH },
+      ],
     },
     {
       id: 'dueDate',
@@ -136,7 +156,7 @@ const AddFixedExpense: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('addFixedExpense.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 
@@ -160,6 +180,14 @@ const AddFixedExpense: React.FC = () => {
     const step = steps[currentStep];
     if (step.field) {
       setFormData({ ...formData, [step.field]: value });
+    }
+  };
+
+  const handleOptionSelect = (value: string) => {
+    const step = steps[currentStep];
+    if (step.field) {
+      setFormData({ ...formData, [step.field]: value });
+      handleNext();
     }
   };
 
@@ -209,6 +237,12 @@ const AddFixedExpense: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
+        const dayNum = formData.dueDate ? parseInt(String(formData.dueDate).replace(/\D/g, ''), 10) : 0;
+        const t = new Date();
+        const paymentDate =
+          dayNum >= 1 && dayNum <= 31
+            ? `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+            : undefined;
         const newExpense: FixedExpense = {
           id: Date.now().toString(),
           name: formData.name || '',
@@ -217,6 +251,7 @@ const AddFixedExpense: React.FC = () => {
           localCurrency: storage.getLocalCurrency(),
           category: formData.category || undefined,
           dueDate: formData.dueDate || undefined,
+          paymentDate,
           notes: formData.notes || undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -238,6 +273,7 @@ const AddFixedExpense: React.FC = () => {
   const progress = ((currentStep + 1) / steps.length) * 100;
   const canProceed = () => {
     if (currentStepData.id === 'welcome' || currentStepData.id === 'complete') return true;
+    if (currentStepData.options) return true;
     if (currentStepData.optional) return true;
     if (currentStepData.field) {
       const value = formData[currentStepData.field];
@@ -302,13 +338,33 @@ const AddFixedExpense: React.FC = () => {
             )}
 
             <div className="step-input">
-              {currentStepData.field ? (
+              {currentStepData.options ? (
+                <div className="options-grid">
+                  {currentStepData.options.map((option, index) => (
+                    <motion.button
+                      key={option.value}
+                      type="button"
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.05 * index }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="option-button"
+                      onClick={() => handleOptionSelect(option.value)}
+                    >
+                      <Icon component={option.icon} className="option-icon" size={32} />
+                      <span className="option-label">{option.label}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              ) : currentStepData.field ? (
                 <motion.input
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   type={currentStepData.type === 'number' ? 'text' : (currentStepData.type || 'text')}
                   placeholder={currentStepData.placeholder}
+                  inputMode={currentStepData.type === 'number' ? 'decimal' : undefined}
                   value={
                     currentStepData.type === 'number'
                       ? getCurrencyInputValue()
@@ -352,7 +408,7 @@ const AddFixedExpense: React.FC = () => {
               {t('common.skip')}
             </motion.button>
           )}
-          {currentStepData.id !== 'complete' && (
+          {currentStepData.id !== 'complete' && !currentStepData.options && (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

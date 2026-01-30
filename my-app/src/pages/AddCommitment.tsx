@@ -9,7 +9,6 @@ import {
   FaDollarSign, 
   FaMoneyBill, 
   FaClipboardList,
-  FaGift,
   FaArrowLeft,
   FaCheckCircle
 } from 'react-icons/fa';
@@ -159,7 +158,7 @@ const AddCommitment: React.FC = () => {
       id: 'complete',
       title: t('common.allDone'),
       subtitle: t('addCommitment.success'),
-      icon: FaGift,
+      icon: FaCheckCircle,
     },
   ];
 
