@@ -1,4 +1,6 @@
 import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription } from '../types';
+import type { HydratePayload } from '../lib/supabaseData';
+import * as supabaseData from '../lib/supabaseData';
 
 const DEBTS_KEY = 'debts';
 const SUBSCRIPTION_PREFIX = 'subscription_';
@@ -37,6 +39,28 @@ export const storage = {
     localStorage.removeItem(IS_LOGGED_IN_KEY);
   },
 
+  /** Escribe en localStorage los datos traídos de Supabase (tras login). */
+  hydrateToLocalStorage: (data: HydratePayload, userId: string) => {
+    localStorage.setItem(DEBTS_KEY, JSON.stringify(data.debts));
+    localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(data.fixedExpenses));
+    localStorage.setItem(ASSETS_KEY, JSON.stringify(data.assets));
+    localStorage.setItem(INCOMES_KEY, JSON.stringify(data.incomes));
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(data.notifications));
+    localStorage.setItem(SUBSCRIPTION_PREFIX + userId, JSON.stringify(data.subscription || { plan: 'free' }));
+    localStorage.setItem(DEBTS_ORDER_KEY, JSON.stringify(data.debtsOrder));
+    localStorage.setItem(FIXED_EXPENSES_ORDER_KEY, JSON.stringify(data.fixedExpensesOrder));
+    localStorage.setItem(ASSETS_ORDER_KEY, JSON.stringify(data.assetsOrder));
+    localStorage.setItem(INCOMES_ORDER_KEY, JSON.stringify(data.incomesOrder));
+    if (data.preferences) {
+      localStorage.setItem('localCurrency', data.preferences.localCurrency);
+      localStorage.setItem('language', data.preferences.language);
+      if (data.preferences.themeMode) localStorage.setItem('themeMode', data.preferences.themeMode);
+      if (data.preferences.colorScheme != null) localStorage.setItem('colorScheme', data.preferences.colorScheme);
+      localStorage.setItem('hideAmounts', String(data.preferences.hideAmounts));
+      localStorage.setItem('hasSeenInitialSetup', data.preferences.hasSeenInitialSetup ? '1' : '');
+    }
+  },
+
   // Subscription (per user)
   getSubscription: (userId: string): Subscription | null => {
     const raw = localStorage.getItem(SUBSCRIPTION_PREFIX + userId);
@@ -44,6 +68,7 @@ export const storage = {
   },
   setSubscription: (userId: string, data: Subscription) => {
     localStorage.setItem(SUBSCRIPTION_PREFIX + userId, JSON.stringify(data));
+    supabaseData.setSubscription(userId, data).catch((e) => console.warn('[storage] sync subscription', e));
   },
 
   // Debts management
@@ -67,12 +92,17 @@ export const storage = {
     }
     
     localStorage.setItem(DEBTS_KEY, JSON.stringify(debts));
+    const uid = storage.getUser()?.id;
+    const toSync = debts.find(d => d.id === debt.id);
+    if (uid && toSync) supabaseData.saveDebt(uid, toSync).catch((e) => console.warn('[storage] sync debt', e));
   },
 
   deleteDebt: (id: string) => {
     const debts = storage.getDebts();
     const filtered = debts.filter(d => d.id !== id);
     localStorage.setItem(DEBTS_KEY, JSON.stringify(filtered));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.deleteDebt(uid, id).catch((e) => console.warn('[storage] sync deleteDebt', e));
   },
 
   getDebt: (id: string): Debt | null => {
@@ -83,6 +113,8 @@ export const storage = {
   // Theme management
   setThemeMode: (mode: 'light' | 'dark') => {
     localStorage.setItem('themeMode', mode);
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setUserPreferences(uid, { themeMode: mode }).catch((e) => console.warn('[storage] sync themeMode', e));
   },
 
   getThemeMode: (): 'light' | 'dark' | null => {
@@ -91,6 +123,8 @@ export const storage = {
 
   setColorScheme: (scheme: string) => {
     localStorage.setItem('colorScheme', scheme);
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setUserPreferences(uid, { colorScheme: scheme }).catch((e) => console.warn('[storage] sync colorScheme', e));
   },
 
   getColorScheme: (): string | null => {
@@ -100,6 +134,8 @@ export const storage = {
   // Local currency management
   setLocalCurrency: (currency: string) => {
     localStorage.setItem('localCurrency', currency);
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setUserPreferences(uid, { localCurrency: currency }).catch((e) => console.warn('[storage] sync localCurrency', e));
   },
 
   getLocalCurrency: (): string => {
@@ -109,6 +145,8 @@ export const storage = {
   // Language management
   setLanguage: (language: string) => {
     localStorage.setItem('language', language);
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setUserPreferences(uid, { language }).catch((e) => console.warn('[storage] sync language', e));
   },
 
   getLanguage: (): string => {
@@ -127,6 +165,8 @@ export const storage = {
   // Debts order management
   setDebtsOrder: (order: string[]) => {
     localStorage.setItem(DEBTS_ORDER_KEY, JSON.stringify(order));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setListOrder(uid, 'debts', order).catch((e) => console.warn('[storage] sync debtsOrder', e));
   },
 
   getDebtsOrder: (): string[] | null => {
@@ -151,6 +191,9 @@ export const storage = {
     }
     
     localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(expenses));
+    const uid = storage.getUser()?.id;
+    const toSync = expenses.find(e => e.id === expense.id);
+    if (uid && toSync) supabaseData.saveFixedExpense(uid, toSync).catch((e) => console.warn('[storage] sync fixedExpense', e));
   },
 
   getFixedExpense: (id: string): FixedExpense | null => {
@@ -166,6 +209,8 @@ export const storage = {
     const expenses = storage.getFixedExpenses();
     const filtered = expenses.filter(e => e.id !== id);
     localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(filtered));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.deleteFixedExpense(uid, id).catch((e) => console.warn('[storage] sync deleteFixedExpense', e));
   },
 
   // Assets management
@@ -185,6 +230,9 @@ export const storage = {
     }
     
     localStorage.setItem(ASSETS_KEY, JSON.stringify(assets));
+    const uid = storage.getUser()?.id;
+    const toSync = assets.find(a => a.id === asset.id);
+    if (uid && toSync) supabaseData.saveAsset(uid, toSync).catch((e) => console.warn('[storage] sync asset', e));
   },
 
   getAsset: (id: string): Asset | null => {
@@ -200,6 +248,8 @@ export const storage = {
     const assets = storage.getAssets();
     const filtered = assets.filter(a => a.id !== id);
     localStorage.setItem(ASSETS_KEY, JSON.stringify(filtered));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.deleteAsset(uid, id).catch((e) => console.warn('[storage] sync deleteAsset', e));
   },
 
   // Incomes management
@@ -219,6 +269,9 @@ export const storage = {
     }
     
     localStorage.setItem(INCOMES_KEY, JSON.stringify(incomes));
+    const uid = storage.getUser()?.id;
+    const toSync = incomes.find(i => i.id === income.id);
+    if (uid && toSync) supabaseData.saveIncome(uid, toSync).catch((e) => console.warn('[storage] sync income', e));
   },
 
   getIncome: (id: string): Income | null => {
@@ -234,11 +287,15 @@ export const storage = {
     const incomes = storage.getIncomes();
     const filtered = incomes.filter(i => i.id !== id);
     localStorage.setItem(INCOMES_KEY, JSON.stringify(filtered));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.deleteIncome(uid, id).catch((e) => console.warn('[storage] sync deleteIncome', e));
   },
 
   // Fixed Expenses order management
   setFixedExpensesOrder: (order: string[]) => {
     localStorage.setItem(FIXED_EXPENSES_ORDER_KEY, JSON.stringify(order));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setListOrder(uid, 'fixed_expenses', order).catch((e) => console.warn('[storage] sync fixedExpensesOrder', e));
   },
 
   getFixedExpensesOrder: (): string[] | null => {
@@ -249,6 +306,8 @@ export const storage = {
   // Assets order management
   setAssetsOrder: (order: string[]) => {
     localStorage.setItem(ASSETS_ORDER_KEY, JSON.stringify(order));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setListOrder(uid, 'assets', order).catch((e) => console.warn('[storage] sync assetsOrder', e));
   },
 
   getAssetsOrder: (): string[] | null => {
@@ -259,6 +318,8 @@ export const storage = {
   // Incomes order management
   setIncomesOrder: (order: string[]) => {
     localStorage.setItem(INCOMES_ORDER_KEY, JSON.stringify(order));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.setListOrder(uid, 'incomes', order).catch((e) => console.warn('[storage] sync incomesOrder', e));
   },
 
   getIncomesOrder: (): string[] | null => {
@@ -270,9 +331,10 @@ export const storage = {
   saveNotification: (notification: Notification) => {
     const notifications = storage.getNotifications();
     notifications.unshift(notification); // Add to beginning
-    // Keep only last 100 notifications
     const limitedNotifications = notifications.slice(0, 100);
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(limitedNotifications));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.saveNotification(uid, notification).catch((e) => console.warn('[storage] sync saveNotification', e));
   },
 
   getNotifications: (): Notification[] => {
@@ -286,22 +348,30 @@ export const storage = {
       n.id === notificationId ? { ...n, read: true } : n
     );
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.markNotificationAsRead(uid, notificationId).catch((e) => console.warn('[storage] sync markNotificationAsRead', e));
   },
 
   markAllNotificationsAsRead: () => {
     const notifications = storage.getNotifications();
     const updated = notifications.map(n => ({ ...n, read: true }));
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.markAllNotificationsAsRead(uid).catch((e) => console.warn('[storage] sync markAllNotificationsAsRead', e));
   },
 
   deleteNotification: (notificationId: string) => {
     const notifications = storage.getNotifications();
     const updated = notifications.filter(n => n.id !== notificationId);
     localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updated));
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.deleteNotification(uid, notificationId).catch((e) => console.warn('[storage] sync deleteNotification', e));
   },
 
   clearAllNotifications: () => {
     localStorage.removeItem(NOTIFICATIONS_KEY);
+    const uid = storage.getUser()?.id;
+    if (uid) supabaseData.clearAllNotifications(uid).catch((e) => console.warn('[storage] sync clearAllNotifications', e));
   },
 
   getUnreadNotificationsCount: (): number => {

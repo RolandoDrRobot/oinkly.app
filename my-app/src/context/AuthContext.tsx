@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User } from '../types';
 import { storage } from '../utils/storage';
 import { supabase, mapSupabaseUser } from '../lib/supabase';
+import { hydrateFromSupabase } from '../lib/supabaseData';
 
 interface AuthContextType {
   user: User | null;
@@ -55,11 +56,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.info('[AuthContext] Session found, mapping user...');
         const mappedUser = mapSupabaseUser(session.user);
         if (mappedUser) {
-          console.info('[AuthContext] User mapped successfully, setting state');
           setUser(mappedUser);
           setIsAuthenticated(true);
-          // Also store in localStorage for backward compatibility
           storage.setUser(mappedUser);
+          try {
+            const data = await hydrateFromSupabase(mappedUser.id);
+            storage.hydrateToLocalStorage(data, mappedUser.id);
+            console.info('[AuthContext] Data hydrated from Supabase');
+          } catch (err) {
+            console.warn('[AuthContext] Hydrate from Supabase failed', err);
+          }
         } else {
           console.warn('[AuthContext] Failed to map user from session');
         }
@@ -82,13 +88,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
       
       if (session) {
-        console.info('[AuthContext] Session in onAuthStateChange, mapping user...');
         const mappedUser = mapSupabaseUser(session.user);
         if (mappedUser) {
-          console.info('[AuthContext] User mapped, updating state');
           setUser(mappedUser);
           setIsAuthenticated(true);
           storage.setUser(mappedUser);
+          hydrateFromSupabase(mappedUser.id)
+            .then((data) => {
+              storage.hydrateToLocalStorage(data, mappedUser.id);
+              console.info('[AuthContext] Data hydrated from Supabase (onAuthChange)');
+            })
+            .catch((err) => console.warn('[AuthContext] Hydrate failed', err));
         } else {
           console.warn('[AuthContext] Failed to map user in onAuthStateChange');
         }
