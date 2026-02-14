@@ -8,6 +8,7 @@
 
 import type { AIAction } from '../types/ai';
 import { isValidAIIntent } from './aiActions';
+import { storage } from '../utils/storage';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -119,11 +120,20 @@ OTROS: "resumen" / "¿cuánto debo?" → get_overview. "ocultar montos" → togg
  * Llama a la API de IA para interpretar el texto y devolver una AIAction.
  * Si no hay REACT_APP_OPENAI_API_KEY o la llamada falla, devuelve null (usar parser local).
  */
+function getOpenAIApiKey(): string {
+  return (
+    process.env.REACT_APP_OPENAI_API_KEY ||
+    process.env.REACT_APP_AI_VOICE_API_KEY ||
+    storage.getOpenAIApiKey() ||
+    ''
+  ).trim();
+}
+
 export async function interpretWithAI(
   text: string,
   context: InterpretVoiceContext
 ): Promise<AIAction | null> {
-  const apiKey = process.env.REACT_APP_OPENAI_API_KEY || process.env.REACT_APP_AI_VOICE_API_KEY;
+  const apiKey = getOpenAIApiKey();
   if (!apiKey || !text.trim()) return null;
 
   const baseUrl = process.env.REACT_APP_AI_VOICE_API_URL || OPENAI_API_URL;
@@ -230,11 +240,9 @@ export async function interpretWithAI(
   }
 }
 
-/** Indica si la interpretación por IA está disponible (hay API key). */
+/** Indica si la interpretación por IA está disponible (hay API key en env o en preferencias). */
 export function isAIVoiceEnabled(): boolean {
-  return Boolean(
-    process.env.REACT_APP_OPENAI_API_KEY || process.env.REACT_APP_AI_VOICE_API_KEY
-  );
+  return Boolean(getOpenAIApiKey());
 }
 
 /** Último error conocido (quota, model_not_found). Para mostrar mensaje al usuario. */

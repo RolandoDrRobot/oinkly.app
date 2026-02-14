@@ -12,6 +12,7 @@ const FIXED_EXPENSES_ORDER_KEY = 'fixedExpensesOrder';
 const ASSETS_ORDER_KEY = 'assetsOrder';
 const INCOMES_ORDER_KEY = 'incomesOrder';
 const NOTIFICATIONS_KEY = 'notifications';
+const OPENAI_API_KEY = 'openaiApiKey';
 
 export const storage = {
   // User management
@@ -112,6 +113,15 @@ export const storage = {
 
   getLanguage: (): string => {
     return localStorage.getItem('language') || 'en';
+  },
+
+  // OpenAI / ChatGPT API key (for voice AI; optional, can also use env REACT_APP_OPENAI_API_KEY)
+  getOpenAIApiKey: (): string => {
+    return localStorage.getItem(OPENAI_API_KEY) || '';
+  },
+  setOpenAIApiKey: (key: string) => {
+    if (key.trim()) localStorage.setItem(OPENAI_API_KEY, key.trim());
+    else localStorage.removeItem(OPENAI_API_KEY);
   },
 
   // Debts order management

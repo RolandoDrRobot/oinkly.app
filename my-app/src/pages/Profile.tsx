@@ -122,7 +122,7 @@ const Profile: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="profile-actions-section"
         >
-          <ul className="profile-actions-list" role="list">
+          <ul className="profile-actions-list">
             {actions.map((item) => (
               <li key={item.id}>
                 <motion.button

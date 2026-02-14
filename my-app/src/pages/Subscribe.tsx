@@ -21,7 +21,6 @@ const Subscribe: React.FC = () => {
     setIsSubmitting(true);
     try {
       await activatePremium(interval);
-      notify.subscriptionActivated();
       navigate('/dashboard');
     } catch (e) {
       notify.subscriptionError();

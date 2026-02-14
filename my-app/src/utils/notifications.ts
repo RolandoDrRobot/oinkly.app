@@ -149,6 +149,22 @@ export const ensureFixedExpenseReminders = (fixedExpenses: FixedExpense[]): void
   }
 };
 
+// Toast options to match App Toaster (dark theme, same styles as other notifications)
+const APP_TOAST_OPTS = {
+  duration: 4000,
+  className: 'app-toast',
+  style: {
+    background: 'var(--dark-section)',
+    color: 'var(--text-primary)',
+    border: '1px solid var(--bg-tertiary, rgba(255,255,255,0.08))',
+    borderRadius: '12px',
+    padding: '14px 18px',
+    fontSize: '14px',
+    fontFamily: 'var(--font-family, "DynaPuff", system-ui)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+  },
+};
+
 // Standard: save to storage (shows in NotificationsSidebar) + show toast
 const saveAndToast = (
   message: string,
@@ -157,10 +173,11 @@ const saveAndToast = (
 ) => {
   saveNotification(message, type);
   const duration = options?.duration ?? 4000;
-  if (type === 'success') toast.success(message, { duration });
-  else if (type === 'error') toast.error(message, { duration });
-  else if (type === 'warning') toast(message, { icon: '⚠️', duration });
-  else toast(message, { icon: 'ℹ️', duration });
+  const opts = { ...APP_TOAST_OPTS, duration };
+  if (type === 'success') toast.success(message, opts);
+  else if (type === 'error') toast.error(message, opts);
+  else if (type === 'warning') toast(message, { ...opts, icon: '⚠️' });
+  else toast(message, { ...opts, icon: 'ℹ️' });
 };
 
 // Notification helpers with i18n support – all persist to storage and show in NotificationsSidebar
@@ -168,15 +185,12 @@ export const notify = {
   // Save + toast (for user actions that should appear in sidebar and as toast)
   saveAndToast,
 
-  // Suscripción cancelada (solo en panel, como editar deuda / overviewUpdated)
+  // Suscripción cancelada: guardar en panel + toast como las demás
   subscriptionCanceled: () => {
-    const message = t('notifications.subscriptionCanceled');
-    saveNotification(message, 'success');
+    saveAndToast(t('notifications.subscriptionCanceled'), 'success');
   },
-  // Premium activado
-  subscriptionActivated: () => {
-    saveAndToast(t('notifications.subscriptionActivated'), 'success');
-  },
+  // Premium activado: sin notificación (solo navegación)
+  subscriptionActivated: () => {},
   // Error al activar Premium
   subscriptionError: (message?: string) => {
     const msg = message ?? t('notifications.subscriptionError');

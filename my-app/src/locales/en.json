@@ -355,7 +355,14 @@
     "localCurrency": "Local Currency",
     "language": "Language",
     "english": "English",
-    "spanish": "Spanish"
+    "spanish": "Spanish",
+    "voiceAiSection": "Voice assistant (ChatGPT)",
+    "voiceAiDescription": "With an OpenAI API key you can control the entire app by voice: create and edit debts, fixed expenses, assets, income, commitments, and bank calls using natural language.",
+    "openAIApiKey": "OpenAI API key",
+    "openAIApiKeyPlaceholder": "sk-... (optional)",
+    "openAIApiKeySaved": "API key saved",
+    "openAIApiKeyRemoved": "API key removed",
+    "getKeyAt": "Get your key at platform.openai.com"
   },
   "profile": {
     "title": "Profile",
