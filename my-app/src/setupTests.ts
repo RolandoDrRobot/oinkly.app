@@ -2,6 +2,7 @@
  * Jest setup (CRA runs this before each test file).
  * Optional: mock localStorage, matchMedia, etc.
  */
+import '@testing-library/jest-dom';
 
 // Mock localStorage with a real backing store so tests can assert on stored values.
 const storageBacking: Record<string, string> = {};
