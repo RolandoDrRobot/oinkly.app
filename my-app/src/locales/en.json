@@ -29,6 +29,11 @@
     "or": "or",
     "googleLoginError": "Error signing in with Google. Please try again."
   },
+  "mobileOnly": {
+    "title": "This is a mobile app",
+    "message": "Oinkly is designed to be used on your phone. Open this page on your mobile device to use the app.",
+    "hint": "Mobile only."
+  },
   "dashboard": {
     "title": "Oinkly",
     "debt": "Debt",

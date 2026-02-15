@@ -30,6 +30,7 @@ import Subscribe from './pages/Subscribe';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Contact from './pages/Contact';
 import InstallApp from './pages/InstallApp';
+import MobileOnlyGate from './components/MobileOnlyGate';
 import { Toaster } from './utils/notifications';
 import './App.css';
 
@@ -263,6 +264,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <SubscriptionProvider>
+          <MobileOnlyGate>
           <Router>
             <AppRoutes />
             <Toaster
@@ -290,6 +292,7 @@ function App() {
               }}
             />
           </Router>
+          </MobileOnlyGate>
         </SubscriptionProvider>
       </AuthProvider>
     </ThemeProvider>

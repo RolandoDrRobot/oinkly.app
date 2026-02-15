@@ -29,6 +29,11 @@
     "or": "o",
     "googleLoginError": "Error al iniciar sesión con Google. Por favor, intenta de nuevo."
   },
+  "mobileOnly": {
+    "title": "Esta es una app para celular",
+    "message": "Oinkly está pensada para usarse en tu teléfono. Abre esta página desde tu celular para usar la app.",
+    "hint": "Es solo para móvil."
+  },
   "dashboard": {
     "title": "Oinkly",
     "debt": "Deuda",
