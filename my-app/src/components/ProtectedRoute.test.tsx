@@ -7,8 +7,12 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 
 const mockUseAuth = jest.fn();
+const mockUseSubscription = jest.fn();
 jest.mock('../context/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
+}));
+jest.mock('../context/SubscriptionContext', () => ({
+  useSubscription: () => mockUseSubscription(),
 }));
 
 const routerFuture = { v7_startTransition: true, v7_relativeSplatPath: true };
@@ -42,6 +46,7 @@ afterAll(() => {
 describe('ProtectedRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseSubscription.mockReturnValue({ isLoading: false });
   });
 
   it('shows loading screen when loading is true', () => {
@@ -59,8 +64,17 @@ describe('ProtectedRoute', () => {
     expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument();
   });
 
-  it('renders children when authenticated', () => {
+  it('shows loading when authenticated but subscription still loading', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true, loading: false });
+    mockUseSubscription.mockReturnValue({ isLoading: true });
+    renderWithRouter();
+    expect(document.querySelector('.auth-loading-screen')).toBeInTheDocument();
+    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument();
+  });
+
+  it('renders children when authenticated and subscription loaded', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, loading: false });
+    mockUseSubscription.mockReturnValue({ isLoading: false });
     renderWithRouter();
     expect(screen.getByText('Dashboard content')).toBeInTheDocument();
     expect(screen.queryByText('Landing')).not.toBeInTheDocument();

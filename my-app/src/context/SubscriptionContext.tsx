@@ -16,18 +16,22 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [subscriptionState, setSubscriptionState] = useState<Subscription | null>(null);
+  const [loadedForUserId, setLoadedForUserId] = useState<string | null>(null);
+
+  // Don't consider "loaded" until we've read subscription for this user — blocks first render until we're sure
+  const isLoading = user?.id ? loadedForUserId !== user.id : false;
+  const subscription = subscriptionState;
 
   const loadSubscription = useCallback(() => {
     if (!user?.id) {
-      setSubscription(null);
-      setIsLoading(false);
+      setSubscriptionState(null);
+      setLoadedForUserId(null);
       return;
     }
     const sub = storage.getSubscription(user.id);
-    setSubscription(sub);
-    setIsLoading(false);
+    setSubscriptionState(sub);
+    setLoadedForUserId(user.id);
   }, [user?.id]);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
         interval,
       };
       storage.setSubscription(user.id, data);
-      setSubscription(data);
+      setSubscriptionState(data);
     },
     [user?.id]
   );
@@ -60,7 +64,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user?.id) return;
     const data: Subscription = { plan: 'free' };
     storage.setSubscription(user.id, data);
-    setSubscription(data);
+    setSubscriptionState(data);
   }, [user?.id]);
 
   return (

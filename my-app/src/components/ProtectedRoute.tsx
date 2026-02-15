@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import './ProtectedRoute.css';
 
 interface ProtectedRouteProps {
@@ -9,9 +10,12 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { isLoading: subscriptionLoading } = useSubscription();
 
-  // Show loading state: floating logo (same as landing first screen)
-  if (loading) {
+  const showLoading = loading || (isAuthenticated && subscriptionLoading);
+
+  // Show loading state until auth and subscription are resolved (avoids AI assistant flash)
+  if (showLoading) {
     return (
       <div className="auth-loading-screen">
         <div className="auth-loading-logo-wrapper">

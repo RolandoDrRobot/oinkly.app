@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaCheck, FaDollarSign, FaGlobe, FaMicrophone } from 'react-icons/fa';
 import { storage } from '../utils/storage';
+import { setUserPreferences } from '../lib/supabaseData';
 import { isAIVoiceEnabled } from '../api/aiVoiceApi';
 import './Preferences.css';
 
@@ -67,6 +68,14 @@ const Preferences: React.FC = () => {
   const handleHeaderAction = () => {
     if (isFirstTime) {
       localStorage.setItem('hasSeenInitialSetup', '1');
+      const userId = storage.getUser()?.id;
+      if (userId) {
+        setUserPreferences(userId, {
+          hasSeenInitialSetup: true,
+          localCurrency: storage.getLocalCurrency(),
+          language: storage.getLanguage(),
+        }).catch((e) => console.warn('[Preferences] persist initial setup', e));
+      }
       navigate('/dashboard', { replace: true });
     } else {
       navigate('/profile');

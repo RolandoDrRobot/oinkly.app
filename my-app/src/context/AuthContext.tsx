@@ -136,21 +136,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      // initAuth() already restores session via getSession() — avoid duplicate hydrate/setUser and second Dashboard render
+      if (event === 'INITIAL_SESSION') return;
+
       if (session) {
         if (window.location.hash) {
           window.history.replaceState(null, '', window.location.pathname + window.location.search || '/');
         }
         const mappedUser = mapSupabaseUser(session.user);
         if (mappedUser) {
-          setUser(mappedUser);
-          setIsAuthenticated(true);
-          storage.setUser(mappedUser);
           hydrateFromSupabase(mappedUser.id)
             .then(async (data) => {
               await ensureUserDefaultsInSupabase(mappedUser.id, data);
               storage.hydrateToLocalStorage(data, mappedUser.id);
+              setUser(mappedUser);
+              setIsAuthenticated(true);
+              storage.setUser(mappedUser);
             })
-            .catch((err) => console.warn('[AuthContext] Hydrate failed', err));
+            .catch((err) => console.warn('[AuthContext] Hydrate failed', err))
+            .finally(() => setLoading(false));
+          return;
         }
       } else {
         setUser(null);
