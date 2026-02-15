@@ -17,10 +17,10 @@ const mockGetDebts = jest.fn(() => []);
 const mockGetFixedExpenses = jest.fn(() => []);
 const mockGetAssets = jest.fn(() => []);
 const mockGetIncomes = jest.fn(() => []);
-const mockGetDebtsOrder = jest.fn(() => []);
-const mockGetFixedExpensesOrder = jest.fn(() => []);
-const mockGetAssetsOrder = jest.fn(() => []);
-const mockGetIncomesOrder = jest.fn(() => []);
+const mockGetDebtsOrder = jest.fn(() => [] as string[]);
+const mockGetFixedExpensesOrder = jest.fn(() => [] as string[]);
+const mockGetAssetsOrder = jest.fn(() => [] as string[]);
+const mockGetIncomesOrder = jest.fn(() => [] as string[]);
 const mockGetLocalCurrency = jest.fn(() => 'MXN');
 const mockGetUnreadNotificationsCount = jest.fn(() => 0);
 jest.mock('../utils/storage', () => ({
@@ -83,7 +83,7 @@ const createMotion = (Tag: string) => {
   const C = (props: any) => {
     const clean = domOnly(props);
     const { children, ...attr } = clean;
-    return React.createElement(Tag, attr, children);
+    return React.createElement(Tag, attr, children as React.ReactNode);
   };
   C.displayName = `motion.${Tag}`;
   return C;

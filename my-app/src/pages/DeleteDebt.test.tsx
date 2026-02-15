@@ -30,7 +30,7 @@ const mockDebt = {
 
 const mockGetDebt = jest.fn();
 const mockDeleteDebt = jest.fn();
-const mockGetDebtsOrder = jest.fn(() => []);
+const mockGetDebtsOrder = jest.fn(() => [] as string[]);
 const mockSetDebtsOrder = jest.fn();
 jest.mock('../utils/storage', () => ({
   storage: {
