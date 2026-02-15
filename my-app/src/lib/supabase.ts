@@ -4,20 +4,16 @@ import { User } from '../types';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
-console.info('[Supabase] Initializing client...', {
-  hasUrl: !!supabaseUrl,
-  hasKey: !!supabaseAnonKey,
-  urlLength: supabaseUrl.length,
-  keyLength: supabaseAnonKey.length,
-  urlPrefix: supabaseUrl.substring(0, 20) + '...',
-});
-
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials are missing. Please check your .env file.');
+  console.error(
+    '[Supabase] Missing REACT_APP_SUPABASE_URL or REACT_APP_SUPABASE_ANON_KEY. ' +
+    'Add them to .env and restart the dev server. Requests will return 401 / "No API key found".'
+  );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-console.info('[Supabase] Client created successfully');
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { detectSessionInUrl: true },
+});
 
 // Helper function to map Supabase user to our User type
 export const mapSupabaseUser = (supabaseUser: any): User | null => {

@@ -26,6 +26,10 @@ La app **lee los tokens del hash** al volver de Google, establece la sesión y *
 - `REACT_APP_SUPABASE_URL`: URL del proyecto (ej. `https://xxxx.supabase.co`).
 - `REACT_APP_SUPABASE_ANON_KEY`: anon/public key del proyecto.
 
+**Si ves "No API key found in request" o 401:** las variables no están definidas en el entorno donde se ejecuta la app. En desarrollo, crea `.env` en la raíz de `my-app` con esas dos variables y reinicia `npm start`. En producción (Vercel, Netlify, etc.), configúralas en el panel de variables de entorno del proyecto.
+
+**Si ves "Session as retrieved from URL was issued in the future":** el reloj del dispositivo o del navegador va atrasado respecto al servidor. Supabase rechaza la sesión por seguridad. Solución: sincronizar la hora del sistema (ajustes de fecha/hora del SO o del dispositivo).
+
 ## Flujo actual en la app (login con Google y guardado de datos)
 
 1. Usuario hace clic en "Sign in with Google".
