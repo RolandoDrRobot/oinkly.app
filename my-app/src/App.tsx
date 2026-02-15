@@ -31,6 +31,7 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import Contact from './pages/Contact';
 import InstallApp from './pages/InstallApp';
 import MobileOnlyGate from './components/MobileOnlyGate';
+import GoogleAnalyticsRouteTracker from './components/GoogleAnalyticsRouteTracker';
 import { Toaster } from './utils/notifications';
 import './App.css';
 
@@ -266,6 +267,7 @@ function App() {
         <SubscriptionProvider>
           <MobileOnlyGate>
           <Router>
+            <GoogleAnalyticsRouteTracker />
             <AppRoutes />
             <Toaster
               position="top-center"
