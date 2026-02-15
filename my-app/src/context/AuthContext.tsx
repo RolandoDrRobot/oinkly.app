@@ -83,14 +83,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                   console.warn('[AuthContext] Hydrate from Supabase failed', err);
                 }
               }
-              // Ir a /dashboard y quitar tokens de la URL (seguridad + que no quede en raíz).
-              // replace() recarga en /dashboard; la sesión ya está guardada por setSession.
               window.location.replace(window.location.origin + '/dashboard');
               return;
+            }
+            // 401 u otro error: quitar hash para no reintentar en bucle y que el usuario pueda volver a iniciar sesión
+            if (error) {
+              console.warn('[AuthContext] setSession failed (e.g. 401). Check REACT_APP_SUPABASE_ANON_KEY and device clock.', error);
+              window.history.replaceState(null, '', window.location.pathname || '/');
             }
           }
         } catch (e) {
           console.warn('[AuthContext] Failed to set session from OAuth hash', e);
+          window.history.replaceState(null, '', window.location.pathname || '/');
         }
       }
 

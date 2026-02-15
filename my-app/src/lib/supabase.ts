@@ -11,8 +11,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// detectSessionInUrl: false — nosotros parseamos el hash en AuthContext y llamamos setSession.
+// Así evitamos que el cliente haga GET /auth/v1/user al cargar (que puede dar 401 si falta apikey o el token está mal).
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { detectSessionInUrl: true },
+  auth: { detectSessionInUrl: false },
 });
 
 // Helper function to map Supabase user to our User type
