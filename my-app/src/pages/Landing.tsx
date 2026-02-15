@@ -307,31 +307,27 @@ const Landing: React.FC = () => {
             <div className="step-actions">
               {isLastStep ? (
                 <div className="step-actions-final">
-                  {!isAuthenticated && (
-                    <>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="btn-primary btn-google"
-                        onClick={handleGoogleLogin}
-                        disabled={loading}
-                      >
-                        <span style={{ marginRight: '8px', fontSize: '18px' }}>G</span>
-                        {loading ? t('common.loading') : t('landing.signInWithGoogle')}
-                      </motion.button>
-                      <div className="divider">
-                        <span>{t('landing.or')}</span>
-                      </div>
-                    </>
+                  {!isAuthenticated ? (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="btn-primary btn-google"
+                      onClick={handleGoogleLogin}
+                      disabled={loading}
+                    >
+                      <span style={{ marginRight: '8px', fontSize: '18px' }}>G</span>
+                      {loading ? t('common.loading') : t('landing.signInWithGoogle')}
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="btn-primary btn-dashboard"
+                      onClick={handleGetStarted}
+                    >
+                      {t('about.backToDashboard')}
+                    </motion.button>
                   )}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn-primary btn-dashboard"
-                    onClick={handleGetStarted}
-                  >
-                    {isAuthenticated ? t('about.backToDashboard') : t('landing.getStarted')}
-                  </motion.button>
                 </div>
               ) : (
                 <motion.button
