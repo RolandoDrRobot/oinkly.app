@@ -13,6 +13,7 @@ const mockSignInWithOAuth = jest.fn();
 const mockMapSupabaseUser = jest.fn();
 
 jest.mock('../lib/supabase', () => ({
+  isSupabaseConfigured: true,
   supabase: {
     auth: {
       getSession: () => mockGetSession(),
@@ -40,8 +41,12 @@ jest.mock('../utils/storage', () => ({
 }));
 
 const mockHydrateFromSupabase = jest.fn();
+const mockSetSubscription = jest.fn().mockResolvedValue(undefined);
+const mockSetUserPreferences = jest.fn().mockResolvedValue(undefined);
 jest.mock('../lib/supabaseData', () => ({
   hydrateFromSupabase: (userId: string) => mockHydrateFromSupabase(userId),
+  setSubscription: (...args: unknown[]) => mockSetSubscription(...args),
+  setUserPreferences: (...args: unknown[]) => mockSetUserPreferences(...args),
 }));
 
 function Consumer() {
