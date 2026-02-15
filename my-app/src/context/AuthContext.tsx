@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { supabase, mapSupabaseUser, isSupabaseConfigured } from '../lib/supabase';
 import {
   hydrateFromSupabase,
@@ -80,6 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setUser(mappedUser);
                 setIsAuthenticated(true);
                 storage.setUser(mappedUser);
+                analytics.signInSuccess('google');
                 try {
                   const data = await hydrateFromSupabase(mappedUser.id);
                   await ensureUserDefaultsInSupabase(mappedUser.id, data);
@@ -119,6 +121,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(mappedUser);
           setIsAuthenticated(true);
           storage.setUser(mappedUser);
+          analytics.signInSuccess('session_restore');
           try {
             const data = await hydrateFromSupabase(mappedUser.id);
             await ensureUserDefaultsInSupabase(mappedUser.id, data);
@@ -152,6 +155,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               setUser(mappedUser);
               setIsAuthenticated(true);
               storage.setUser(mappedUser);
+              analytics.signInSuccess('google');
             })
             .catch((err) => console.warn('[AuthContext] Hydrate failed', err))
             .finally(() => setLoading(false));

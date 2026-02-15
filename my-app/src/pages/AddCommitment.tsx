@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { PaymentCommitment, Debt } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
@@ -327,7 +328,7 @@ const AddCommitment: React.FC = () => {
         updatedDebt.inOrder = calculateInOrder(updatedDebt);
 
         storage.saveDebt(updatedDebt);
-        
+        analytics.addCommitment();
         // Notify if status changed automatically
         if (oldInOrder !== updatedDebt.inOrder) {
           notify.debtStatusChanged(debt.name, updatedDebt.inOrder);

@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fa';
 import { Asset } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -240,6 +241,7 @@ const AddAsset: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveAsset(newAsset);
+        analytics.addAsset();
         notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);

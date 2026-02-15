@@ -18,6 +18,7 @@ const mockGetLocalCurrency = jest.fn(() => 'MXN');
 jest.mock('../utils/storage', () => ({
   storage: {
     getLocalCurrency: () => mockGetLocalCurrency(),
+    getDebts: () => [],
     saveDebt: (data: unknown) => mockSaveDebt(data),
   },
 }));

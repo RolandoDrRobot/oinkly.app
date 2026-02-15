@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaCheck, FaDollarSign, FaGlobe, FaMicrophone } from 'react-icons/fa';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { setUserPreferences } from '../lib/supabaseData';
 import { isAIVoiceEnabled } from '../api/aiVoiceApi';
 import './Preferences.css';
@@ -67,6 +68,7 @@ const Preferences: React.FC = () => {
 
   const handleHeaderAction = () => {
     if (isFirstTime) {
+      analytics.onboardingComplete();
       localStorage.setItem('hasSeenInitialSetup', '1');
       const userId = storage.getUser()?.id;
       if (userId) {

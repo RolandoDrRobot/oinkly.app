@@ -19,6 +19,7 @@ import {
 // Google icon will be displayed as text or we can use a simple icon
 import { useAuth } from '../context/AuthContext';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import toast from 'react-hot-toast';
 import './Landing.css';
 
@@ -37,6 +38,10 @@ const Landing: React.FC = () => {
     setLanguage(storage.getLanguage());
   }, []);
 
+  useEffect(() => {
+    analytics.landingView(currentStep);
+  }, [currentStep]);
+
   const handleLanguageChange = (lang: string) => {
     storage.setLanguage(lang);
     i18n.changeLanguage(lang);
@@ -51,14 +56,13 @@ const Landing: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    analytics.signInStart();
     try {
-      console.info('[Landing] handleGoogleLogin called, isAuthenticated:', isAuthenticated);
-      console.info('[Landing] Calling loginWithGoogle...');
       await loginWithGoogle();
-      console.info('[Landing] loginWithGoogle completed, redirect should happen');
-      // The redirect will happen automatically via Supabase
+      // Redirect happens via Supabase OAuth or AuthContext
     } catch (error: any) {
       console.error('[Landing] Error in handleGoogleLogin:', error);
+      analytics.signInError(error?.message);
       toast.error(error.message || t('landing.googleLoginError') || 'Error al iniciar sesión con Google');
     }
   };

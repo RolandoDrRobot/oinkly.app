@@ -2,6 +2,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import i18next from 'i18next';
 import { Debt, FixedExpense, Notification, NotificationMeta } from '../types';
 import { storage } from './storage';
+import { analytics } from './analytics';
 
 // Type assertion helper for i18next.t with interpolation
 const t = (key: string, options?: any): string => {
@@ -169,14 +170,16 @@ const APP_TOAST_OPTS = {
 const saveAndToast = (
   message: string,
   type: 'success' | 'info' | 'warning' | 'error' = 'success',
-  options?: { duration?: number }
+  options?: { duration?: number; screen?: string; errorType?: string }
 ) => {
   saveNotification(message, type);
   const duration = options?.duration ?? 4000;
   const opts = { ...APP_TOAST_OPTS, duration };
   if (type === 'success') toast.success(message, opts);
-  else if (type === 'error') toast.error(message, opts);
-  else if (type === 'warning') toast(message, { ...opts, icon: '⚠️' });
+  else if (type === 'error') {
+    analytics.error(options?.errorType ?? 'toast', options?.screen, message);
+    toast.error(message, opts);
+  } else if (type === 'warning') toast(message, { ...opts, icon: '⚠️' });
   else toast(message, { ...opts, icon: 'ℹ️' });
 };
 

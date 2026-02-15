@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FaArrowLeft } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './EditDebt.css';
@@ -164,6 +165,7 @@ const EditDebt: React.FC = () => {
         // inOrder will be calculated based on commitments
         updatedAt: new Date().toISOString(),
       });
+      analytics.editDebt();
       notify.overviewUpdated();
       navigate('/dashboard');
     }

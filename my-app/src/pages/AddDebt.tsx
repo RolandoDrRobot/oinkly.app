@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -335,7 +336,10 @@ const AddDebt: React.FC = () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
+        const wasFirstDebt = storage.getDebts().length === 0;
         storage.saveDebt(newDebt);
+        if (wasFirstDebt) analytics.firstDebtCreated();
+        analytics.addDebt();
         notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);

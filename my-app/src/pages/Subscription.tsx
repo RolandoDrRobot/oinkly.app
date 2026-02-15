@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaMicrophone, FaCheck, FaCrown, FaTimes } from 'react-icons/fa';
 import { useSubscription } from '../context/SubscriptionContext';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import './Subscription.css';
 
@@ -15,6 +16,11 @@ const Subscription: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { subscription, isPremium, cancelSubscription } = useSubscription();
+
+  useEffect(() => {
+    const source = (location.state as { from?: string } | null)?.from ?? 'direct';
+    analytics.viewPlans(source);
+  }, [location.state]);
 
   const handleBack = () => {
     const from = (location.state as { from?: string } | null)?.from;

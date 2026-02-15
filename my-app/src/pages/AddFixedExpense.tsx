@@ -25,6 +25,7 @@ import {
 } from 'react-icons/fa';
 import { FixedExpense } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -257,6 +258,7 @@ const AddFixedExpense: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveFixedExpense(newExpense);
+        analytics.addFixedExpense();
         notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);

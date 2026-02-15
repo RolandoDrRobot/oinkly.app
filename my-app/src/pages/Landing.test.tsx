@@ -1,5 +1,5 @@
 /**
- * Landing UI tests: form/buttons visible, Get started calls login and navigates to dashboard.
+ * Landing UI tests: last step shows Sign in with Google; button calls loginWithGoogle.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -64,25 +64,23 @@ describe('Landing', () => {
     jest.clearAllMocks();
   });
 
-  it('shows Get started and Sign in with Google on last step', async () => {
+  it('shows Sign in with Google on last step', async () => {
     const user = userEvent.setup();
     renderLanding();
     // Go to last step (5 steps: 0..4, so click Next 4 times)
     for (let i = 0; i < 4; i++) {
       await user.click(screen.getByText('common.next'));
     }
-    expect(screen.getByText('landing.getStarted')).toBeInTheDocument();
     expect(screen.getByText('landing.signInWithGoogle')).toBeInTheDocument();
   });
 
-  it('Get started calls login and navigate to dashboard', async () => {
+  it('Sign in with Google button calls loginWithGoogle', async () => {
     const user = userEvent.setup();
     renderLanding();
     for (let i = 0; i < 4; i++) {
       await user.click(screen.getByText('common.next'));
     }
-    await user.click(screen.getByText('landing.getStarted'));
-    expect(mockLogin).toHaveBeenCalledWith('rolando@gmail.com', 'Rolo');
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+    await user.click(screen.getByText('landing.signInWithGoogle'));
+    expect(mockLoginWithGoogle).toHaveBeenCalled();
   });
 });

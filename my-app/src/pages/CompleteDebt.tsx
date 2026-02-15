@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa';
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
@@ -111,6 +112,7 @@ const CompleteDebt: React.FC = () => {
         };
 
         storage.saveDebt(updatedDebt);
+        analytics.completeDebt();
         notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);

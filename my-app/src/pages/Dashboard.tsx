@@ -65,6 +65,7 @@ import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
 import { useSubscription } from '../context/SubscriptionContext';
 import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
+import { analytics } from '../utils/analytics';
 import './Dashboard.css';
 
 // Extend Window interface for Speech Recognition
@@ -856,10 +857,13 @@ const Dashboard: React.FC = () => {
       console.log('[AI Voice] handleAIUserInput – action from parser:', action);
     }
 
-    if (action) {
+      if (action) {
       console.log('[AI Voice] handleAIUserInput – executing action:', action.type, action.params);
       const result = await executeAIAction(action, { navigate });
       console.log('[AI Voice] handleAIUserInput – result:', result);
+      if (result.success) {
+        analytics.aiAssistantUsed(action.type);
+      }
       if (action.type === 'toggle_hide_amounts') {
         toggleHideAmounts();
       }
@@ -889,6 +893,7 @@ const Dashboard: React.FC = () => {
       console.log('[AI Voice] handleAIUserInput – no action (parser returned null)');
       const apiError = getLastAIVoiceError();
       if (apiError === 'quota') {
+        analytics.aiVoiceError('quota');
         notify.saveAndToast(
           lang === 'es'
             ? 'Cuota de OpenAI agotada. Revisa tu plan y facturación en platform.openai.com'
@@ -897,6 +902,7 @@ const Dashboard: React.FC = () => {
           { duration: 8000 }
         );
       } else if (apiError === 'model_not_found') {
+        analytics.aiVoiceError('model_not_found');
         notify.saveAndToast(
           lang === 'es'
             ? 'Modelo no disponible en tu cuenta. Prueba REACT_APP_OPENAI_MODEL=gpt-4o-mini en .env'
@@ -905,6 +911,7 @@ const Dashboard: React.FC = () => {
           { duration: 6000 }
         );
       } else {
+        analytics.aiVoiceError('not_understood');
         notify.saveAndToast(t('aiAgent.notUnderstood'), 'error');
       }
       updateUnreadNotificationsCount();
@@ -3016,7 +3023,10 @@ const Dashboard: React.FC = () => {
                     className="ai-agent-locked-cta"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate('/subscription', { state: { from: 'dashboard' } })}
+                    onClick={() => {
+                      analytics.aiAssistantLockedClick('dashboard');
+                      navigate('/subscription', { state: { from: 'dashboard' } });
+                    }}
                   >
                     {t('subscription.aiLockedMessage')}
                   </motion.button>

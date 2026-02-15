@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaMicrophone, FaLock, FaCreditCard } from 'react-icons/fa';
 import { useSubscription } from '../context/SubscriptionContext';
+import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
 import './Subscribe.css';
 
@@ -13,14 +14,23 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Subscribe: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { activatePremium } = useSubscription();
   const [interval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const planFromUrl = searchParams.get('plan') ?? interval;
+    analytics.viewSubscribe(planFromUrl);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handlePay = async () => {
+    analytics.startCheckout(interval, interval === 'monthly' ? 4.99 : 49, 'USD');
     setIsSubmitting(true);
     try {
       await activatePremium(interval);
+      analytics.purchase(interval, interval === 'monthly' ? 4.99 : 49, 'USD');
       navigate('/dashboard');
     } catch (e) {
       notify.subscriptionError();
