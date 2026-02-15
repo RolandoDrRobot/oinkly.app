@@ -367,7 +367,8 @@
     "openAIApiKeyPlaceholder": "sk-... (optional)",
     "openAIApiKeySaved": "API key saved",
     "openAIApiKeyRemoved": "API key removed",
-    "getKeyAt": "Get your key at platform.openai.com"
+    "getKeyAt": "Get your key at platform.openai.com",
+    "dataStoredOnDevice": "Your data is stored on this device. Keep it secure and do not share access."
   },
   "profile": {
     "title": "Profile",

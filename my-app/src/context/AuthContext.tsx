@@ -176,7 +176,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = (email: string, name: string) => {
-    // Fallback login for backward compatibility
+    // Dev-only: when Supabase is not configured. Disabled in production to avoid auth bypass.
+    if (isSupabaseConfigured) return;
     const newUser: User = {
       id: Date.now().toString(),
       email,
@@ -189,11 +190,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const loginWithGoogle = async () => {
     try {
-      console.info('[AuthContext] loginWithGoogle called');
       setLoading(true);
       const redirectTo = `${window.location.origin}/dashboard`;
-      console.info('[AuthContext] Initiating OAuth with redirectTo:', redirectTo);
-      
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -201,20 +200,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         },
       });
 
-      console.info('[AuthContext] signInWithOAuth response:', {
-        hasData: !!data,
-        hasError: !!error,
-        error: error?.message,
-        url: data?.url,
-      });
-
       if (error) {
         console.error('[AuthContext] Error signing in with Google:', error);
         setLoading(false);
         throw error;
       }
-      
-      console.info('[AuthContext] OAuth initiated successfully, redirect should happen');
       // Note: setLoading(false) is not called here because the redirect will happen
       // and the component will unmount. The loading state will be reset when the
       // user returns and onAuthStateChange fires.
@@ -227,19 +217,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = async () => {
     try {
-      console.info('[AuthContext] logout called');
       setLoading(true);
       const { error } = await supabase.auth.signOut();
-      console.info('[AuthContext] signOut result:', {
-        hasError: !!error,
-        error: error?.message,
-      });
-      
+
       if (error) {
         console.error('[AuthContext] Error signing out:', error);
         throw error;
       }
-      console.info('[AuthContext] Sign out successful, clearing state');
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[AuthContext] Sign out successful');
+      }
       setUser(null);
       setIsAuthenticated(false);
       storage.logout();

@@ -223,6 +223,9 @@ const Preferences: React.FC = () => {
           )}
           <p className="preferences-get-key">{t('preferences.getKeyAt')}</p>
         </motion.div>
+        <p className="preferences-security-note" role="note">
+          {t('preferences.dataStoredOnDevice')}
+        </p>
       </div>
     </motion.div>
   );

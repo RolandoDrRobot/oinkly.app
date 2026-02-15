@@ -20,20 +20,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Helper function to map Supabase user to our User type
 export const mapSupabaseUser = (supabaseUser: any): User | null => {
-  console.info('[mapSupabaseUser] Mapping user:', {
-    hasUser: !!supabaseUser,
-    userId: supabaseUser?.id,
-    email: supabaseUser?.email,
-    metadata: supabaseUser?.user_metadata,
-  });
-  
-  if (!supabaseUser) {
-    console.info('[mapSupabaseUser] No user provided, returning null');
-    return null;
-  }
-  
+  if (!supabaseUser) return null;
+
   const metadata = supabaseUser.user_metadata || {};
-  // Avatar: Google sends "picture"; Supabase may store as avatar_url or in identities[].identity_data
   const identityData = supabaseUser.identities?.[0]?.identity_data;
   const avatarUrl =
     metadata.avatar_url ||
@@ -48,10 +37,9 @@ export const mapSupabaseUser = (supabaseUser: any): User | null => {
     name: metadata.full_name || metadata.name || identityData?.full_name || identityData?.name || supabaseUser.email?.split('@')[0] || 'User',
     avatarUrl: avatarUrl || undefined,
   };
-  
-  if (process.env.NODE_ENV === 'development' && !avatarUrl) {
-    console.info('[mapSupabaseUser] No avatar URL found. user_metadata keys:', Object.keys(metadata), 'identity_data keys:', identityData ? Object.keys(identityData) : []);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.info('[mapSupabaseUser] Mapped (no PII in prod)', { hasAvatar: !!mappedUser.avatarUrl });
   }
-  console.info('[mapSupabaseUser] Mapped user result:', { ...mappedUser, avatarUrl: mappedUser.avatarUrl ? '(set)' : '(empty)' });
   return mappedUser;
 };

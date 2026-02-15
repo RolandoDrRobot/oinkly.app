@@ -11,9 +11,12 @@ const mockOnAuthStateChange = jest.fn();
 const mockSignOut = jest.fn();
 const mockSignInWithOAuth = jest.fn();
 const mockMapSupabaseUser = jest.fn();
+const mockIsSupabaseConfigured = jest.fn(() => true);
 
 jest.mock('../lib/supabase', () => ({
-  isSupabaseConfigured: true,
+  get isSupabaseConfigured() {
+    return mockIsSupabaseConfigured();
+  },
   supabase: {
     auth: {
       getSession: () => mockGetSession(),
@@ -78,6 +81,7 @@ afterAll(() => {
 describe('AuthContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsSupabaseConfigured.mockReturnValue(true);
     mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
     mockHydrateFromSupabase.mockResolvedValue({
       debts: [],
@@ -145,7 +149,8 @@ describe('AuthContext', () => {
     expect(screen.getByTestId('user-name')).toHaveTextContent('Test User');
   });
 
-  it('login() sets user and calls storage.setUser', async () => {
+  it('login() sets user and calls storage.setUser when Supabase is not configured', async () => {
+    mockIsSupabaseConfigured.mockReturnValue(false);
     const user = userEvent.setup();
     render(
       <AuthProvider>
@@ -164,9 +169,26 @@ describe('AuthContext', () => {
     );
     expect(screen.getByTestId('authenticated')).toHaveTextContent('true');
     expect(screen.getByTestId('user-name')).toHaveTextContent('Test User');
+    mockIsSupabaseConfigured.mockReturnValue(true);
+  });
+
+  it('login() is no-op when Supabase is configured', async () => {
+    mockIsSupabaseConfigured.mockReturnValue(true);
+    const user = userEvent.setup();
+    render(
+      <AuthProvider>
+        <Consumer />
+      </AuthProvider>
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
+    });
+    await user.click(screen.getByRole('button', { name: /login/i }));
+    expect(mockSetUser).not.toHaveBeenCalled();
   });
 
   it('logout() calls signOut, storage.logout and clears state', async () => {
+    mockIsSupabaseConfigured.mockReturnValue(false);
     mockSignOut.mockResolvedValue({ error: null });
     const user = userEvent.setup();
     render(

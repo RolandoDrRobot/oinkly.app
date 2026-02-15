@@ -29,7 +29,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 
 const Landing: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, login, loginWithGoogle, loading } = useAuth();
+  const { isAuthenticated, loginWithGoogle, loading } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [language, setLanguage] = useState<string>(storage.getLanguage());
@@ -49,9 +49,7 @@ const Landing: React.FC = () => {
   };
 
   const handleGetStarted = () => {
-    if (!isAuthenticated) {
-      login('rolando@gmail.com', 'Rolo');
-    }
+    // "Volver al Dashboard": only navigate; no dev login in production
     navigate('/dashboard');
   };
 
