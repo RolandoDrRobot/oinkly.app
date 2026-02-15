@@ -4,15 +4,16 @@ import { User } from '../types';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+/** Si es false, no hagas llamadas a Supabase Auth (getSession, setSession): devolverán 401. */
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+
+if (!isSupabaseConfigured) {
   console.error(
     '[Supabase] Missing REACT_APP_SUPABASE_URL or REACT_APP_SUPABASE_ANON_KEY. ' +
-    'Add them to .env and restart the dev server. Requests will return 401 / "No API key found".'
+    'Add them to .env and restart. GET /auth/v1/user will return 401 until then.'
   );
 }
 
-// detectSessionInUrl: false — nosotros parseamos el hash en AuthContext y llamamos setSession.
-// Así evitamos que el cliente haga GET /auth/v1/user al cargar (que puede dar 401 si falta apikey o el token está mal).
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: { detectSessionInUrl: false },
 });

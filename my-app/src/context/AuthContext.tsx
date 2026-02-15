@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
 import { storage } from '../utils/storage';
-import { supabase, mapSupabaseUser } from '../lib/supabase';
+import { supabase, mapSupabaseUser, isSupabaseConfigured } from '../lib/supabase';
 import {
   hydrateFromSupabase,
   setSubscription,
@@ -54,6 +54,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let cancelled = false;
 
     async function initAuth() {
+      if (!isSupabaseConfigured) {
+        setLoading(false);
+        return;
+      }
+
       const hash = window.location.hash;
       const hasOAuthHash = hash && /access_token=/.test(hash);
 
