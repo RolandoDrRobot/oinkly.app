@@ -2,7 +2,37 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User } from '../types';
 import { storage } from '../utils/storage';
 import { supabase, mapSupabaseUser } from '../lib/supabase';
-import { hydrateFromSupabase } from '../lib/supabaseData';
+import {
+  hydrateFromSupabase,
+  setSubscription,
+  setUserPreferences,
+  type HydratePayload,
+} from '../lib/supabaseData';
+
+const DEFAULT_PREFS = {
+  localCurrency: 'USD',
+  language: 'en',
+  themeMode: null as string | null,
+  colorScheme: null as string | null,
+  hideAmounts: false,
+  hasSeenInitialSetup: false,
+};
+
+/** Asegura que un usuario nuevo tenga fila en subscription y user_preferences en Supabase y datos listos para localStorage. */
+async function ensureUserDefaultsInSupabase(userId: string, data: HydratePayload): Promise<void> {
+  try {
+    if (!data.subscription) {
+      await setSubscription(userId, { plan: 'free' });
+      data.subscription = { plan: 'free' };
+    }
+    if (!data.preferences) {
+      await setUserPreferences(userId, DEFAULT_PREFS);
+      data.preferences = DEFAULT_PREFS;
+    }
+  } catch (e) {
+    console.warn('[AuthContext] ensureUserDefaultsInSupabase failed', e);
+  }
+}
 
 interface AuthContextType {
   user: User | null;
@@ -21,39 +51,60 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.info('[AuthContext] useEffect - Checking for existing session...');
-    console.info('[AuthContext] Current URL:', {
-      href: window.location.href,
-      hash: window.location.hash,
-      search: window.location.search,
-      pathname: window.location.pathname,
-    });
-    
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-      console.info('[AuthContext] getSession result:', {
-        hasSession: !!session,
-        hasError: !!error,
-        error: error?.message,
-        errorCode: error?.status,
-        userId: session?.user?.id,
-        userEmail: session?.user?.email,
-        accessToken: session?.access_token ? 'present' : 'missing',
-        expiresAt: session?.expires_at,
-        expiresIn: session?.expires_in,
-      });
-      
+    let cancelled = false;
+
+    async function initAuth() {
+      const hash = window.location.hash;
+      const hasOAuthHash = hash && /access_token=/.test(hash);
+
+      // Vuelta de OAuth: Supabase redirige a Site URL (ej. oinkly.app) con #access_token=...
+      // Establecemos sesión desde el hash y mandamos al usuario a /dashboard.
+      if (hasOAuthHash) {
+        try {
+          const params = new URLSearchParams(hash.slice(1));
+          const access_token = params.get('access_token');
+          const refresh_token = params.get('refresh_token');
+          if (access_token && refresh_token) {
+            const { data: { session }, error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+            if (!cancelled && !error && session) {
+              const mappedUser = mapSupabaseUser(session.user);
+              if (mappedUser) {
+                setUser(mappedUser);
+                setIsAuthenticated(true);
+                storage.setUser(mappedUser);
+                try {
+                  const data = await hydrateFromSupabase(mappedUser.id);
+                  await ensureUserDefaultsInSupabase(mappedUser.id, data);
+                  storage.hydrateToLocalStorage(data, mappedUser.id);
+                } catch (err) {
+                  console.warn('[AuthContext] Hydrate from Supabase failed', err);
+                }
+              }
+              // Ir a /dashboard y quitar tokens de la URL (seguridad + que no quede en raíz).
+              // replace() recarga en /dashboard; la sesión ya está guardada por setSession.
+              window.location.replace(window.location.origin + '/dashboard');
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('[AuthContext] Failed to set session from OAuth hash', e);
+        }
+      }
+
+      // Sesión ya existente (recarga o visita directa)
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (cancelled) return;
+
       if (error) {
         console.error('[AuthContext] Error getting session:', error);
-        console.error('[AuthContext] Error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-        });
       }
-      
       if (session) {
-        console.info('[AuthContext] Session found, mapping user...');
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search || '/');
+        }
         const mappedUser = mapSupabaseUser(session.user);
         if (mappedUser) {
           setUser(mappedUser);
@@ -61,49 +112,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           storage.setUser(mappedUser);
           try {
             const data = await hydrateFromSupabase(mappedUser.id);
+            await ensureUserDefaultsInSupabase(mappedUser.id, data);
             storage.hydrateToLocalStorage(data, mappedUser.id);
-            console.info('[AuthContext] Data hydrated from Supabase');
           } catch (err) {
             console.warn('[AuthContext] Hydrate from Supabase failed', err);
           }
-        } else {
-          console.warn('[AuthContext] Failed to map user from session');
         }
-      } else {
-        console.info('[AuthContext] No session found');
       }
       setLoading(false);
-    });
+    }
 
-    // Listen for auth changes
-    console.info('[AuthContext] Setting up auth state change listener...');
+    initAuth();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.info('[AuthContext] onAuthStateChange triggered:', {
-        event,
-        hasSession: !!session,
-        userId: session?.user?.id,
-        userEmail: session?.user?.email,
-      });
-      
       if (session) {
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search || '/');
+        }
         const mappedUser = mapSupabaseUser(session.user);
         if (mappedUser) {
           setUser(mappedUser);
           setIsAuthenticated(true);
           storage.setUser(mappedUser);
           hydrateFromSupabase(mappedUser.id)
-            .then((data) => {
+            .then(async (data) => {
+              await ensureUserDefaultsInSupabase(mappedUser.id, data);
               storage.hydrateToLocalStorage(data, mappedUser.id);
-              console.info('[AuthContext] Data hydrated from Supabase (onAuthChange)');
             })
             .catch((err) => console.warn('[AuthContext] Hydrate failed', err));
-        } else {
-          console.warn('[AuthContext] Failed to map user in onAuthStateChange');
         }
       } else {
-        console.info('[AuthContext] No session in onAuthStateChange, clearing state');
         setUser(null);
         setIsAuthenticated(false);
         storage.logout();
@@ -111,7 +151,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = (email: string, name: string) => {
