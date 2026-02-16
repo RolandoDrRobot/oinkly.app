@@ -88,7 +88,6 @@ const InstallApp: React.FC = () => {
           <div className="install-app-icon-wrap">
             <img src="/logo.png" alt="Oinkly" className="install-app-icon" />
           </div>
-          <p className="install-app-subtitle">{t('installApp.subtitle')}</p>
         </motion.section>
 
         {/* Already installed */}

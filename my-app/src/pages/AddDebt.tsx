@@ -8,7 +8,6 @@ import {
   FaPen, 
   FaCreditCard, 
   FaMoneyBillWave, 
-  FaLandmark, 
   FaPhone, 
   FaDollarSign, 
   FaMoneyBill, 
@@ -111,14 +110,6 @@ const AddDebt: React.FC = () => {
         { value: 'prestamo', label: t('addDebt.loan'), icon: FaMoneyBillWave },
         { value: 'tarjeta', label: t('addDebt.creditCard'), icon: FaCreditCard },
       ],
-    },
-    {
-      id: 'bank',
-      title: t('addDebt.bankName'),
-      subtitle: t('addDebt.bankNameSubtitle'),
-      icon: FaLandmark,
-      field: 'bankName' as keyof StepData,
-      placeholder: t('addDebt.bankNamePlaceholder'),
     },
     {
       id: 'phone',

@@ -39,7 +39,7 @@ const hasReminderNotification = (existing: Notification[], meta: NotificationMet
   );
 };
 
-// Create reminder notifications for payment due, overdue commitments, and call bank (deduped)
+// Create reminder notifications for payment due (deduped)
 export const ensureReminders = (debts: Debt[]): void => {
   const existing = storage.getNotifications();
 
@@ -72,43 +72,6 @@ export const ensureReminders = (debts: Debt[]): void => {
           saveNotification(message, 'warning', meta);
           existing.push({ meta } as Notification);
         }
-      }
-    }
-
-    // Overdue commitment: one notification per overdue (not completed) commitment
-    if (debt.commitments) {
-      for (const commitment of debt.commitments) {
-        if (commitment.status === 'completed') continue;
-        const commitmentDate = new Date(commitment.date);
-        commitmentDate.setHours(0, 0, 0, 0);
-        if (commitmentDate.getTime() < today.getTime()) {
-          const meta: NotificationMeta = {
-            reminderType: 'overdue_commitment',
-            debtId: debt.id,
-            commitmentId: commitment.id,
-          };
-          if (!hasReminderNotification(existing, meta)) {
-            const message = t('notifications.overdueCommitment', {
-              debtName: debt.name,
-              date: commitment.date.slice(0, 10),
-            });
-            saveNotification(message, 'error', meta);
-            existing.push({ meta } as Notification);
-          }
-        }
-      }
-    }
-
-    // Call bank reminder: hasCallTask && !callCompleted
-    if (debt.hasCallTask && !debt.callCompleted) {
-      const meta: NotificationMeta = { reminderType: 'call_reminder', debtId: debt.id };
-      if (!hasReminderNotification(existing, meta)) {
-        const message = t('notifications.callBankReminder', {
-          debtName: debt.name,
-          bankName: debt.bankName,
-        });
-        saveNotification(message, 'info', meta);
-        existing.push({ meta } as Notification);
       }
     }
   }

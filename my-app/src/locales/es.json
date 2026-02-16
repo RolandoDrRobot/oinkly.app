@@ -209,13 +209,25 @@
     "success": "Tu ingreso ha sido actualizado exitosamente"
   },
   "deleteFixedExpense": {
-    "confirm": "¿Estás seguro de que quieres eliminar este gasto fijo?"
+    "confirm": "¿Estás seguro de que quieres eliminar este gasto fijo?",
+    "title": "Eliminar gasto fijo",
+    "subtitle": "¿Estás seguro de que quieres eliminar este pago?",
+    "confirmMessage": "Esto eliminará permanentemente \"{{expenseName}}\". Esta acción no se puede deshacer.",
+    "success": "Gasto fijo eliminado correctamente"
   },
   "deleteAsset": {
-    "confirm": "¿Estás seguro de que quieres eliminar este activo?"
+    "confirm": "¿Estás seguro de que quieres eliminar este activo?",
+    "title": "Eliminar activo",
+    "subtitle": "¿Estás seguro de que quieres eliminar este activo?",
+    "confirmMessage": "Esto eliminará permanentemente \"{{assetName}}\". Esta acción no se puede deshacer.",
+    "success": "Activo eliminado correctamente"
   },
   "deleteIncome": {
-    "confirm": "¿Estás seguro de que quieres eliminar este ingreso?"
+    "confirm": "¿Estás seguro de que quieres eliminar este ingreso?",
+    "title": "Eliminar ingreso",
+    "subtitle": "¿Estás seguro de que quieres eliminar este ingreso?",
+    "confirmMessage": "Esto eliminará permanentemente \"{{incomeName}}\". Esta acción no se puede deshacer.",
+    "success": "Ingreso eliminado correctamente"
   },
   "addDebt": {
     "title": "Nueva Deuda",
@@ -704,13 +716,8 @@
     "email": "Correo electrónico",
     "address": "Dirección",
     "socialHeading": "Redes sociales",
-    "formHeading": "Enviar un mensaje",
-    "formName": "Nombre",
-    "formEmail": "Tu correo",
-    "formMessage": "Mensaje",
-    "send": "Enviar",
-    "successMessage": "Mensaje enviado. Te responderemos pronto.",
-    "fillAllFields": "Completa todos los campos.",
+    "writeUsSocial": "Escríbenos por redes sociales.",
+    "weAlwaysReply": "Siempre contestamos.",
     "placeholderPhone": "506 7161 2344",
     "placeholderEmail": "neodeveloper.eth@gmail.com",
     "placeholderAddress": "Ulloa, Heredia, Costa Rica"

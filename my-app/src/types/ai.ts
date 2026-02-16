@@ -10,15 +10,6 @@ export type AIIntent =
   | 'delete_debt'
   | 'delete_all_debts'
   | 'complete_debt'
-  // Compromisos
-  | 'add_commitment'
-  | 'edit_commitment'
-  | 'delete_commitment'
-  | 'complete_commitment'
-  // Llamadas
-  | 'add_call'
-  | 'edit_call'
-  | 'delete_call'
   // Gastos fijos
   | 'add_fixed_expense'
   | 'edit_fixed_expense'

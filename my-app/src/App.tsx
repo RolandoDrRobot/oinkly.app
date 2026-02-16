@@ -7,13 +7,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import EditDebt from './pages/EditDebt';
-import AddCommitment from './pages/AddCommitment';
-import AddCall from './pages/AddCall';
-import EditCall from './pages/EditCall';
-import DeleteCall from './pages/DeleteCall';
-import DeleteCommitment from './pages/DeleteCommitment';
-import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
+import DeleteAsset from './pages/DeleteAsset';
+import DeleteFixedExpense from './pages/DeleteFixedExpense';
+import DeleteIncome from './pages/DeleteIncome';
 import CompleteDebt from './pages/CompleteDebt';
 import CompleteAsset from './pages/CompleteAsset';
 import EditFixedExpense from './pages/EditFixedExpense';
@@ -64,66 +61,34 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/delete-asset/:assetId"
+        element={
+          <ProtectedRoute>
+            <DeleteAsset />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delete-fixed-expense/:id"
+        element={
+          <ProtectedRoute>
+            <DeleteFixedExpense />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/delete-income/:id"
+        element={
+          <ProtectedRoute>
+            <DeleteIncome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/complete-debt/:debtId"
         element={
           <ProtectedRoute>
             <CompleteDebt />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-commitment/:debtId"
-        element={
-          <ProtectedRoute>
-            <AddCommitment />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/edit-commitment/:debtId/:commitmentId"
-        element={
-          <ProtectedRoute>
-            <AddCommitment />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/delete-commitment/:debtId/:commitmentId"
-        element={
-          <ProtectedRoute>
-            <DeleteCommitment />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/complete-commitment/:debtId/:commitmentId"
-        element={
-          <ProtectedRoute>
-            <CompleteCommitment />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-call/:debtId"
-        element={
-          <ProtectedRoute>
-            <AddCall />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/edit-call/:debtId/:callId"
-        element={
-          <ProtectedRoute>
-            <EditCall />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/delete-call/:debtId/:callId"
-        element={
-          <ProtectedRoute>
-            <DeleteCall />
           </ProtectedRoute>
         }
       />

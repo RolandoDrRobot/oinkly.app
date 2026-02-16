@@ -227,17 +227,6 @@ const EditDebt: React.FC = () => {
 
           <div className="form-group">
             <input
-              name="bankName"
-              type="text"
-              value={formData.bankName}
-              onChange={handleChange}
-              placeholder={t('addDebt.bankName')}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <input
               name="bankPhone"
               type="tel"
               value={formData.bankPhone || ''}

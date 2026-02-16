@@ -24,7 +24,6 @@ import {
   FaCheck, 
   FaTimes, 
   FaFileInvoiceDollar, 
-  FaLandmark, 
   FaCreditCard, 
   FaMoneyBillWave, 
   FaUser, 
@@ -79,8 +78,6 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('debt');
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
-  const [editingCall, setEditingCall] = useState<{ debtId: string; callId: string; field: string } | null>(null);
-  const [editingCommitment, setEditingCommitment] = useState<{ debtId: string; commitmentId: string; field: string } | null>(null);
   const [editingFixedExpense, setEditingFixedExpense] = useState<{ expenseId: string; field: string } | null>(null);
   const [editingAsset, setEditingAsset] = useState<{ assetId: string; field: string } | null>(null);
   const [editingIncome, setEditingIncome] = useState<{ incomeId: string; field: string } | null>(null);
@@ -224,45 +221,9 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Calculate inOrder based on payment commitments
-  // Returns true if no pending/overdue commitments (shows "No compromisos")
-  // Returns false if there are pending/overdue commitments (shows "Compromiso pendiente")
-  const calculateInOrder = (debt: Debt): boolean => {
-    if (!debt.commitments || debt.commitments.length === 0) {
-      // No commitments means "No compromisos"
-      return true;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Check if there are any pending or overdue commitments
-    const hasPendingOrOverdue = debt.commitments.some(commitment => {
-      if (commitment.status === 'completed') {
-        return false; // Completed commitments don't affect status
-      }
-
-      const commitmentDate = new Date(commitment.date);
-      commitmentDate.setHours(0, 0, 0, 0);
-      const diffTime = commitmentDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      // If commitment is overdue (past due) or pending (not completed), shows "Compromiso pendiente"
-      return diffDays < 0 || commitment.status === 'pending';
-    });
-
-    // Returns true if no pending/overdue (shows "No compromisos"), false otherwise (shows "Compromiso pendiente")
-    return !hasPendingOrOverdue;
-  };
-
   const loadDebts = () => {
     const allDebts = storage.getDebts();
-    // Ensure commitments and callHistory arrays exist, and calculate inOrder
     const updatedDebts = allDebts.map(debt => {
-      // Ensure commitments and callHistory arrays exist
-      if (!debt.commitments) debt.commitments = [];
-      if (!debt.callHistory) debt.callHistory = [];
-      
       // Migrate: if total is 0 but no closedAt, set closedAt so it sorts as closed
       const isPaidOff = (debt.totalLocal || 0) === 0 && (debt.totalDollars || 0) === 0;
       if (isPaidOff && !debt.closedAt) {
@@ -274,22 +235,6 @@ const Dashboard: React.FC = () => {
         storage.saveDebt(updated);
         return updated;
       }
-      
-      // Calculate inOrder based on commitments
-      const calculatedInOrder = calculateInOrder(debt);
-      
-      // Update debt if inOrder changed (e.g. commitment became overdue)
-      if (debt.inOrder !== calculatedInOrder) {
-        const updated = {
-          ...debt,
-          inOrder: calculatedInOrder,
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(updated);
-        notify.debtStatusChanged(debt.name, calculatedInOrder);
-        return updated;
-      }
-      
       return debt;
     });
     
@@ -323,7 +268,6 @@ const Dashboard: React.FC = () => {
       return 0;
     });
 
-    // Create reminder notifications (payment due, overdue commitments, call bank) – deduped
     ensureReminders(orderedDebts);
     updateUnreadNotificationsCount();
 
@@ -332,40 +276,6 @@ const Dashboard: React.FC = () => {
 
   const handleDelete = (id: string) => {
     navigate(`/delete-debt/${id}`);
-  };
-
-  const hasPendingCommitments = (debt: Debt): boolean => {
-    if (!debt.commitments || debt.commitments.length === 0) {
-      return false;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return debt.commitments.some(commitment => {
-      if (commitment.status === 'completed') {
-        return false;
-      }
-
-      const commitmentDate = new Date(commitment.date);
-      commitmentDate.setHours(0, 0, 0, 0);
-      const diffTime = commitmentDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      return diffDays < 0 || commitment.status === 'pending';
-    });
-  };
-
-  const getOverdueCount = (debt: Debt): number => {
-    if (!debt.commitments || debt.commitments.length === 0) return 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return debt.commitments.filter(c => {
-      if (c.status === 'completed') return false;
-      const d = new Date(c.date);
-      d.setHours(0, 0, 0, 0);
-      return d.getTime() < today.getTime();
-    }).length;
   };
 
   /** Current month YYYY-MM */
@@ -532,8 +442,6 @@ const Dashboard: React.FC = () => {
 
   const cancelEdit = () => {
     setEditingField(null);
-    setEditingCall(null);
-    setEditingCommitment(null);
     setEditingFixedExpense(null);
     setEditingAsset(null);
     setEditingIncome(null);
@@ -640,88 +548,6 @@ const Dashboard: React.FC = () => {
     notify.overviewUpdated();
     loadIncomes();
     setEditingIncome(null);
-    setEditValue('');
-  };
-
-  const startEditingCall = (debtId: string, callId: string, field: string, currentValue: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingCall({ debtId, callId, field });
-    setEditValue(currentValue);
-  };
-
-  const saveCallEdit = (debtId: string, callId: string, field: string) => {
-    const debt = debts.find(d => d.id === debtId);
-    if (!debt || !debt.callHistory) return;
-
-    const call = debt.callHistory.find(c => c.id === callId);
-    if (!call) return;
-
-    const updatedCall = {
-      ...call,
-      [field]: field === 'date' ? new Date(editValue).toISOString() : editValue,
-    };
-
-    const updatedDebt = {
-      ...debt,
-      callHistory: debt.callHistory.map(c => c.id === callId ? updatedCall : c),
-      updatedAt: new Date().toISOString(),
-    };
-
-    storage.saveDebt(updatedDebt);
-    loadDebts();
-    setEditingCall(null);
-    setEditValue('');
-  };
-
-  const startEditingCommitment = (debtId: string, commitmentId: string, field: string, currentValue: string | number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingCommitment({ debtId, commitmentId, field });
-    setEditValue(currentValue.toString());
-  };
-
-  const saveCommitmentEdit = (debtId: string, commitmentId: string, field: string) => {
-    const debt = debts.find(d => d.id === debtId);
-    if (!debt || !debt.commitments) return;
-
-    const commitment = debt.commitments.find(c => c.id === commitmentId);
-    if (!commitment) return;
-
-    let newValue: string | number = editValue;
-    
-    // Convert to number if it's a numeric field
-    const numericFields = ['amountLocal', 'amountDollars'];
-    if (numericFields.includes(field)) {
-      newValue = parseFloat(editValue) || 0;
-    } else if (field === 'date') {
-      newValue = new Date(editValue).toISOString();
-    }
-
-    const updatedCommitment = {
-      ...commitment,
-      [field]: newValue,
-      updatedAt: new Date().toISOString(),
-    };
-
-    const updatedDebt = {
-      ...debt,
-      commitments: debt.commitments.map(c => c.id === commitmentId ? updatedCommitment : c),
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Recalculate inOrder
-    const oldInOrder = debt.inOrder;
-    const newInOrder = calculateInOrder(updatedDebt);
-    updatedDebt.inOrder = newInOrder;
-
-    storage.saveDebt(updatedDebt);
-    loadDebts();
-    
-    // Notify if status changed
-    if (oldInOrder !== newInOrder) {
-      notify.debtStatusChanged(debt.name, newInOrder);
-    }
-    
-    setEditingCommitment(null);
     setEditValue('');
   };
 
@@ -1076,29 +902,6 @@ const Dashboard: React.FC = () => {
                                     </h3>
                                   )}
                                   <div className="debt-bank-type-row">
-                                    {editingField?.debtId === debt.id && editingField?.field === 'bankName' ? (
-                                      <input
-                                        type="text"
-                                        value={editValue}
-                                        onChange={(e) => setEditValue(e.target.value)}
-                                        onBlur={() => saveEdit(debt.id, 'bankName')}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') saveEdit(debt.id, 'bankName');
-                                          if (e.key === 'Escape') cancelEdit();
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="inline-edit-input"
-                                        autoFocus
-                                      />
-                                    ) : (
-                                      <p className="debt-bank editable-field" onClick={(e) => {
-                                        e.stopPropagation();
-                                        startEditing(debt.id, 'bankName', debt.bankName, e);
-                                      }}>
-                                        <Icon component={FaLandmark} className="debt-info-icon" />
-                                        {debt.bankName}
-                                      </p>
-                                    )}
                                     <p className="debt-type">
                                       <Icon component={debt.type === 'prestamo' ? FaMoneyBillWave : FaCreditCard} className="debt-info-icon" />
                                       {debt.type === 'prestamo' ? t('addDebt.loan') : t('addDebt.creditCard')}
@@ -1106,7 +909,7 @@ const Dashboard: React.FC = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div className="debt-header-actions" onClick={(e) => e.stopPropagation()}>
+                              <div className="debt-header-actions debt-header-actions-corner" onClick={(e) => e.stopPropagation()}>
                                 <div className="debt-summary">
                                   <div className="debt-status">
                                     {debt.closedAt ? (
@@ -1117,22 +920,7 @@ const Dashboard: React.FC = () => {
                                       <span className="debt-completed-badge">
                                         <Icon component={FaCheck} size={12} /> {t('common.completed')}
                                       </span>
-                                    ) : debt.inOrder ? (
-                                      <span className="status-badge in-order">
-                                        <Icon component={FaCheck} size={12} /> {t('dashboard.inOrder')}
-                                      </span>
-                                    ) : (
-                                      <>
-                                        <span className="status-badge not-in-order">
-                                          <Icon component={FaTimes} size={12} /> {t('dashboard.notInOrder')}
-                                        </span>
-                                        {getOverdueCount(debt) > 0 && (
-                                          <span className="debt-overdue-count">
-                                            {t('dashboard.overdueCount', { count: getOverdueCount(debt) })}
-                                          </span>
-                                        )}
-                                      </>
-                                    )}
+                                    ) : null}
                                   </div>
                                 </div>
                                 <div className="debt-actions">
@@ -1147,20 +935,6 @@ const Dashboard: React.FC = () => {
                                   >
                                     <Icon component={FaTrash} />
                                   </motion.button>
-                                  {!hasPendingCommitments(debt) && (
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      className="btn-complete-item"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/complete-debt/${debt.id}`);
-                                      }}
-                                      title={t('debt.markAsCompleted')}
-                                    >
-                                      <Icon component={FaCheck} />
-                                    </motion.button>
-                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1325,298 +1099,6 @@ const Dashboard: React.FC = () => {
                                     </div>
                                   </div>
 
-                                  {debt.commitments && debt.commitments.length > 0 && (
-                                    <div className="debt-commitments">
-                                      <h4>{t('dashboard.paymentCommitments')}</h4>
-                                      <div className="commitments-list">
-                                        {debt.commitments.map(commitment => (
-                                          <div key={commitment.id} className="commitment-item">
-                                            <div className="commitment-main">
-                                              <div className="commitment-info">
-                                                {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'date' ? (
-                                                  <input
-                                                    type="date"
-                                                    value={editValue.split('T')[0]}
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'date')}
-                                                    onKeyDown={(e) => {
-                                                      if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'date');
-                                                      if (e.key === 'Escape') cancelEdit();
-                                                    }}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="inline-edit-input"
-                                                    autoFocus
-                                                  />
-                                                ) : (
-                                                  <span 
-                                                    className="commitment-date editable-field"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      startEditingCommitment(debt.id, commitment.id, 'date', commitment.date.split('T')[0], e);
-                                                    }}
-                                                  >
-                                                    {formatDateLocal(commitment.date)}
-                                                  </span>
-                                                )}
-                                                <span className={`commitment-status ${commitment.status}`}>
-                                                  {commitment.status === 'completed' ? t('common.completed') : 
-                                                   commitment.status === 'overdue' ? t('dashboard.overdue') : 
-                                                   t('dashboard.pending')}
-                                                </span>
-                                              </div>
-                                              <div className="commitment-amounts">
-                                                {!hideAmounts && (
-                                                  <>
-                                                    {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'amountLocal' ? (
-                                                      <input
-                                                        type="number"
-                                                        inputMode="decimal"
-                                                        step="0.01"
-                                                        value={editValue}
-                                                        onChange={(e) => setEditValue(e.target.value)}
-                                                        onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'amountLocal')}
-                                                        onKeyDown={(e) => {
-                                                          if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'amountLocal');
-                                                          if (e.key === 'Escape') cancelEdit();
-                                                        }}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="inline-edit-input"
-                                                        autoFocus
-                                                      />
-                                                    ) : (
-                                                      <span 
-                                                        className="editable-field"
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          startEditingCommitment(debt.id, commitment.id, 'amountLocal', commitment.amountLocal, e);
-                                                        }}
-                                                      >
-                                                        {formatCurrency(commitment.amountLocal, debt.localCurrency)}
-                                                      </span>
-                                                    )}
-                                                    {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'amountDollars' ? (
-                                                      <input
-                                                        type="number"
-                                                        inputMode="decimal"
-                                                        step="0.01"
-                                                        value={editValue}
-                                                        onChange={(e) => setEditValue(e.target.value)}
-                                                        onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'amountDollars')}
-                                                        onKeyDown={(e) => {
-                                                          if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'amountDollars');
-                                                          if (e.key === 'Escape') cancelEdit();
-                                                        }}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="inline-edit-input"
-                                                        autoFocus
-                                                      />
-                                                    ) : (
-                                                      <span 
-                                                        className="editable-field"
-                                                        onClick={(e) => {
-                                                          e.stopPropagation();
-                                                          startEditingCommitment(debt.id, commitment.id, 'amountDollars', commitment.amountDollars, e);
-                                                        }}
-                                                      >
-                                                        {formatCurrency(commitment.amountDollars, 'USD')}
-                                                      </span>
-                                                    )}
-                                                  </>
-                                                )}
-                                              </div>
-                                            </div>
-                                            <div className="commitment-notes-row">
-                                              <div className="commitment-notes-container">
-                                                {editingCommitment?.debtId === debt.id && editingCommitment?.commitmentId === commitment.id && editingCommitment?.field === 'notes' ? (
-                                                  <input
-                                                    type="text"
-                                                    value={editValue}
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    onBlur={() => saveCommitmentEdit(debt.id, commitment.id, 'notes')}
-                                                    onKeyDown={(e) => {
-                                                      if (e.key === 'Enter') saveCommitmentEdit(debt.id, commitment.id, 'notes');
-                                                      if (e.key === 'Escape') cancelEdit();
-                                                    }}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="inline-edit-input"
-                                                    autoFocus
-                                                  />
-                                                ) : (
-                                                  <p 
-                                                    className="commitment-notes editable-field"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      startEditingCommitment(debt.id, commitment.id, 'notes', commitment.notes || '', e);
-                                                    }}
-                                                  >
-                                                    {commitment.notes || ''}
-                                                  </p>
-                                                )}
-                                              </div>
-                                              <div className="commitment-actions">
-                                                <motion.button
-                                                  className="btn-delete-item"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (window.confirm(t('deleteCommitment.confirm'))) {
-                                                      navigate(`/delete-commitment/${debt.id}/${commitment.id}`);
-                                                    }
-                                                  }}
-                                                  whileHover={{ scale: 1.1 }}
-                                                  whileTap={{ scale: 0.9 }}
-                                                >
-                                                  <Icon component={FaTrash} />
-                                                </motion.button>
-                                                {commitment.status === 'pending' && (
-                                                  <motion.button
-                                                    className="btn-complete-item"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      navigate(`/complete-commitment/${debt.id}/${commitment.id}`);
-                                                    }}
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.9 }}
-                                                    title={t('commitment.markCompleted')}
-                                                  >
-                                                    <Icon component={FaCheck} />
-                                                  </motion.button>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {debt.callHistory && debt.callHistory.length > 0 && (
-                                    <div className="debt-calls">
-                                      <h4>{t('dashboard.callHistory')}</h4>
-                                      <div className="calls-list">
-                                        {debt.callHistory.map(call => (
-                                          <div key={call.id} className="call-item">
-                                            <div className="call-content">
-                                              {editingCall?.debtId === debt.id && editingCall?.callId === call.id && editingCall?.field === 'date' ? (
-                                                <input
-                                                  type="date"
-                                                  value={editValue.split('T')[0]}
-                                                  onChange={(e) => setEditValue(e.target.value)}
-                                                  onBlur={() => saveCallEdit(debt.id, call.id, 'date')}
-                                                  onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') saveCallEdit(debt.id, call.id, 'date');
-                                                    if (e.key === 'Escape') cancelEdit();
-                                                  }}
-                                                  onClick={(e) => e.stopPropagation()}
-                                                  className="inline-edit-input"
-                                                  autoFocus
-                                                />
-                                              ) : (
-                                                <span 
-                                                  className="call-date editable-field"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    startEditingCall(debt.id, call.id, 'date', call.date.split('T')[0], e);
-                                                  }}
-                                                >
-                                                  <Icon component={FaPhone} style={{ marginRight: '6px', fontSize: '12px' }} />
-                                                  {formatDateLocal(call.date)}
-                                                </span>
-                                              )}
-                                            </div>
-                                            <div className="call-notes-row">
-                                              {editingCall?.debtId === debt.id && editingCall?.callId === call.id && editingCall?.field === 'notes' ? (
-                                                <input
-                                                  type="text"
-                                                  value={editValue}
-                                                  onChange={(e) => setEditValue(e.target.value)}
-                                                  onBlur={() => saveCallEdit(debt.id, call.id, 'notes')}
-                                                  onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') saveCallEdit(debt.id, call.id, 'notes');
-                                                    if (e.key === 'Escape') cancelEdit();
-                                                  }}
-                                                  onClick={(e) => e.stopPropagation()}
-                                                  className="inline-edit-input"
-                                                  autoFocus
-                                                />
-                                              ) : (
-                                                <p 
-                                                  className="call-notes editable-field"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    startEditingCall(debt.id, call.id, 'notes', call.notes || '', e);
-                                                  }}
-                                                >
-                                                  {call.notes}
-                                                </p>
-                                              )}
-                                              <div className="call-actions">
-                                                <motion.button
-                                                  className="btn-delete-item"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (window.confirm(t('deleteCall.confirm'))) {
-                                                      navigate(`/delete-call/${debt.id}/${call.id}`);
-                                                    }
-                                                  }}
-                                                  whileHover={{ scale: 1.1 }}
-                                                  whileTap={{ scale: 0.9 }}
-                                                >
-                                                  <Icon component={FaTrash} />
-                                                </motion.button>
-                                                {!debt.callCompleted && (
-                                                  <motion.button
-                                                    className="btn-complete-item"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      const updatedDebt = {
-                                                        ...debt,
-                                                        callCompleted: true,
-                                                        updatedAt: new Date().toISOString(),
-                                                      };
-                                                      storage.saveDebt(updatedDebt);
-                                                      loadDebts();
-                                                    }}
-                                                    whileHover={{ scale: 1.1 }}
-                                                    whileTap={{ scale: 0.9 }}
-                                                    title={t('debt.callCompleted')}
-                                                  >
-                                                    <Icon component={FaCheck} />
-                                                  </motion.button>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  <div className="debt-actions-section">
-                                    <motion.button
-                                      className="btn-add-commitment"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/add-commitment/${debt.id}`);
-                                      }}
-                                      whileHover={{ scale: 1.02 }}
-                                      whileTap={{ scale: 0.98 }}
-                                    >
-                                      <Icon component={FaPlus} style={{ marginRight: '8px' }} />
-                                      {t('dashboard.addCommitment')}
-                                    </motion.button>
-                                    <motion.button
-                                      className="btn-add-call"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/add-call/${debt.id}`);
-                                      }}
-                                      whileHover={{ scale: 1.02 }}
-                                      whileTap={{ scale: 0.98 }}
-                                    >
-                                      <Icon component={FaPhone} style={{ marginRight: '8px' }} />
-                                      {t('dashboard.recordCall')}
-                                    </motion.button>
-                                  </div>
                                 </motion.div>
                               )}
                             </AnimatePresence>
@@ -1930,11 +1412,7 @@ const Dashboard: React.FC = () => {
                                       className="btn-delete"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (window.confirm(t('deleteFixedExpense.confirm'))) {
-                                          storage.deleteFixedExpense(expense.id);
-                                          loadFixedExpenses();
-                                          notify.overviewUpdated();
-                                        }
+                                        navigate(`/delete-fixed-expense/${expense.id}`);
                                       }}
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
@@ -2178,28 +1656,12 @@ const Dashboard: React.FC = () => {
                                       className="btn-delete"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (window.confirm(t('deleteAsset.confirm'))) {
-                                          storage.deleteAsset(asset.id);
-                                          loadAssets();
-                                          notify.overviewUpdated();
-                                        }
+                                        navigate(`/delete-asset/${asset.id}`);
                                       }}
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
                                     >
                                       <Icon component={FaTrash} />
-                                    </motion.button>
-                                    <motion.button
-                                      className="btn-complete-item"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/complete-asset/${asset.id}`);
-                                      }}
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      title={t('asset.liquidate')}
-                                    >
-                                      <Icon component={FaCheck} />
                                     </motion.button>
                                   </div>
                                 </div>
@@ -2466,11 +1928,7 @@ const Dashboard: React.FC = () => {
                                       className="btn-delete"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        if (window.confirm(t('deleteIncome.confirm'))) {
-                                          storage.deleteIncome(income.id);
-                                          loadIncomes();
-                                          notify.overviewUpdated();
-                                        }
+                                        navigate(`/delete-income/${income.id}`);
                                       }}
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}

@@ -26,10 +26,6 @@ jest.mock('../context/SubscriptionContext', () => ({
   useSubscription: () => ({ isPremium: false }),
 }));
 
-jest.mock('../utils/export', () => ({
-  exportAllDataToCSV: jest.fn(),
-}));
-
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));

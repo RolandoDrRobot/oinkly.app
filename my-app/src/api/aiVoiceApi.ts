@@ -56,31 +56,17 @@ REGLA #1 — PRIORIDAD EDITAR/ELIMINAR/COMPLETAR (nunca confundir con agregar):
 
 REGLA #2 — ACTUALIZACIONES PARCIALES POR VOZ:
 - Puedes ACTUALIZAR uno o varios atributos sin tocar el resto. Si el usuario dice "cambiar la cuota de BBVA a 50 mil" → edit_debt { debtId: id_BBVA, localFee: 50000 }. Solo incluye en params los atributos que el usuario quiera cambiar.
-- "cambiar el monto del compromiso de BBVA a 4000" → edit_commitment { debtId, commitmentId, amountLocal: 4000 }
-- "actualizar las notas de la llamada de Scotiabank a 'acordé plazo'" → edit_call { debtId, callId, notes: "acordé plazo" }
 - "cambiar el gasto de internet a 60 dólares" → edit_fixed_expense { expenseId, amountDollars: 60 }
 - "cambiar el valor del activo casa a 2.5 millones" → edit_asset { assetId, valueLocal: 2500000 }
 - "cambiar mi ingreso de Forj a 6000" → edit_income { incomeId, amountLocal: 6000 }
 
-IDENTIFICAR ENTIDADES: Te pasamos listas con id y nombre. Para edit/delete/complete usa SIEMPRE el id de la entidad existente (deudas, compromisos, llamadas, gastos, activos, ingresos).
+IDENTIFICAR ENTIDADES: Te pasamos listas con id y nombre. Para edit/delete/complete usa SIEMPRE el id de la entidad existente (deudas, gastos, activos, ingresos).
 
 —— DEUDAS (crear, editar, eliminar, marcar pagada) ——
 add_debt — params: name (requerido), type ("tarjeta"|"prestamo"), bankName, bankPhone, totalLocal, totalDollars, localFee, dollarFee, paymentDate, cutDate, interestRate, currentPlan, hasCallTask.
 edit_debt — params: debtId (requerido). Atributos editables: name, type, bankName, bankPhone, totalLocal, totalDollars, localFee, dollarFee, feeToUpdate, feeToUpdateDollars, paymentDate, cutDate, interestRate, currentPlan, hasCallTask, callCompleted.
 delete_debt: debtId. delete_all_debts: {}.
 complete_debt: debtId — marcar deuda como pagada.
-
-—— COMPROMISOS DE PAGO (crear, editar, eliminar, completar) ——
-add_commitment — params: debtId (requerido), amountLocal, amountDollars, date (ISO), paymentType ("partial"|"full"|"settlement"), notes.
-edit_commitment — params: debtId, commitmentId (requeridos). Atributos editables: date, amountLocal, amountDollars, notes.
-delete_commitment: debtId, commitmentId. complete_commitment: debtId, commitmentId.
-Si el usuario pide "agregar compromiso" sin monto → navigate { route: "/add-commitment/DEBT_ID" }.
-
-—— LLAMADAS AL BANCO / LOGS DE TELÉFONO (crear, editar, eliminar) ——
-add_call — params: debtId (requerido), date (ISO), notes.
-edit_call — params: debtId, callId (requeridos). Atributos editables: date, notes.
-delete_call: debtId, callId.
-Si "agregar llamada" sin más → navigate { route: "/add-call/DEBT_ID" }.
 
 —— GASTOS FIJOS (crear, editar, eliminar) ——
 add_fixed_expense — params: name (requerido), amountLocal, amountDollars, category, dueDate (día 1-31 o ISO), notes.
@@ -98,7 +84,7 @@ edit_income — params: incomeId (requerido). Atributos editables: name, amountL
 delete_income: incomeId. delete_all_incomes: {}.
 
 —— NAVEGACIÓN ——
-navigate: params: { route: "/dashboard"|"/edit-debt/ID"|"/delete-debt/ID"|"/complete-debt/ID"|"/add-commitment/ID"|"/edit-commitment/DEBT_ID/COMMITMENT_ID"|"/add-call/ID"|"/edit-call/DEBT_ID/CALL_ID"|"/edit-fixed-expense/ID"|"/edit-asset/ID"|"/complete-asset/ID"|"/edit-income/ID"|"/profile"|"/preferences"|"/about"|"/terms" }. Reemplaza ID por el id real. No uses /add-debt, /add-fixed-expense, /add-asset ni /add-income; crear solo con acciones add_debt, add_fixed_expense, add_asset, add_income y los params.
+navigate: params: { route: "/dashboard"|"/edit-debt/ID"|"/delete-debt/ID"|"/complete-debt/ID"|"/edit-fixed-expense/ID"|"/edit-asset/ID"|"/complete-asset/ID"|"/edit-income/ID"|"/profile"|"/preferences"|"/about"|"/terms" }. Reemplaza ID por el id real. No uses /add-debt, /add-fixed-expense, /add-asset ni /add-income; crear solo con acciones add_debt, add_fixed_expense, add_asset, add_income y los params.
 
 —— CONSULTAS Y UI ——
 get_overview, get_debts, get_state: sin params. toggle_hide_amounts: sin params.
@@ -106,10 +92,10 @@ get_overview, get_debts, get_state: sin params. toggle_hide_amounts: sin params.
 REGLAS: Extrae TODOS los datos que el usuario mencione. Montos: "2 millones"=2000000, "5 mil"=5000. "dólares"/"dollars"→*Dollars; si no→*Local. Fechas: ISO YYYY-MM-DD; "día 15" → año actual + mes actual + 15.
 
 EJEMPLOS (usa los ids de las listas que te pasan):
-CREAR: "tengo una deuda con BBVA de 15000" → add_debt { name: "BBVA", totalLocal: 15000 }. "deuda DaviBank 3 millones cuota 30 mil pago día 30 tasa 18%" → add_debt { name: "DaviBank", totalLocal: 3000000, localFee: 30000, paymentDate: "30", interestRate: 18 }. "compromiso BBVA 3000" → add_commitment { debtId, amountLocal: 3000 }. "registrar llamada con Scotiabank, acordé plazo" → add_call { debtId, notes: "acordé plazo" }. "gasto internet 50 dólares día 10" → add_fixed_expense { name: "Internet", amountDollars: 50, dueDate: "10" }. "activo casa 2 millones tipo property" → add_asset { name: "Casa", valueLocal: 2000000, type: "property" }. "gano 5000 al mes en Forj" → add_income { name: "Forj", amountLocal: 5000, type: "salary", frequency: "monthly" }.
-ACTUALIZAR (solo los atributos que mencione): "cambiar la cuota de la deuda BBVA a 50 mil" → edit_debt { debtId, localFee: 50000 }. "cambiar la fecha de pago de BBVA al día 20" → edit_debt { debtId, paymentDate: "20" }. "cambiar el monto del compromiso de BBVA a 4000" → edit_commitment { debtId, commitmentId, amountLocal: 4000 }. "actualizar notas de la llamada de Scotiabank a 'me dieron plazo'" → edit_call { debtId, callId, notes: "me dieron plazo" }. "cambiar el gasto de internet a 60 dólares" → edit_fixed_expense { expenseId, amountDollars: 60 }. "cambiar el valor del activo casa a 2.5 millones" → edit_asset { assetId, valueLocal: 2500000 }. "cambiar mi ingreso de Forj a 6000" → edit_income { incomeId, amountLocal: 6000 }. "editar deuda Santander" (sin atributos) → navigate { route: "/edit-debt/ID" }.
-ELIMINAR: "eliminar deuda BBVA" → delete_debt { debtId }. "eliminar todas las deudas" → delete_all_debts {}. "eliminar compromiso de BBVA" → delete_commitment { debtId, commitmentId }. "eliminar llamada de Scotiabank" → delete_call { debtId, callId }. "eliminar gasto internet" → delete_fixed_expense { expenseId }. "eliminar activo carro" → delete_asset { assetId }. "eliminar ingreso Forj" → delete_income { incomeId }.
-COMPLETAR: "completar deuda Scotiabank" / "marcar deuda BBVA como pagada" → complete_debt { debtId }. "completar compromiso de BBVA" → complete_commitment { debtId, commitmentId }. "liquidar activo casa" → complete_asset { assetId }.
+CREAR: "tengo una deuda con BBVA de 15000" → add_debt { name: "BBVA", totalLocal: 15000 }. "deuda DaviBank 3 millones cuota 30 mil pago día 30 tasa 18%" → add_debt { name: "DaviBank", totalLocal: 3000000, localFee: 30000, paymentDate: "30", interestRate: 18 }. "gasto internet 50 dólares día 10" → add_fixed_expense { name: "Internet", amountDollars: 50, dueDate: "10" }. "activo casa 2 millones tipo property" → add_asset { name: "Casa", valueLocal: 2000000, type: "property" }. "gano 5000 al mes en Forj" → add_income { name: "Forj", amountLocal: 5000, type: "salary", frequency: "monthly" }.
+ACTUALIZAR (solo los atributos que mencione): "cambiar la cuota de la deuda BBVA a 50 mil" → edit_debt { debtId, localFee: 50000 }. "cambiar la fecha de pago de BBVA al día 20" → edit_debt { debtId, paymentDate: "20" }. "cambiar el gasto de internet a 60 dólares" → edit_fixed_expense { expenseId, amountDollars: 60 }. "cambiar el valor del activo casa a 2.5 millones" → edit_asset { assetId, valueLocal: 2500000 }. "cambiar mi ingreso de Forj a 6000" → edit_income { incomeId, amountLocal: 6000 }. "editar deuda Santander" (sin atributos) → navigate { route: "/edit-debt/ID" }.
+ELIMINAR: "eliminar deuda BBVA" → delete_debt { debtId }. "eliminar todas las deudas" → delete_all_debts {}. "eliminar gasto internet" → delete_fixed_expense { expenseId }. "eliminar activo carro" → delete_asset { assetId }. "eliminar ingreso Forj" → delete_income { incomeId }.
+COMPLETAR: "completar deuda Scotiabank" / "marcar deuda BBVA como pagada" → complete_debt { debtId }. "liquidar activo casa" → complete_asset { assetId }.
 OTROS: "resumen" / "¿cuánto debo?" → get_overview. "ocultar montos" → toggle_hide_amounts. "ir al inicio" → navigate { route: "/dashboard" }. "agregar deuda" (sin más) → responde en JSON con type "reply" o pide nombre/monto en chat; no navegues a /add-debt.
 `;
 

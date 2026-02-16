@@ -2,7 +2,7 @@
  * Ejecutor único de acciones IA: recibe AIAction y ejecuta (storage + notify + navigate).
  */
 
-import type { Debt, PaymentCommitment, CallRecord, FixedExpense, Asset, Income } from '../types';
+import type { Debt, FixedExpense, Asset, Income } from '../types';
 import type { AIAction, AIActionResult } from '../types/ai';
 import { isValidAIIntent } from './aiActions';
 import { getFullState, getOverviewForAI } from './aiContext';
@@ -10,19 +10,6 @@ import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 
 const genId = () => Date.now().toString() + Math.random().toString(36).slice(2, 9);
-
-function calculateInOrder(debt: Debt): boolean {
-  if (!debt.commitments || debt.commitments.length === 0) return true;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const hasPendingOrOverdue = debt.commitments.some((c) => {
-    if (c.status === 'completed') return false;
-    const d = new Date(c.date);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() < today.getTime() || c.status === 'pending';
-  });
-  return !hasPendingOrOverdue;
-}
 
 function num(p: unknown): number {
   if (typeof p === 'number' && !isNaN(p)) return p;
@@ -198,132 +185,6 @@ export async function executeAIAction(
         storage.saveDebt(updated);
         notify.overviewUpdated();
         return { success: true, message: 'Debt marked as paid off' };
-      }
-
-      case 'add_commitment': {
-        const debtId = str(params.debtId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const date = params.date ? new Date(str(params.date)).toISOString() : new Date().toISOString();
-        const paymentType = (str(params.paymentType) as 'partial' | 'full' | 'settlement') || 'partial';
-        const newCommitment: PaymentCommitment = {
-          id: genId(),
-          debtId,
-          date,
-          amountLocal: num(params.amountLocal),
-          amountDollars: num(params.amountDollars),
-          status: 'pending',
-          paymentType: paymentType === 'full' || paymentType === 'settlement' ? paymentType : 'partial',
-          notes: str(params.notes) || undefined,
-          createdAt: new Date().toISOString(),
-        };
-        const updatedDebt: Debt = {
-          ...debt,
-          commitments: [...(debt.commitments || []), newCommitment],
-          inOrder: calculateInOrder({ ...debt, commitments: [...(debt.commitments || []), newCommitment] }),
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(updatedDebt);
-        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
-        return { success: true, message: 'Commitment added', data: { commitmentId: newCommitment.id } };
-      }
-
-      case 'edit_commitment': {
-        const debtId = str(params.debtId);
-        const commitmentId = str(params.commitmentId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const commitment = debt.commitments?.find((c) => c.id === commitmentId);
-        if (!commitment) return { success: false, error: 'Commitment not found' };
-        const paymentType = str(params.paymentType) as PaymentCommitment['paymentType'];
-        const validPaymentTypes: PaymentCommitment['paymentType'][] = ['partial', 'full', 'settlement'];
-        const updatedCommitment: PaymentCommitment = {
-          ...commitment,
-          ...(params.date !== undefined && { date: new Date(str(params.date)).toISOString() }),
-          ...(params.amountLocal !== undefined && { amountLocal: num(params.amountLocal) }),
-          ...(params.amountDollars !== undefined && { amountDollars: num(params.amountDollars) }),
-          ...(params.paymentType !== undefined && validPaymentTypes.includes(paymentType) && { paymentType }),
-          ...(params.notes !== undefined && { notes: str(params.notes) || undefined }),
-        };
-        const newList = debt.commitments?.map((c) => (c.id === commitmentId ? updatedCommitment : c)) || [];
-        const updatedDebt: Debt = {
-          ...debt,
-          commitments: newList,
-          inOrder: calculateInOrder({ ...debt, commitments: newList }),
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(updatedDebt);
-        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
-        return { success: true, message: 'Commitment updated' };
-      }
-
-      case 'delete_commitment': {
-        const debtId = str(params.debtId);
-        const commitmentId = str(params.commitmentId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const newList = debt.commitments?.filter((c) => c.id !== commitmentId) || [];
-        const updatedDebt: Debt = {
-          ...debt,
-          commitments: newList,
-          inOrder: calculateInOrder({ ...debt, commitments: newList }),
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(updatedDebt);
-        notify.debtStatusChanged(debt.name, updatedDebt.inOrder);
-        return { success: true, message: 'Commitment deleted' };
-      }
-
-      case 'complete_commitment':
-        navigate(`/complete-commitment/${params.debtId}/${params.commitmentId}`);
-        return { success: true, message: 'Opening complete commitment' };
-
-      case 'add_call': {
-        const debtId = str(params.debtId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const newCall: CallRecord = {
-          id: genId(),
-          debtId,
-          date: params.date ? new Date(str(params.date)).toISOString() : new Date().toISOString(),
-          notes: str(params.notes),
-          createdAt: new Date().toISOString(),
-        };
-        const updatedDebt: Debt = {
-          ...debt,
-          callHistory: [...(debt.callHistory || []), newCall],
-          lastCallDate: newCall.date,
-          updatedAt: new Date().toISOString(),
-        };
-        storage.saveDebt(updatedDebt);
-        return { success: true, message: 'Call recorded', data: { callId: newCall.id } };
-      }
-
-      case 'edit_call': {
-        const debtId = str(params.debtId);
-        const callId = str(params.callId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const call = debt.callHistory?.find((c) => c.id === callId);
-        if (!call) return { success: false, error: 'Call not found' };
-        const updatedCall: CallRecord = {
-          ...call,
-          ...(params.date !== undefined && { date: new Date(str(params.date)).toISOString() }),
-          ...(params.notes !== undefined && { notes: str(params.notes) }),
-        };
-        const newList = debt.callHistory?.map((c) => (c.id === callId ? updatedCall : c)) || [];
-        storage.saveDebt({ ...debt, callHistory: newList, updatedAt: new Date().toISOString() });
-        return { success: true, message: 'Call updated' };
-      }
-
-      case 'delete_call': {
-        const debtId = str(params.debtId);
-        const callId = str(params.callId);
-        const debt = storage.getDebt(debtId);
-        if (!debt) return { success: false, error: 'Debt not found' };
-        const newList = debt.callHistory?.filter((c) => c.id !== callId) || [];
-        storage.saveDebt({ ...debt, callHistory: newList, updatedAt: new Date().toISOString() });
-        return { success: true, message: 'Call deleted' };
       }
 
       case 'add_fixed_expense': {

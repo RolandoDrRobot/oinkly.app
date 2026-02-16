@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
-import { Debt, CallRecord } from '../types';
+import { Asset } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
@@ -12,42 +12,35 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
-const DeleteCall: React.FC = () => {
+const DeleteAsset: React.FC = () => {
   const { t } = useTranslation();
-  const { debtId, callId } = useParams<{ debtId: string; callId: string }>();
+  const { assetId } = useParams<{ assetId: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [debt, setDebt] = useState<Debt | null>(null);
-  const [call, setCall] = useState<CallRecord | null>(null);
+  const [asset, setAsset] = useState<Asset | null>(null);
 
   useEffect(() => {
-    if (debtId && callId) {
-      const foundDebt = storage.getDebt(debtId);
-      if (foundDebt) {
-        setDebt(foundDebt);
-        const foundCall = foundDebt.callHistory?.find(c => c.id === callId);
-        if (foundCall) {
-          setCall(foundCall);
-        } else {
-          navigate('/dashboard');
-        }
+    if (assetId) {
+      const foundAsset = storage.getAssets().find((a) => a.id === assetId);
+      if (foundAsset) {
+        setAsset(foundAsset);
       } else {
         navigate('/dashboard');
       }
     }
-  }, [debtId, callId, navigate]);
+  }, [assetId, navigate]);
 
   const steps = [
     {
       id: 'confirm',
-      title: t('deleteCall.title'),
-      subtitle: t('deleteCall.subtitle'),
+      title: t('deleteAsset.title'),
+      subtitle: t('deleteAsset.subtitle'),
       icon: FaExclamationTriangle,
     },
     {
       id: 'complete',
       title: t('common.allDone'),
-      subtitle: t('deleteCall.success'),
+      subtitle: t('deleteAsset.success'),
       icon: FaCheckCircle,
     },
   ];
@@ -61,24 +54,20 @@ const DeleteCall: React.FC = () => {
   };
 
   useEffect(() => {
-    if (currentStep === 1 && debt && call) {
+    if (currentStep === 1 && asset) {
       const timer = setTimeout(() => {
-        const updatedDebt: Debt = {
-          ...debt,
-          callHistory: debt.callHistory?.filter(c => c.id !== call.id),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        storage.saveDebt(updatedDebt);
-        notify.callDeleted();
+        storage.deleteAsset(asset.id);
+        const currentOrder = storage.getAssetsOrder() || [];
+        const newOrder = currentOrder.filter((id) => id !== asset.id);
+        storage.setAssetsOrder(newOrder);
+        notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, debt, call]);
+  }, [currentStep, asset, navigate]);
 
-  if (!debt || !call) {
+  if (!asset) {
     return (
       <div className="add-debt">
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -151,7 +140,7 @@ const DeleteCall: React.FC = () => {
               style={{ marginTop: '32px', textAlign: 'center' }}
             >
               <p style={{ fontSize: '18px', color: 'var(--text-primary)', marginBottom: '24px' }}>
-                {t('deleteCall.confirmMessage')}
+                {t('deleteAsset.confirmMessage', { assetName: asset.name })}
               </p>
             </motion.div>
           )}
@@ -186,4 +175,4 @@ const DeleteCall: React.FC = () => {
   );
 };
 
-export default DeleteCall;
+export default DeleteAsset;

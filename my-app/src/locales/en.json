@@ -209,13 +209,25 @@
     "success": "Your income has been updated successfully"
   },
   "deleteFixedExpense": {
-    "confirm": "Are you sure you want to delete this fixed expense?"
+    "confirm": "Are you sure you want to delete this fixed expense?",
+    "title": "Delete Fixed Expense",
+    "subtitle": "Are you sure you want to delete this payment?",
+    "confirmMessage": "This will permanently delete \"{{expenseName}}\". This action cannot be undone.",
+    "success": "Fixed expense deleted successfully"
   },
   "deleteAsset": {
-    "confirm": "Are you sure you want to delete this asset?"
+    "confirm": "Are you sure you want to delete this asset?",
+    "title": "Delete Asset",
+    "subtitle": "Are you sure you want to delete this asset?",
+    "confirmMessage": "This will permanently delete \"{{assetName}}\". This action cannot be undone.",
+    "success": "Asset deleted successfully"
   },
   "deleteIncome": {
-    "confirm": "Are you sure you want to delete this income?"
+    "confirm": "Are you sure you want to delete this income?",
+    "title": "Delete Income",
+    "subtitle": "Are you sure you want to delete this income?",
+    "confirmMessage": "This will permanently delete \"{{incomeName}}\". This action cannot be undone.",
+    "success": "Income deleted successfully"
   },
   "addDebt": {
     "title": "New Debt",
@@ -704,13 +716,8 @@
     "email": "Email",
     "address": "Address",
     "socialHeading": "Social media",
-    "formHeading": "Send a message",
-    "formName": "Name",
-    "formEmail": "Your email",
-    "formMessage": "Message",
-    "send": "Send",
-    "successMessage": "Message sent. We'll get back to you soon.",
-    "fillAllFields": "Please fill in all fields.",
+    "writeUsSocial": "Write to us on social media.",
+    "weAlwaysReply": "We always reply.",
     "placeholderPhone": "506 7161 2344",
     "placeholderEmail": "neodeveloper.eth@gmail.com",
     "placeholderAddress": "Ulloa, Heredia, Costa Rica"

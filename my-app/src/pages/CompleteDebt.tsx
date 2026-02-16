@@ -24,38 +24,10 @@ const CompleteDebt: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [debt, setDebt] = useState<Debt | null>(null);
 
-  const hasPendingCommitments = (debt: Debt): boolean => {
-    if (!debt.commitments || debt.commitments.length === 0) {
-      return false;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return debt.commitments.some(commitment => {
-      if (commitment.status === 'completed') {
-        return false;
-      }
-
-      const commitmentDate = new Date(commitment.date);
-      commitmentDate.setHours(0, 0, 0, 0);
-      const diffTime = commitmentDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      return diffDays < 0 || commitment.status === 'pending';
-    });
-  };
-
   useEffect(() => {
     if (debtId) {
       const foundDebt = storage.getDebt(debtId);
       if (foundDebt) {
-        // Check if there are pending commitments
-        if (hasPendingCommitments(foundDebt)) {
-          // Redirect to dashboard if there are pending commitments
-          navigate('/dashboard');
-          return;
-        }
         setDebt(foundDebt);
       } else {
         navigate('/dashboard');

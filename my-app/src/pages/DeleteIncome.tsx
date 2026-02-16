@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaArrowLeft } from 'react-icons/fa';
-import { Debt, PaymentCommitment } from '../types';
+import { Income } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
@@ -12,42 +12,35 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
-const DeleteCommitment: React.FC = () => {
+const DeleteIncome: React.FC = () => {
   const { t } = useTranslation();
-  const { debtId, commitmentId } = useParams<{ debtId: string; commitmentId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [debt, setDebt] = useState<Debt | null>(null);
-  const [commitment, setCommitment] = useState<PaymentCommitment | null>(null);
+  const [income, setIncome] = useState<Income | null>(null);
 
   useEffect(() => {
-    if (debtId && commitmentId) {
-      const foundDebt = storage.getDebt(debtId);
-      if (foundDebt) {
-        setDebt(foundDebt);
-        const foundCommitment = foundDebt.commitments?.find(c => c.id === commitmentId);
-        if (foundCommitment) {
-          setCommitment(foundCommitment);
-        } else {
-          navigate('/dashboard');
-        }
+    if (id) {
+      const found = storage.getIncomes().find((i) => i.id === id);
+      if (found) {
+        setIncome(found);
       } else {
         navigate('/dashboard');
       }
     }
-  }, [debtId, commitmentId, navigate]);
+  }, [id, navigate]);
 
   const steps = [
     {
       id: 'confirm',
-      title: t('deleteCommitment.title'),
-      subtitle: t('deleteCommitment.subtitle'),
+      title: t('deleteIncome.title'),
+      subtitle: t('deleteIncome.subtitle'),
       icon: FaExclamationTriangle,
     },
     {
       id: 'complete',
       title: t('common.allDone'),
-      subtitle: t('deleteCommitment.success'),
+      subtitle: t('deleteIncome.success'),
       icon: FaCheckCircle,
     },
   ];
@@ -61,52 +54,20 @@ const DeleteCommitment: React.FC = () => {
   };
 
   useEffect(() => {
-    if (currentStep === 1 && debt && commitment) {
+    if (currentStep === 1 && income) {
       const timer = setTimeout(() => {
-        // Calculate inOrder before deletion
-        const calculateInOrder = (debt: Debt): boolean => {
-          if (!debt.commitments || debt.commitments.length === 0) {
-            return true;
-          }
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const hasPendingOrOverdue = debt.commitments.some(c => {
-            if (c.status === 'completed') return false;
-            const commitmentDate = new Date(c.date);
-            commitmentDate.setHours(0, 0, 0, 0);
-            const diffTime = commitmentDate.getTime() - today.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays < 0 || c.status === 'pending';
-          });
-          return !hasPendingOrOverdue;
-        };
-        
-        const oldInOrder = calculateInOrder(debt);
-        
-        const updatedDebt: Debt = {
-          ...debt,
-          commitments: debt.commitments?.filter(c => c.id !== commitment.id),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        const newInOrder = calculateInOrder(updatedDebt);
-        updatedDebt.inOrder = newInOrder;
-        
-        storage.saveDebt(updatedDebt);
-        
-        // Notify if status changed automatically
-        if (oldInOrder !== newInOrder) {
-          notify.debtStatusChanged(debt.name, newInOrder);
-        }
-        
+        storage.deleteIncome(income.id);
+        const currentOrder = storage.getIncomesOrder() || [];
+        const newOrder = currentOrder.filter((oid) => oid !== income.id);
+        storage.setIncomesOrder(newOrder);
+        notify.overviewUpdated();
         navigate('/dashboard');
       }, 1500);
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, debt, commitment]);
+  }, [currentStep, income, navigate]);
 
-  if (!debt || !commitment) {
+  if (!income) {
     return (
       <div className="add-debt">
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -179,7 +140,7 @@ const DeleteCommitment: React.FC = () => {
               style={{ marginTop: '32px', textAlign: 'center' }}
             >
               <p style={{ fontSize: '18px', color: 'var(--text-primary)', marginBottom: '24px' }}>
-                {t('deleteCommitment.confirmMessage')}
+                {t('deleteIncome.confirmMessage', { incomeName: income.name })}
               </p>
             </motion.div>
           )}
@@ -214,4 +175,4 @@ const DeleteCommitment: React.FC = () => {
   );
 };
 
-export default DeleteCommitment;
+export default DeleteIncome;

@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
   FaArrowLeft,
   FaMapMarkerAlt,
-  FaPhone,
   FaEnvelope,
   FaMapPin,
   FaTwitter,
 } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
 import './Contact.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) =>
@@ -19,30 +17,8 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Contact: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
 
   const CONTACT_EMAIL = 'neodeveloper.eth@gmail.com';
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error(t('contact.fillAllFields'));
-      return;
-    }
-    setSending(true);
-    const subject = `Contacto Oinkly - ${name.trim()}`;
-    const body = `Nombre: ${name.trim()}\nEmail: ${email.trim()}\n\nMensaje:\n${message.trim()}`;
-    const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    setName('');
-    setEmail('');
-    setMessage('');
-    setSending(false);
-    toast.success(t('contact.successMessage'));
-  };
 
   const socialLinks = [
     { id: 'x', icon: FaTwitter, url: 'https://x.com/oinklyapp', label: 'X (Oinkly)' },
@@ -111,15 +87,6 @@ const Contact: React.FC = () => {
           </h2>
           <ul className="contact-info-list">
             <li className="contact-info-item">
-              <Icon component={FaPhone} className="contact-info-icon" />
-              <div>
-                <span className="contact-info-label">{t('contact.phone')}</span>
-                <a href="tel:+50671612344" className="contact-info-value">
-                  {t('contact.placeholderPhone')}
-                </a>
-              </div>
-            </li>
-            <li className="contact-info-item">
               <Icon component={FaEnvelope} className="contact-info-icon" />
               <div>
                 <span className="contact-info-label">{t('contact.email')}</span>
@@ -138,7 +105,7 @@ const Contact: React.FC = () => {
           </ul>
         </motion.section>
 
-        {/* Social */}
+        {/* Social + message to write via social */}
         <motion.section
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -146,6 +113,8 @@ const Contact: React.FC = () => {
           className="contact-section contact-social-section"
         >
           <h2 className="contact-section-title">{t('contact.socialHeading')}</h2>
+          <p className="contact-social-message">{t('contact.writeUsSocial')}</p>
+          <p className="contact-social-note">{t('contact.weAlwaysReply')}</p>
           <div className="contact-social-links">
             {socialLinks.map((item) => (
               <a
@@ -160,59 +129,6 @@ const Contact: React.FC = () => {
               </a>
             ))}
           </div>
-        </motion.section>
-
-        {/* Form */}
-        <motion.section
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="contact-section contact-form-section"
-        >
-          <h2 className="contact-section-title">{t('contact.formHeading')}</h2>
-          <form onSubmit={handleSubmit} className="contact-form">
-            <label className="contact-form-label">
-              {t('contact.formName')}
-              <input
-                type="text"
-                className="contact-form-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t('contact.formName')}
-                autoComplete="name"
-              />
-            </label>
-            <label className="contact-form-label">
-              {t('contact.formEmail')}
-              <input
-                type="email"
-                className="contact-form-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('contact.formEmail')}
-                autoComplete="email"
-              />
-            </label>
-            <label className="contact-form-label">
-              {t('contact.formMessage')}
-              <textarea
-                className="contact-form-textarea"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={t('contact.formMessage')}
-                rows={4}
-              />
-            </label>
-            <motion.button
-              type="submit"
-              className="contact-form-submit"
-              disabled={sending}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {sending ? '...' : t('contact.send')}
-            </motion.button>
-          </form>
         </motion.section>
       </div>
     </motion.div>

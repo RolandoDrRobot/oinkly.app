@@ -109,8 +109,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
 
       if (!action) {
         action = parseTextToAIAction(text, debts, {
-          commitments: voiceCommitments,
-          calls: voiceCalls,
           fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
           assets: assets.map((a) => ({ id: a.id, name: a.name })),
           incomes: incomes.map((i) => ({ id: i.id, name: i.name })),

@@ -7,7 +7,6 @@ import {
   FaUser,
   FaCog,
   FaFileContract,
-  FaDownload,
   FaChevronRight,
   FaSignOutAlt,
   FaEnvelope,
@@ -15,7 +14,6 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
-import { exportAllDataToCSV } from '../utils/export';
 import './Profile.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) =>
@@ -51,7 +49,6 @@ const Profile: React.FC = () => {
       : []),
     { id: 'contact', icon: FaEnvelope, label: t('profile.contact'), onClick: () => navigate('/contact') },
     { id: 'terms', icon: FaFileContract, label: t('profile.termsAndConditions'), onClick: () => navigate('/terms') },
-    { id: 'export', icon: FaDownload, label: t('profile.exportData'), onClick: exportAllDataToCSV },
   ];
 
   return (

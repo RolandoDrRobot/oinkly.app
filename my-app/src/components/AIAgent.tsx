@@ -34,7 +34,7 @@ interface AIAgentProps {
 }
 
 export interface AgentAction {
-  type: 'add_debt' | 'add_commitment' | 'complete_commitment' | 'delete_debt' | 'edit_debt' | 'record_call' | 'navigate' | 'toggle_hide_amounts' | 'show_info' | 'calculate';
+  type: 'add_debt' | 'delete_debt' | 'edit_debt' | 'navigate' | 'toggle_hide_amounts' | 'show_info' | 'calculate';
   params?: {
     debtId?: string;
     debtName?: string;
@@ -139,38 +139,6 @@ const AIAgent: React.FC<AIAgentProps> = ({ debts, onAction, isOpen, onClose }) =
       return { type: 'navigate', params: { route: '/profile' } };
     }
 
-    // Add commitment to a debt
-    const commitmentMatch = lowerText.match(/(?:agregar|add|crear|create).*?(?:compromiso|commitment).*?(?:para|to|de|for)?\s*(.+?)(?:\s+con|\s+with|\s+de|\s+of)?\s*(\d+)/i);
-    if (commitmentMatch) {
-      const debtName = commitmentMatch[1]?.trim();
-      const amount = parseFloat(commitmentMatch[2]);
-      const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-      if (debt && amount) {
-        return {
-          type: 'add_commitment',
-          params: { debtId: debt.id, amount: amount },
-        };
-      }
-    }
-
-    // Complete commitment
-    if (lowerText.includes('completar compromiso') || lowerText.includes('complete commitment') || lowerText.includes('pago realizado') || lowerText.includes('payment made')) {
-      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)(?:\s+compromiso|\s+commitment)?/i);
-      if (debtMatch) {
-        const debtName = debtMatch[1]?.trim();
-        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-        if (debt && debt.commitments && debt.commitments.length > 0) {
-          const pendingCommitment = debt.commitments.find(c => c.status === 'pending');
-          if (pendingCommitment) {
-            return {
-              type: 'complete_commitment',
-              params: { debtId: debt.id },
-            };
-          }
-        }
-      }
-    }
-
     // Delete debt
     if (lowerText.includes('eliminar deuda') || lowerText.includes('delete debt') || lowerText.includes('borrar deuda')) {
       const debtMatch = lowerText.match(/(?:deuda|debt)?\s*(.+?)$/i);
@@ -180,21 +148,6 @@ const AIAgent: React.FC<AIAgentProps> = ({ debts, onAction, isOpen, onClose }) =
         if (debt) {
           return {
             type: 'delete_debt',
-            params: { debtId: debt.id },
-          };
-        }
-      }
-    }
-
-    // Record call
-    if (lowerText.includes('registrar llamada') || lowerText.includes('record call') || lowerText.includes('llamada')) {
-      const debtMatch = lowerText.match(/(?:para|to|de|for)?\s*(.+?)$/i);
-      if (debtMatch) {
-        const debtName = debtMatch[1]?.trim();
-        const debt = debts.find(d => d.name.toLowerCase().includes(debtName.toLowerCase()));
-        if (debt) {
-          return {
-            type: 'record_call',
             params: { debtId: debt.id },
           };
         }
@@ -224,17 +177,8 @@ const AIAgent: React.FC<AIAgentProps> = ({ debts, onAction, isOpen, onClose }) =
         case 'navigate':
           response = t('aiAgent.navigating', { route: action.params?.route });
           break;
-        case 'add_commitment':
-          response = t('aiAgent.commitmentAdded');
-          break;
-        case 'complete_commitment':
-          response = t('aiAgent.commitmentCompleted');
-          break;
         case 'delete_debt':
           response = t('aiAgent.debtDeleted');
-          break;
-        case 'record_call':
-          response = t('aiAgent.callRecorded');
           break;
         case 'toggle_hide_amounts':
           response = t('aiAgent.amountsToggled');

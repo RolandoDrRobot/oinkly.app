@@ -445,10 +445,6 @@ function parseNaturalCall(text: string, debts: Debt[]): { debtId: string } | nul
 }
 
 export interface ParseTextContext {
-  /** Compromisos (deuda + commitmentId) para editar/eliminar/completar por voz */
-  commitments?: { debtId: string; debtName: string; commitmentId: string; date?: string }[];
-  /** Llamadas al banco (deuda + callId) para editar/eliminar por voz */
-  calls?: { debtId: string; debtName: string; callId: string; date?: string }[];
   fixedExpenses?: { id: string; name: string }[];
   assets?: { id: string; name: string }[];
   incomes?: { id: string; name: string }[];
@@ -464,32 +460,11 @@ export function parseTextToAIAction(
   const fixedExpenses = context?.fixedExpenses ?? [];
   const assets = context?.assets ?? [];
   const incomes = context?.incomes ?? [];
-  const commitments = context?.commitments ?? [];
-  const calls = context?.calls ?? [];
 
   // —— Navegación: inicio, agregar pantallas ——
   if (/ir al inicio|abrir dashboard|volver al inicio|go to dashboard|dashboard/i.test(lower) && !/deuda|debt|gasto|income|asset/i.test(lower)) {
     return { type: 'navigate', params: { route: '/dashboard' } };
   }
-  if (/^(agregar|add|crear)\s+(compromiso|commitment)$/i.test(trimmed) && !/\d/.test(trimmed) && debts.length > 0) {
-    return { type: 'navigate', params: { route: `/add-commitment/${debts[0].id}` } };
-  }
-  const addCommitmentForMatch = trimmed.match(/^(agregar|add|crear)\s+(compromiso|commitment)\s+(?:para|de|to|for)\s+([a-záéíóúñ\w\s]+?)$/i);
-  if (addCommitmentForMatch && !/\d/.test(trimmed) && debts.length > 0) {
-    const debtName = addCommitmentForMatch[3]?.trim();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
-    if (debt) return { type: 'navigate', params: { route: `/add-commitment/${debt.id}` } };
-  }
-  if (/^(agregar|add|registrar)\s+(llamada|call)$/i.test(trimmed) && debts.length > 0) {
-    return { type: 'navigate', params: { route: `/add-call/${debts[0].id}` } };
-  }
-  const addCallForMatch = trimmed.match(/^(agregar|add|registrar)\s+(llamada|call)\s+(?:para|de|con|to|for)\s+([a-záéíóúñ\w\s]+?)$/i);
-  if (addCallForMatch && debts.length > 0) {
-    const debtName = addCallForMatch[3]?.trim();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
-    if (debt) return { type: 'navigate', params: { route: `/add-call/${debt.id}` } };
-  }
-
   // —— Resumen y UI (sin captura de datos) ——
   if (/resumen|overview|total|cuánto debo|how much|patrimonio|net worth|dame el resumen|ver resumen|cuál es mi patrimonio/i.test(lower)) {
     return { type: 'get_overview' };
@@ -584,18 +559,6 @@ export function parseTextToAIAction(
       const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
       if (debt && day != null && day >= 1 && day <= 31) return { type: 'edit_debt', params: { debtId: debt.id, paymentDate: String(day) } };
     }
-    if (/(?:cambiar|actualizar)\s+(?:el\s+)?monto\s+(?:del\s+)?(?:compromiso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i.test(lower) && commitments.length > 0) {
-      const debtNameMatch = lower.match(/(?:compromiso\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
-      const debtName = debtNameMatch?.[1]?.trim();
-      const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
-      if (debt) {
-        const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
-        if (commitmentForDebt) {
-          const isDollars = isDollarsMentioned(trimmed);
-          return { type: 'edit_commitment', params: { debtId: debt.id, commitmentId: commitmentForDebt.commitmentId, ...(isDollars ? { amountDollars: updateAmount } : { amountLocal: updateAmount }) } };
-        }
-      }
-    }
     if (/(?:cambiar|actualizar)\s+(?:el\s+)?(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+\d/i.test(lower) && fixedExpenses.length > 0) {
       const nameMatch = lower.match(/(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
       const name = nameMatch?.[1]?.trim();
@@ -622,49 +585,6 @@ export function parseTextToAIAction(
         const isDollars = isDollarsMentioned(trimmed);
         return { type: 'edit_income', params: { incomeId: income.id, ...(isDollars ? { amountDollars: updateAmount } : { amountLocal: updateAmount }) } };
       }
-    }
-  }
-
-  // —— Compromisos: editar, eliminar, completar (por nombre de deuda; requiere context.commitments para ID) ——
-  const extractDebtNameFromCommitmentOrCall = (): string | null => {
-    const m = lower.match(/(?:compromiso|commitment|llamada|call)\s+(?:de\s+|del\s+)?(?:la\s+deuda\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
-    if (m?.[1]) return m[1].trim();
-    const m2 = lower.match(/(?:editar|eliminar|borrar|completar|edit|delete|complete)\s+(?:el\s+)?(?:compromiso|commitment|llamada|call)\s+(?:de\s+)?([a-záéíóúñ\w\s]+?)(?:\s*$|\.|,)/i);
-    if (m2?.[1]) return m2[1].trim();
-    return null;
-  };
-  if (/(?:editar|modificar|edit)\s+(?:el\s+)?(?:compromiso|commitment)/i.test(lower)) {
-    const debtName = extractDebtNameFromCommitmentOrCall();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
-    if (debt) {
-      const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
-      if (commitmentForDebt) return { type: 'navigate', params: { route: `/edit-commitment/${debt.id}/${commitmentForDebt.commitmentId}` } };
-      return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
-    }
-  }
-  if (/(?:eliminar|borrar|quitar|delete|remove)\s+(?:el\s+)?(?:compromiso|commitment)/i.test(lower)) {
-    const debtName = extractDebtNameFromCommitmentOrCall();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
-    if (debt) {
-      const commitmentForDebt = commitments.find((c) => c.debtId === debt.id);
-      if (commitmentForDebt) return { type: 'delete_commitment', params: { debtId: debt.id, commitmentId: commitmentForDebt.commitmentId } };
-    }
-  }
-  if (/(?:editar|modificar|edit)\s+(?:la\s+)?(?:llamada|call)/i.test(lower)) {
-    const debtName = extractDebtNameFromCommitmentOrCall();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
-    if (debt) {
-      const callForDebt = calls.find((c) => c.debtId === debt.id);
-      if (callForDebt) return { type: 'navigate', params: { route: `/edit-call/${debt.id}/${callForDebt.callId}` } };
-      return { type: 'navigate', params: { route: `/edit-debt/${debt.id}` } };
-    }
-  }
-  if (/(?:eliminar|borrar|quitar|delete|remove)\s+(?:la\s+)?(?:llamada|call)/i.test(lower)) {
-    const debtName = extractDebtNameFromCommitmentOrCall();
-    const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : null;
-    if (debt) {
-      const callForDebt = calls.find((c) => c.debtId === debt.id);
-      if (callForDebt) return { type: 'delete_call', params: { debtId: debt.id, callId: callForDebt.callId } };
     }
   }
 
@@ -759,62 +679,6 @@ export function parseTextToAIAction(
     if (amountLocal != null) params.valueLocal = amountLocal;
     if (amountDollars != null) params.valueDollars = amountDollars;
     return { type: 'add_asset', params };
-  }
-
-  // —— Compromiso: frases naturales primero ——
-  const naturalCommitment = parseNaturalCommitment(trimmed, debts);
-  if (naturalCommitment) {
-    return { type: 'add_commitment', params: naturalCommitment };
-  }
-
-  // —— Compromiso: comando directo "agregar compromiso para [deuda] [monto]" ——
-  const commitmentMatch = lower.match(
-    /(?:agregar|add|crear|create)\s*(?:compromiso|commitment)\s*(?:para|to|de|for)?\s*(.+?)(?:\s+con|\s+with|\s+de|\s+of)?\s*(\d+(?:[.,]\d+)?)/i
-  );
-  if (commitmentMatch) {
-    const debtName = commitmentMatch[1]?.trim();
-    const amount = parseFloat(commitmentMatch[2].replace(',', '.')) || 0;
-    const debt = debts.find((d) => d.name.toLowerCase().includes(debtName?.toLowerCase() || ''));
-    if (debt && amount > 0) {
-      return {
-        type: 'add_commitment',
-        params: { debtId: debt.id, amountLocal: amount, amountDollars: 0 },
-      };
-    }
-  }
-
-  // —— Completar compromiso: "completar compromiso [deuda]" ——
-  if (/completar compromiso|complete commitment|pago realizado|payment made/i.test(lower)) {
-    const deMatch = lower.match(/(?:completar|complete)\s+(?:compromiso|commitment)\s+(?:de\s+|del\s+|para\s+|to\s+|for\s+)([a-záéíóúñ\w\s]+?)$/i);
-    const debtName = deMatch?.[1]?.trim() ?? lower.match(/(?:para|to|de|for)\s+([a-záéíóúñ\w\s]+?)(?:\s+compromiso|\s+commitment)?$/i)?.[1]?.trim();
-    const debt = debtName
-      ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
-      : debts[0];
-    if (debt?.commitments?.length) {
-      const pending = debt.commitments.find((c) => c.status === 'pending');
-      if (pending) {
-        return { type: 'complete_commitment', params: { debtId: debt.id, commitmentId: pending.id } };
-      }
-      return { type: 'navigate', params: { route: `/complete-commitment/${debt.id}/${debt.commitments[0].id}` } };
-    }
-  }
-
-  // —— Registrar llamada: frases naturales primero ——
-  const naturalCall = parseNaturalCall(trimmed, debts);
-  if (naturalCall) {
-    return { type: 'add_call', params: naturalCall };
-  }
-
-  // —— Registrar llamada: comando directo ——
-  if (/registrar llamada|record call|llamada/i.test(lower)) {
-    const debtMatch = lower.match(/(?:para|to|de|for)?\s*(.+?)$/i);
-    const debtName = debtMatch?.[1]?.trim();
-    const debt = debtName
-      ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()))
-      : debts[0];
-    if (debt) {
-      return { type: 'add_call', params: { debtId: debt.id } };
-    }
   }
 
   // —— Editar / eliminar gasto fijo (por nombre, requiere context.fixedExpenses) ——
