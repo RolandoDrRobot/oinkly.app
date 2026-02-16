@@ -29,7 +29,8 @@
     "start": "react-scripts start",
     "build": "node --no-deprecation node_modules/react-scripts/bin/react-scripts.js build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "compress-images": "node scripts/compress-images.js"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +55,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0"
+    "@types/jest": "^30.0.0",
+    "sharp": "^0.32.6"
   }
 }
