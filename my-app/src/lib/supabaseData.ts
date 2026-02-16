@@ -198,6 +198,9 @@ export async function deleteDebt(userId: string, id: string): Promise<void> {
 // ============ FIXED EXPENSES ============
 
 function fixedExpenseToRow(e: FixedExpense, userId: string): Record<string, unknown> {
+  const paymentDate = e.paymentDate
+    ? (typeof e.paymentDate === 'string' && e.paymentDate.length >= 10 ? e.paymentDate.slice(0, 10) : e.paymentDate)
+    : null;
   return {
     id: e.id,
     user_id: userId,
@@ -207,7 +210,7 @@ function fixedExpenseToRow(e: FixedExpense, userId: string): Record<string, unkn
     local_currency: e.localCurrency || 'USD',
     category: e.category || null,
     due_date: e.dueDate || null,
-    payment_date: e.paymentDate || null,
+    payment_date: paymentDate,
     paid_for_month: e.paidForMonth || null,
     notes: e.notes || null,
     created_at: e.createdAt,

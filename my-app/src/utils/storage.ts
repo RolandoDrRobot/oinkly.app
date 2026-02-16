@@ -183,13 +183,16 @@ export const storage = {
   saveFixedExpense: (expense: FixedExpense) => {
     const expenses = storage.getFixedExpenses();
     const existingIndex = expenses.findIndex(e => e.id === expense.id);
-    
+    const currentOrder = storage.getFixedExpensesOrder() || expenses.map(e => e.id);
+
     if (existingIndex >= 0) {
       expenses[existingIndex] = { ...expense, updatedAt: new Date().toISOString() };
     } else {
       expenses.push({ ...expense, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      currentOrder.push(expense.id);
+      storage.setFixedExpensesOrder(currentOrder);
     }
-    
+
     localStorage.setItem(FIXED_EXPENSES_KEY, JSON.stringify(expenses));
     const uid = storage.getUser()?.id;
     const toSync = expenses.find(e => e.id === expense.id);
