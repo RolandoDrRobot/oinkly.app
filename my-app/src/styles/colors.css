@@ -29,6 +29,7 @@
   
   /* Accent Colors */
   --color-accent-yellow: #f4c032;      /* Yellow for highlights */
+  --color-accent-gold: #c9a227;        /* Gold yellow (achievements, level) */
   --color-accent-pink: #ffbca1;        /* Light pink accents */
   --color-accent-pink-dark: #f89774;   /* Darker pink */
   
@@ -64,6 +65,7 @@
   
   /* Accent Colors */
   --color-accent-yellow: #f4c032;      /* Yellow for highlights */
+  --color-accent-gold: #d4af37;        /* Gold yellow (achievements, level) */
   --color-accent-pink: #ffbca1;        /* Light pink accents */
   --color-accent-pink-dark: #f89774;   /* Darker pink */
   

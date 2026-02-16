@@ -122,6 +122,61 @@
     "emptyStateAlt": "Empty state",
     "logoAlt": "Oinkly Logo"
   },
+  "challenges": {
+    "title": "Challenges",
+    "achievements": "Achievements",
+    "level": "Level",
+    "nextLevel": "Next level",
+    "streakDays": "day streak",
+    "completed": "Completed!",
+    "go": "Go",
+    "categories": {
+      "debt": "Get out of debt",
+      "assets": "Build your wealth",
+      "habit": "Daily habits"
+    },
+    "doIt": "Do it",
+    "addFirstDebt": {
+      "title": "Add your first debt",
+      "description": "Register one debt to start tracking and taking control."
+    },
+    "addCommitment": {
+      "title": "Add a payment commitment",
+      "description": "Set a date and amount you'll pay on one of your debts."
+    },
+    "completeDebt": {
+      "title": "Pay off a debt",
+      "description": "Finish paying one debt completely. You've got this!"
+    },
+    "logCall": {
+      "title": "Log a call",
+      "description": "Record a call with a creditor to track your progress."
+    },
+    "addFirstAsset": {
+      "title": "Add your first asset",
+      "description": "Register a property, savings, or other asset."
+    },
+    "add3Assets": {
+      "title": "Add 3 assets",
+      "description": "Track at least three assets to see your full picture."
+    },
+    "addIncome": {
+      "title": "Add an income",
+      "description": "Record your salary or other income source."
+    },
+    "addFixedExpense": {
+      "title": "Add a fixed expense",
+      "description": "Track rent, utilities, or other recurring expenses."
+    },
+    "openAppToday": {
+      "title": "Open the app today",
+      "description": "You're here! Small steps build big habits."
+    },
+    "streak3": {
+      "title": "3-day streak",
+      "description": "Open Oinkly three days in a row to build momentum."
+    }
+  },
   "addFixedExpense": {
     "title": "New Fixed Expense",
     "subtitle": "Let's add your fixed expense step by step",

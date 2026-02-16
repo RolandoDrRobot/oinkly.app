@@ -60,6 +60,7 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
+import ChallengesPanel from '../components/ChallengesPanel';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -92,6 +93,7 @@ const Dashboard: React.FC = () => {
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const [isChallengesOpen, setIsChallengesOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -2509,6 +2511,10 @@ const Dashboard: React.FC = () => {
           updateUnreadNotificationsCount();
         }}
       />
+      <ChallengesPanel
+        isOpen={isChallengesOpen}
+        onClose={() => setIsChallengesOpen(false)}
+      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -2516,14 +2522,19 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <div className="header-title-wrapper">
+          <button
+            type="button"
+            className="header-title-wrapper"
+            onClick={() => setIsChallengesOpen(true)}
+            title={t('challenges.title')}
+          >
             <img 
               src={`${process.env.PUBLIC_URL}/logo.png`} 
               alt={t('dashboard.logoAlt')} 
               className="header-logo"
             />
             <h1>{t('dashboard.title')}</h1>
-          </div>
+          </button>
           <div className="header-actions">
             <motion.button
               whileHover={{ scale: 1.05 }}
