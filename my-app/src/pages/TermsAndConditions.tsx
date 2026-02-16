@@ -52,7 +52,8 @@ const TermsAndConditions: React.FC = () => {
           </div>
           <div className="section-body">
             <p className="last-updated">{t('terms.lastUpdated')}</p>
-            
+            <h3>{t('terms.betaNoticeTitle')}</h3>
+            <p>{t('terms.betaNoticeText')}</p>
             <h3>{t('terms.acceptanceTitle')}</h3>
             <p>{t('terms.acceptanceText')}</p>
 

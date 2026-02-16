@@ -86,7 +86,7 @@ const InstallApp: React.FC = () => {
           className="install-app-hero"
         >
           <div className="install-app-icon-wrap">
-            <img src="/logo.png" alt="Oinkly" className="install-app-icon" />
+            <img src="/logo.png" alt={t('dashboard.logoAlt')} className="install-app-icon" />
           </div>
         </motion.section>
 

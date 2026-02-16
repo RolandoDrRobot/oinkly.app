@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import MobileOnlyGate from './components/MobileOnlyGate';
 import GoogleAnalyticsRouteTracker from './components/GoogleAnalyticsRouteTracker';
 import { Toaster } from './utils/notifications';
+import i18n from './i18n';
 import './App.css';
 
 const Landing = lazy(() => import('./pages/Landing'));
@@ -191,7 +192,7 @@ function App() {
           <MobileOnlyGate>
           <Router>
             <GoogleAnalyticsRouteTracker />
-            <Suspense fallback={<div className="app-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Cargando…</div>}>
+            <Suspense fallback={<div className="app-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>{i18n.t('common.loading')}</div>}>
               <AppRoutes />
             </Suspense>
             <Toaster

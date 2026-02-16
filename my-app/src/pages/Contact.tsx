@@ -64,7 +64,7 @@ const Contact: React.FC = () => {
           </h2>
           <div className="contact-map-wrap">
             <iframe
-              title="Map"
+              title={t('contact.mapHeading')}
               className="contact-map-iframe"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3929.4640726373677!2d-84.1474965!3d9.978470600000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8fa0fba960ca1987%3A0x938c6116c6c52900!2sTorres%20de%20Heredia%2C%20Heredia%2C%20Barreal!5e0!3m2!1sen!2scr!4v1769814410597!5m2!1sen!2scr"
               loading="lazy"

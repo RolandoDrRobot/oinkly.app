@@ -131,10 +131,10 @@ const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
         const apiError = getLastAIVoiceError();
         let replyText = t('aiAgent.notUnderstood');
         if (apiError === 'quota') {
-          replyText = lang === 'es' ? 'Cuota de OpenAI agotada.' : 'OpenAI quota exceeded.';
+          replyText = t('aiAgent.openAIQuotaExceeded');
           notify.saveAndToast(replyText, 'error', { duration: 8000 });
         } else if (apiError === 'model_not_found') {
-          replyText = lang === 'es' ? 'Modelo no disponible.' : 'Model not available.';
+          replyText = t('aiAgent.modelNotAvailable');
           notify.saveAndToast(replyText, 'error', { duration: 6000 });
         }
         setMessages((prev) => [...prev, { role: 'assistant', text: replyText }]);

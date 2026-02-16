@@ -61,7 +61,7 @@ const Landing: React.FC = () => {
     } catch (error: any) {
       console.error('[Landing] Error in handleGoogleLogin:', error);
       analytics.signInError(error?.message);
-      toast.error(error.message || t('landing.googleLoginError') || 'Error al iniciar sesión con Google');
+      toast.error(error.message || t('landing.googleLoginError'));
     }
   };
 
