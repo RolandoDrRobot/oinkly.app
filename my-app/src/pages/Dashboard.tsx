@@ -893,14 +893,16 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="empty-state"
           >
-            <motion.img
-              src="/shopping.png"
-              alt={t('dashboard.emptyStateAlt')}
-              className="empty-state-image"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            />
+            <div className="empty-state-image-wrapper">
+              <motion.img
+                src="/shopping.png"
+                alt={t('dashboard.emptyStateAlt')}
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              />
+            </div>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1644,14 +1646,16 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="empty-state"
           >
-            <motion.img
-              src="/shopping.png"
-              alt={t('dashboard.emptyStateAlt')}
-              className="empty-state-image"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            />
+            <div className="empty-state-image-wrapper">
+              <motion.img
+                src="/shopping.png"
+                alt={t('dashboard.emptyStateAlt')}
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              />
+            </div>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1968,14 +1972,16 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="empty-state"
           >
-            <motion.img
-              src="/shopping.png"
-              alt={t('dashboard.emptyStateAlt')}
-              className="empty-state-image"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            />
+            <div className="empty-state-image-wrapper">
+              <motion.img
+                src="/shopping.png"
+                alt={t('dashboard.emptyStateAlt')}
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              />
+            </div>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -2226,14 +2232,16 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="empty-state"
           >
-            <motion.img
-              src="/shopping.png"
-              alt={t('dashboard.emptyStateAlt')}
-              className="empty-state-image"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            />
+            <div className="empty-state-image-wrapper">
+              <motion.img
+                src="/shopping.png"
+                alt={t('dashboard.emptyStateAlt')}
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              />
+            </div>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -2758,7 +2766,7 @@ const Dashboard: React.FC = () => {
         >
           <span
             className="ai-agent-entry-image"
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ai.png)` }}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
           />
           <span className="ai-agent-entry-label">{t('aiAgent.assistantLabel')}</span>
         </motion.button>

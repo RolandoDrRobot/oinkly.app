@@ -2,8 +2,9 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaPaperPlane, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
+import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
@@ -21,9 +22,12 @@ interface ChatMessage {
   text: string;
 }
 
+const AI_AVATAR_URL = `${process.env.PUBLIC_URL || ''}/img/ai.png`;
+
 const AIChat: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isPremium } = useSubscription();
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
@@ -203,16 +207,43 @@ const AIChat: React.FC = () => {
     if (aiInputText.trim()) handleAIUserInput(aiInputText);
   };
 
+  const pageTransition = { type: 'tween' as const, duration: 0.35, ease: 'easeOut' };
+  const pageVariants = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -8 },
+  };
+  const itemVariants = {
+    initial: { opacity: 0, y: 12 },
+    animate: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, ...pageTransition } }),
+  };
+
   if (!isPremium) {
     return (
-      <div className="ai-chat-page">
-        <header className="ai-chat-header">
+      <motion.div
+        className="ai-chat-page"
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        <motion.header
+          className="ai-chat-header"
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, ...pageTransition }}
+        >
           <button type="button" className="ai-chat-back" onClick={() => navigate('/dashboard')}>
             <Icon component={FaArrowLeft} /> {t('common.back')}
           </button>
-          <h1 className="ai-chat-title">{t('aiAgent.assistantLabel')}</h1>
-        </header>
-        <div className="ai-chat-locked">
+        </motion.header>
+        <motion.div
+          className="ai-chat-locked"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, ...pageTransition }}
+        >
           <p className="ai-chat-locked-text">{t('subscription.aiLockedMessage')}</p>
           <motion.button
             type="button"
@@ -226,38 +257,106 @@ const AIChat: React.FC = () => {
           >
             {t('subscription.upgradeToUseAI')}
           </motion.button>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="ai-chat-page">
-      <header className="ai-chat-header">
+    <motion.div
+      className="ai-chat-page"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+      transition={pageTransition}
+    >
+      <motion.header
+        className="ai-chat-header"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, ...pageTransition }}
+      >
         <button type="button" className="ai-chat-back" onClick={() => navigate('/dashboard')}>
           <Icon component={FaArrowLeft} /> {t('common.back')}
         </button>
-        <h1 className="ai-chat-title">{t('aiAgent.assistantLabel')}</h1>
-      </header>
+      </motion.header>
 
-      <div className="ai-chat-messages">
-        {messages.length === 0 && (
-          <p className="ai-chat-welcome">{t('aiAgent.welcome')}</p>
-        )}
-        {messages.map((msg, i) => (
-          <div key={i} className={`ai-chat-message ai-chat-message--${msg.role}`}>
-            <span className="ai-chat-message-text">{msg.text}</span>
-          </div>
-        ))}
-        {isProcessing && (
-          <div className="ai-chat-message ai-chat-message--assistant">
-            <span className="ai-chat-message-text ai-chat-typing">...</span>
-          </div>
-        )}
+      <motion.div
+        className="ai-chat-messages"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.12, ...pageTransition }}
+      >
+        <AnimatePresence initial={false}>
+          {messages.length === 0 && (
+            <motion.div
+              className="ai-chat-welcome-wrap"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={pageTransition}
+            >
+              <img src={AI_AVATAR_URL} alt="" className="ai-chat-welcome-avatar" />
+              <p className="ai-chat-welcome">{t('aiAgent.welcome')}</p>
+            </motion.div>
+          )}
+          {messages.map((msg, i) => (
+            <motion.div
+              key={`msg-${i}`}
+              className={`ai-chat-message-row ai-chat-message-row--${msg.role}`}
+              variants={itemVariants}
+              initial="initial"
+              animate="animate"
+              custom={i}
+              layout
+            >
+              {msg.role === 'assistant' ? (
+                <>
+                  <img src={AI_AVATAR_URL} alt="" className="ai-chat-message-avatar" />
+                  <div className="ai-chat-message ai-chat-message--assistant">
+                    <span className="ai-chat-message-text">{msg.text}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="ai-chat-message ai-chat-message--user">
+                    <span className="ai-chat-message-text">{msg.text}</span>
+                  </div>
+                  <div
+                    className="ai-chat-message-avatar ai-chat-message-avatar--user"
+                    style={user?.avatarUrl ? { backgroundImage: `url(${user.avatarUrl})` } : undefined}
+                  >
+                    {!user?.avatarUrl ? ((user?.name || user?.email) ? (user.name || user.email).charAt(0).toUpperCase() : '?') : null}
+                  </div>
+                </>
+              )}
+            </motion.div>
+          ))}
+          {isProcessing && (
+            <motion.div
+              className="ai-chat-message-row ai-chat-message-row--assistant"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={pageTransition}
+            >
+              <img src={AI_AVATAR_URL} alt="" className="ai-chat-message-avatar" />
+              <div className="ai-chat-message ai-chat-message--assistant">
+                <span className="ai-chat-message-text ai-chat-typing">...</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div ref={messagesEndRef} />
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} className="ai-chat-form">
+      <motion.form
+        onSubmit={handleSubmit}
+        className="ai-chat-form"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, ...pageTransition }}
+      >
         <input
           type="text"
           value={aiInputText}
@@ -280,8 +379,8 @@ const AIChat: React.FC = () => {
         >
           <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
         </motion.button>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 };
 

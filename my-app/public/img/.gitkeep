@@ -1,6 +1,4 @@
-# Imágenes de fondo de los botones del menú (Dashboard):
-# - debt.png        (botón Deuda)
-# - gasts_fijos.png (botón Gastos)
-# - activos.png     (botón Activos)
-# - ingresos.png    (botón Ingresos)
-# Formatos: .png, .jpg, .webp (si usas otro, cambia la extensión en Dashboard.tsx)
+# Imágenes del menú y del asistente:
+# - debt.png, gasts_fijos.png, activos.png, ingresos.png (botones menú Dashboard)
+# - banner.png (banner del botón Asistente AI en Dashboard)
+# - ai.png (avatar del asistente en la pantalla de chat)
