@@ -7,8 +7,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 declare global {
   interface Window {
-    webkitSpeechRecognition: any;
-    SpeechRecognition: any;
+    webkitSpeechRecognition?: any;
+    SpeechRecognition?: any;
   }
 }
 

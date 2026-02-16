@@ -29,6 +29,7 @@ import Subscription from './pages/Subscription';
 import Subscribe from './pages/Subscribe';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Contact from './pages/Contact';
+import AIChat from './pages/AIChat';
 import InstallApp from './pages/InstallApp';
 import MobileOnlyGate from './components/MobileOnlyGate';
 import GoogleAnalyticsRouteTracker from './components/GoogleAnalyticsRouteTracker';
@@ -209,6 +210,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Preferences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai-chat"
+        element={
+          <ProtectedRoute>
+            <AIChat />
           </ProtectedRoute>
         }
       />

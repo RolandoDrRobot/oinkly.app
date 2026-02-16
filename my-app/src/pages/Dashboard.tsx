@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -33,9 +33,6 @@ import {
   FaCalendarAlt, 
   FaEye,
   FaEyeSlash,
-  FaMicrophone,
-  FaMicrophoneSlash,
-  FaPaperPlane,
   FaHome,
   FaCar,
   FaPiggyBank,
@@ -63,30 +60,7 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
-import { useSubscription } from '../context/SubscriptionContext';
-import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
-import { analytics } from '../utils/analytics';
 import './Dashboard.css';
-
-// Extend Window interface for Speech Recognition
-declare global {
-  interface Window {
-    webkitSpeechRecognition: any;
-    SpeechRecognition: any;
-  }
-}
-
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult: ((this: SpeechRecognition, ev: any) => any) | null;
-  onerror: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-}
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -96,7 +70,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 type ActiveTab = 'debt' | 'fixedExpenses' | 'assets' | 'incomes';
 
 const Dashboard: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [debts, setDebts] = useState<Debt[]>([]);
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -118,15 +92,7 @@ const Dashboard: React.FC = () => {
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-  // AI Agent states
-  const [isListening, setIsListening] = useState(false);
-  const [aiInputText, setAiInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const speechTranscriptRef = useRef('');
-  // const { user, logout } = useAuth(); // Reserved for future use
   const navigate = useNavigate();
-  const { isPremium } = useSubscription();
 
   useEffect(() => {
     if (!localStorage.getItem('hasSeenInitialSetup')) {
@@ -802,201 +768,6 @@ const Dashboard: React.FC = () => {
     const newValue = !hideAmounts;
     setHideAmounts(newValue);
     localStorage.setItem('hideAmounts', String(newValue));
-  };
-
-  // AI Agent functions
-  const handleAIUserInput = async (text: string) => {
-    if (!text.trim()) return;
-
-    console.log('[AI Voice] handleAIUserInput – text:', JSON.stringify(text), 'debts.length:', debts.length);
-    setAiInputText('');
-    setIsProcessing(true);
-
-    const lang = i18n.language.startsWith('es') ? 'es' : 'en';
-    let action = null;
-
-    const voiceCommitments = debts.flatMap((d) =>
-      (d.commitments || []).map((c) => ({ debtId: d.id, debtName: d.name, commitmentId: c.id, date: c.date }))
-    );
-    const voiceCalls = debts.flatMap((d) =>
-      (d.callHistory || []).map((c) => ({ debtId: d.id, debtName: d.name, callId: c.id, date: c.date }))
-    );
-
-    // Intentar primero interpretación con IA externa si está configurada
-    if (isAIVoiceEnabled()) {
-      action = await interpretWithAI(text, {
-        lang,
-        debts: debts.map((d) => ({ id: d.id, name: d.name })),
-        commitments: voiceCommitments,
-        calls: voiceCalls,
-        fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
-        assets: assets.map((a) => ({ id: a.id, name: a.name })),
-        incomes: incomes.map((i) => ({ id: i.id, name: i.name })),
-        overview: getSummaryText(lang),
-      });
-      console.log('[AI Voice] handleAIUserInput – action from AI:', action);
-
-      // Safeguard: si el usuario claramente pidió editar/eliminar/completar y la IA devolvió add_*, ignorar IA y usar parser local
-      const isEditDeleteCompleteIntent = /editar|modificar|cambiar|actualizar|eliminar|borrar|quitar|completar|liquidar|cerrar|dar de baja|edit|delete|modify|update|remove|complete/i.test(text.trim());
-      const isAddAction = action && ['add_debt', 'add_fixed_expense', 'add_asset', 'add_income'].includes(action.type);
-      if (isEditDeleteCompleteIntent && isAddAction) {
-        console.log('[AI Voice] handleAIUserInput – descartando add_* de IA (usuario pidió editar/eliminar/completar), usando parser local');
-        action = null;
-      }
-    }
-
-    // Fallback al parser local si la IA no devolvió acción
-    if (!action) {
-      action = parseTextToAIAction(text, debts, {
-        commitments: voiceCommitments,
-        calls: voiceCalls,
-        fixedExpenses: fixedExpenses.map((e) => ({ id: e.id, name: e.name })),
-        assets: assets.map((a) => ({ id: a.id, name: a.name })),
-        incomes: incomes.map((i) => ({ id: i.id, name: i.name })),
-      });
-      console.log('[AI Voice] handleAIUserInput – action from parser:', action);
-    }
-
-      if (action) {
-      console.log('[AI Voice] handleAIUserInput – executing action:', action.type, action.params);
-      const result = await executeAIAction(action, { navigate });
-      console.log('[AI Voice] handleAIUserInput – result:', result);
-      if (result.success) {
-        analytics.aiAssistantUsed(action.type);
-      }
-      if (action.type === 'toggle_hide_amounts') {
-        toggleHideAmounts();
-      }
-      // Refresh lists so new/updated/deleted entries appear without reload
-      if (result.success) {
-        const debtRelated = ['add_debt', 'edit_debt', 'delete_debt', 'delete_all_debts', 'add_commitment', 'edit_commitment', 'delete_commitment', 'complete_commitment', 'add_call', 'edit_call', 'delete_call'].includes(action.type);
-        const fixedExpenseRelated = ['add_fixed_expense', 'edit_fixed_expense', 'delete_fixed_expense', 'delete_all_fixed_expenses'].includes(action.type);
-        const assetRelated = ['add_asset', 'edit_asset', 'delete_asset', 'delete_all_assets'].includes(action.type);
-        const incomeRelated = ['add_income', 'edit_income', 'delete_income', 'delete_all_incomes'].includes(action.type);
-        if (debtRelated) loadDebts();
-        if (fixedExpenseRelated) loadFixedExpenses();
-        if (assetRelated) loadAssets();
-        if (incomeRelated) loadIncomes();
-        updateUnreadNotificationsCount();
-      }
-      const message = getMessageForActionResult(action, result, lang);
-      if (result.success && (action.type === 'get_overview' || action.type === 'get_debts')) {
-        notify.saveAndToast(message, 'success', { duration: 6000 });
-      } else if (result.success && (['add_debt', 'add_income', 'add_fixed_expense', 'add_asset'].includes(action.type) || ['delete_all_debts', 'delete_all_fixed_expenses', 'delete_all_assets', 'delete_all_incomes'].includes(action.type))) {
-        notify.saveAndToast(message, 'success', { duration: 4000 });
-      } else if (!result.success && result.error) {
-        notify.saveAndToast(result.error, 'error');
-      }
-      updateUnreadNotificationsCount();
-      setIsProcessing(false);
-    } else {
-      console.log('[AI Voice] handleAIUserInput – no action (parser returned null)');
-      const apiError = getLastAIVoiceError();
-      if (apiError === 'quota') {
-        analytics.aiVoiceError('quota');
-        notify.saveAndToast(
-          lang === 'es'
-            ? 'Cuota de OpenAI agotada. Revisa tu plan y facturación en platform.openai.com'
-            : 'OpenAI quota exceeded. Check your plan and billing at platform.openai.com',
-          'error',
-          { duration: 8000 }
-        );
-      } else if (apiError === 'model_not_found') {
-        analytics.aiVoiceError('model_not_found');
-        notify.saveAndToast(
-          lang === 'es'
-            ? 'Modelo no disponible en tu cuenta. Prueba REACT_APP_OPENAI_MODEL=gpt-4o-mini en .env'
-            : 'Model not available on your account. Try REACT_APP_OPENAI_MODEL=gpt-4o-mini in .env',
-          'error',
-          { duration: 6000 }
-        );
-      } else {
-        analytics.aiVoiceError('not_understood');
-        notify.saveAndToast(t('aiAgent.notUnderstood'), 'error');
-      }
-      updateUnreadNotificationsCount();
-      setIsProcessing(false);
-    }
-  };
-
-  const initializeSpeechRecognition = useCallback(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      const recognition = new SpeechRecognition();
-      // Permite pausas al hablar: no se corta hasta que el usuario pulse parar
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = i18n.language === 'es' ? 'es-ES' : 'en-US';
-
-      recognition.onstart = () => {
-        speechTranscriptRef.current = '';
-        setAiInputText('');
-        setIsListening(true);
-      };
-
-      recognition.onresult = (event: any) => {
-        let fullTranscript = '';
-        for (let i = 0; i < event.results.length; i++) {
-          fullTranscript += event.results[i][0].transcript;
-          if (i < event.results.length - 1) fullTranscript += ' ';
-        }
-        speechTranscriptRef.current = fullTranscript;
-        setAiInputText(fullTranscript);
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i18n.language]);
-
-  useEffect(() => {
-    initializeSpeechRecognition();
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, [initializeSpeechRecognition]);
-
-  const startListening = () => {
-    if (recognitionRef.current && !isListening) {
-      try {
-        recognitionRef.current.start();
-      } catch (error) {
-        console.error('Error starting speech recognition:', error);
-      }
-    }
-  };
-
-  const stopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      const transcript = speechTranscriptRef.current.trim();
-      console.log('[AI Voice] stopListening – transcript:', transcript, 'length:', transcript.length);
-      if (transcript) {
-        handleAIUserInput(transcript);
-      } else {
-        console.log('[AI Voice] stopListening – transcript vacío, no se llama handleAIUserInput');
-      }
-      speechTranscriptRef.current = '';
-    }
-  };
-
-  const handleAISubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (aiInputText.trim()) {
-      handleAIUserInput(aiInputText);
-    }
   };
 
   // Calculate totals
@@ -2975,66 +2746,22 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* AI Agent Section – Premium: habilitado; Free: bloqueado con CTA */}
-        <motion.div
+        {/* Botón Asistente AI: 50% imagen 50% texto → abre oficina del chat */}
+        <motion.button
+          type="button"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className={`ai-agent-section ${!isPremium ? 'ai-agent-section-locked' : ''}`}
+          className="ai-agent-entry-button"
+          onClick={() => navigate('/ai-chat')}
+          aria-label={t('aiAgent.assistantLabel')}
         >
-          {isPremium ? (
-            <form onSubmit={handleAISubmit} className="ai-agent-input-container">
-              <input
-                type="text"
-                value={aiInputText}
-                onChange={(e) => setAiInputText(e.target.value)}
-                placeholder={t('aiAgent.placeholder')}
-                className="ai-agent-input"
-                disabled={isProcessing}
-              />
-              <motion.button
-                type="submit"
-                className="ai-agent-send"
-                disabled={!aiInputText.trim() || isProcessing}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon component={FaPaperPlane} />
-              </motion.button>
-              <motion.button
-                type="button"
-                className={`ai-agent-mic ${isListening ? 'listening' : ''}`}
-                onClick={isListening ? stopListening : startListening}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
-                disabled={isProcessing}
-              >
-                <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
-              </motion.button>
-            </form>
-          ) : (
-            <div className="ai-agent-locked">
-              <div className="ai-agent-locked-row">
-                <Icon component={FaMicrophone} className="ai-agent-locked-icon" />
-                <div className="card-lock">
-                  <motion.button
-                    type="button"
-                    className="ai-agent-locked-cta"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      analytics.aiAssistantLockedClick('dashboard');
-                      navigate('/subscription', { state: { from: 'dashboard' } });
-                    }}
-                  >
-                    {t('subscription.aiLockedMessage')}
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          )}
-        </motion.div>
+          <span
+            className="ai-agent-entry-image"
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ai.png)` }}
+          />
+          <span className="ai-agent-entry-label">{t('aiAgent.assistantLabel')}</span>
+        </motion.button>
 
         {/* Menu de 4 botones */}
         <motion.div

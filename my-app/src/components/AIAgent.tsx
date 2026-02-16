@@ -9,8 +9,8 @@ import './AIAgent.css';
 // Extend Window interface for Speech Recognition
 declare global {
   interface Window {
-    webkitSpeechRecognition: any;
-    SpeechRecognition: any;
+    webkitSpeechRecognition?: any;
+    SpeechRecognition?: any;
   }
 }
 

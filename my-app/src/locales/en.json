@@ -415,6 +415,7 @@
     "errorActivating": "Error activating. Please try again.",
     "aiLockedTitle": "Voice AI Assistant",
     "aiLockedMessage": "Unlock voice control.",
+    "upgradeToUseAI": "View plans to unlock",
     "aiLockedCta": "View plans",
     "cancelSubscription": "Cancel subscription",
     "canceled": "Subscription canceled. You no longer have Premium."
@@ -527,6 +528,7 @@
     }
   },
   "aiAgent": {
+    "assistantLabel": "AI Assistant",
     "title": "Control your finances with your voice",
     "welcome": "Hi! I'm your AI assistant. I can help you manage your debts. Try saying: 'Add a debt', 'Show me the overview', 'Add a commitment to [debt name]', or 'Record a call for [debt name]'. You can also type or use voice commands!",
     "placeholder": "Type or speak your command...",
