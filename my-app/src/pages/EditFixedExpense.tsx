@@ -74,7 +74,6 @@ const EditFixedExpense: React.FC = () => {
           name: foundExpense.name,
           amountLocal: foundExpense.amountLocal,
           amountDollars: foundExpense.amountDollars,
-          category: foundExpense.category || '',
           dueDate: foundExpense.dueDate || '',
           notes: foundExpense.notes || '',
         });
@@ -125,15 +124,6 @@ const EditFixedExpense: React.FC = () => {
       field: 'amountDollars' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
-    },
-    {
-      id: 'category',
-      title: t('addFixedExpense.category'),
-      subtitle: t('addFixedExpense.categorySubtitle'),
-      icon: FaTag,
-      field: 'category' as keyof StepData,
-      placeholder: t('addFixedExpense.categoryPlaceholder'),
-      optional: true,
     },
     {
       id: 'dueDate',
@@ -235,7 +225,6 @@ const EditFixedExpense: React.FC = () => {
           name: formData.name || '',
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
-          category: formData.category || undefined,
           dueDate: formData.dueDate || undefined,
           notes: formData.notes || undefined,
           updatedAt: new Date().toISOString(),

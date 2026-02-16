@@ -1989,11 +1989,6 @@
 }
 
 
-/* Dashboard Screens Container */
-.dashboard-screens-container {
-  min-height: 400px;
-}
-
 /* Screen Container */
 .screen-container {
   width: 100%;
@@ -2212,60 +2207,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.item-status-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.fixed-expense-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.fixed-expense-up-to-date {
-  background: rgba(86, 154, 60, 0.25);
-  color: var(--primary-bright, #7cbd6a);
-}
-
-.fixed-expense-overdue {
-  background: rgba(244, 67, 54, 0.2);
-  color: var(--error, #f44336);
-}
-
-.fixed-expense-due-day {
-  background: rgba(244, 192, 50, 0.2);
-  color: #f4c032;
-}
-
-.item-card .btn-mark-up-to-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 0;
-  background: var(--primary);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.item-card .btn-mark-up-to-date:hover {
-  filter: brightness(1.15);
-  transform: scale(1.02);
 }
 
 .item-header-actions {

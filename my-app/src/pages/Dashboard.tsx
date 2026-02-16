@@ -48,7 +48,9 @@ import {
   FaWallet,
   FaTag,
   FaBell,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaCog,
+  FaBolt
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
@@ -187,19 +189,8 @@ const Dashboard: React.FC = () => {
     setIncomes(orderedIncomes);
   };
 
-  // Helper functions to get icons for items
-  const getFixedExpenseIcon = (category?: string) => {
-    if (!category) return FaShoppingCart;
-    const cat = category.toLowerCase();
-    if (cat.includes('casa') || cat.includes('home') || cat.includes('vivienda')) return FaHome;
-    if (cat.includes('comida') || cat.includes('food') || cat.includes('restaurant')) return FaUtensils;
-    if (cat.includes('gasolina') || cat.includes('gas') || cat.includes('combustible')) return FaGasPump;
-    if (cat.includes('internet') || cat.includes('wifi') || cat.includes('telefono')) return FaWifi;
-    if (cat.includes('entretenimiento') || cat.includes('entretenimiento') || cat.includes('juego')) return FaGamepad;
-    if (cat.includes('educacion') || cat.includes('education') || cat.includes('escuela')) return FaGraduationCap;
-    if (cat.includes('salud') || cat.includes('health') || cat.includes('medico')) return FaHeartbeat;
-    return FaShoppingCart;
-  };
+  // Icono de rayo para todos los gastos fijos
+  const fixedExpenseIcon = FaBolt;
 
   const getAssetIcon = (type: Asset['type']) => {
     switch (type) {
@@ -279,37 +270,6 @@ const Dashboard: React.FC = () => {
   };
 
   /** Current month YYYY-MM */
-  const getCurrentMonth = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-  };
-
-  /** Fixed expense status: upToDate | overdue | dueDay (and day number for dueDay) */
-  const getFixedExpenseStatus = (expense: FixedExpense): { status: 'upToDate' | 'overdue' | 'dueDay'; day?: number } => {
-    const month = getCurrentMonth();
-    if (expense.paidForMonth === month) return { status: 'upToDate' };
-    const dueDay = expense.dueDate ? parseInt(String(expense.dueDate).replace(/\D/g, ''), 10) : 0;
-    if (dueDay < 1 || dueDay > 31) return { status: 'dueDay', day: 0 };
-    const today = new Date();
-    const dayOfMonth = today.getDate();
-    if (dayOfMonth >= dueDay) return { status: 'overdue', day: dueDay };
-    return { status: 'dueDay', day: dueDay };
-  };
-
-  const handleMarkFixedExpenseUpToDate = (expenseId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const expense = fixedExpenses.find(e => e.id === expenseId);
-    if (!expense) return;
-    const updated = {
-      ...expense,
-      paidForMonth: getCurrentMonth(),
-      updatedAt: new Date().toISOString(),
-    };
-    storage.updateFixedExpense(updated);
-    loadFixedExpenses();
-    notify.saveAndToast(t('dashboard.expenseMarkedUpToDate', { name: expense.name }), 'success');
-  };
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -1160,7 +1120,7 @@ const Dashboard: React.FC = () => {
                 <div className="summary-card">
                   <div className="summary-section">
                     <div className="summary-card-header">
-                      <Icon component={FaShoppingCart} className="summary-icon" />
+                      <Icon component={FaBolt} className="summary-icon" />
                       <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
                     </div>
                     <div className="summary-values">
@@ -1197,7 +1157,7 @@ const Dashboard: React.FC = () => {
                               <div className="item-content">
                                 <div className="item-header-info">
                                   <div className="item-icon-wrapper">
-                                    <Icon component={getFixedExpenseIcon(expense.category)} className="item-main-icon" />
+                                    <Icon component={fixedExpenseIcon} className="item-main-icon" />
                                   </div>
                                   {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'name' ? (
                                     <input
@@ -1245,53 +1205,6 @@ const Dashboard: React.FC = () => {
                                       {expense.paymentDate && expense.paymentDate.trim() !== '' ? formatDateLocal(expense.paymentDate) : t('dashboard.noPaymentDate')}
                                     </p>
                                   )}
-                                  <div className="item-type-row">
-                                    {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'category' ? (
-                                      <input
-                                        type="text"
-                                        value={editValue}
-                                        onChange={(e) => setEditValue(e.target.value)}
-                                        onBlur={() => saveFixedExpenseEdit(expense.id, 'category')}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'category');
-                                          if (e.key === 'Escape') cancelEdit();
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="inline-edit-input"
-                                        autoFocus
-                                      />
-                                    ) : (
-                                      <p className="item-type editable-field" onClick={(e) => {
-                                        e.stopPropagation();
-                                        startEditingFixedExpense(expense.id, 'category', expense.category || '', e);
-                                      }}>
-                                        <Icon component={FaTag} className="item-type-icon" />
-                                        {expense.category ? (expense.category === 'other' ? t('dashboard.other') : t(`addFixedExpense.cat${expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}`)) : ''}
-                                      </p>
-                                    )}
-                                  </div>
-                                  {(() => {
-                                    const { status, day } = getFixedExpenseStatus(expense);
-                                    return (
-                                      <div className="item-status-row">
-                                        {status === 'upToDate' && (
-                                          <span className="fixed-expense-badge fixed-expense-up-to-date">
-                                            <Icon component={FaCheck} size={12} /> {t('dashboard.expenseUpToDate')}
-                                          </span>
-                                        )}
-                                        {status === 'overdue' && (
-                                          <span className="fixed-expense-badge fixed-expense-overdue">
-                                            <Icon component={FaTimes} size={12} /> {t('dashboard.expenseOverdue')}
-                                          </span>
-                                        )}
-                                        {status === 'dueDay' && day != null && day > 0 && (
-                                          <span className="fixed-expense-badge fixed-expense-due-day">
-                                            <Icon component={FaCalendarAlt} size={12} /> {t('dashboard.dueDay', { day })}
-                                          </span>
-                                        )}
-                                      </div>
-                                    );
-                                  })()}
                                 </div>
                               </div>
                               {!hideAmounts && (
@@ -1395,19 +1308,6 @@ const Dashboard: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="item-header-actions">
-                                    {getFixedExpenseStatus(expense).status !== 'upToDate' && (
-                                      <motion.button
-                                        type="button"
-                                        className="btn-mark-up-to-date"
-                                        onClick={(e) => handleMarkFixedExpenseUpToDate(expense.id, e)}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        title={t('dashboard.markUpToDate')}
-                                      >
-                                        <Icon component={FaCheck} size={14} />
-                                        <span>{t('dashboard.markUpToDate')}</span>
-                                      </motion.button>
-                                    )}
                                     <motion.button
                                       className="btn-delete"
                                       onClick={(e) => {
@@ -2135,7 +2035,7 @@ const Dashboard: React.FC = () => {
                         <>
                           <div className="summary-section">
                             <div className="summary-card-header">
-                              <Icon component={FaShoppingCart} className="summary-icon" />
+                              <Icon component={FaBolt} className="summary-icon" />
                               <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
                             </div>
                             <div className="summary-values">
@@ -2307,10 +2207,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Nav fija al fondo: botón redondo + mensaje tipo chat que abre el modal */}
+      {/* Nav fija al fondo: botón que abre el modal de IA */}
       <nav className="dashboard-bottom-nav" aria-label={t('aiAgent.assistantLabel')}>
         <div className="ai-agent-entry-wrap">
-          <span className="ai-agent-entry-bubble" aria-hidden="true">{t('aiAgent.chatBubble')}</span>
           <motion.button
             type="button"
             initial={{ opacity: 0, scale: 0.8 }}
