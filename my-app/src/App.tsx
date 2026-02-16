@@ -1,31 +1,32 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
-import EditDebt from './pages/EditDebt';
-import DeleteDebt from './pages/DeleteDebt';
-import DeleteAsset from './pages/DeleteAsset';
-import DeleteFixedExpense from './pages/DeleteFixedExpense';
-import DeleteIncome from './pages/DeleteIncome';
-import CompleteDebt from './pages/CompleteDebt';
-import CompleteAsset from './pages/CompleteAsset';
-import EditFixedExpense from './pages/EditFixedExpense';
-import EditAsset from './pages/EditAsset';
-import EditIncome from './pages/EditIncome';
-import Profile from './pages/Profile';
-import Preferences from './pages/Preferences';
-import TermsAndConditions from './pages/TermsAndConditions';
-import Contact from './pages/Contact';
-import AIChat from './pages/AIChat';
-import InstallApp from './pages/InstallApp';
 import MobileOnlyGate from './components/MobileOnlyGate';
 import GoogleAnalyticsRouteTracker from './components/GoogleAnalyticsRouteTracker';
 import { Toaster } from './utils/notifications';
 import './App.css';
+
+const Landing = lazy(() => import('./pages/Landing'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const EditDebt = lazy(() => import('./pages/EditDebt'));
+const DeleteDebt = lazy(() => import('./pages/DeleteDebt'));
+const DeleteAsset = lazy(() => import('./pages/DeleteAsset'));
+const DeleteFixedExpense = lazy(() => import('./pages/DeleteFixedExpense'));
+const DeleteIncome = lazy(() => import('./pages/DeleteIncome'));
+const CompleteDebt = lazy(() => import('./pages/CompleteDebt'));
+const CompleteAsset = lazy(() => import('./pages/CompleteAsset'));
+const EditFixedExpense = lazy(() => import('./pages/EditFixedExpense'));
+const EditAsset = lazy(() => import('./pages/EditAsset'));
+const EditIncome = lazy(() => import('./pages/EditIncome'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Preferences = lazy(() => import('./pages/Preferences'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const Contact = lazy(() => import('./pages/Contact'));
+const AIChat = lazy(() => import('./pages/AIChat'));
+const InstallApp = lazy(() => import('./pages/InstallApp'));
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -190,7 +191,9 @@ function App() {
           <MobileOnlyGate>
           <Router>
             <GoogleAnalyticsRouteTracker />
-            <AppRoutes />
+            <Suspense fallback={<div className="app-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Cargando…</div>}>
+              <AppRoutes />
+            </Suspense>
             <Toaster
               position="top-center"
               gutter={12}

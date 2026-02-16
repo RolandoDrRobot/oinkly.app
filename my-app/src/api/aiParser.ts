@@ -397,53 +397,6 @@ function parseNaturalAsset(text: string): { name: string; valueLocal?: number; v
   return result;
 }
 
-/** Compromiso de pago en lenguaje natural: "acordé pagar 3000 el día 15", "compromiso con BBVA de 5000". */
-function parseNaturalCommitment(text: string, debts: Debt[]): { debtId: string; amountLocal?: number; amountDollars?: number } | null {
-  const hasCommitment =
-    /acordé\s+pag(?:ar|o)|compromiso\s+(?:de\s+)?pago|voy\s+a\s+pag(?:ar|o)|agregar\s+compromiso|add\s+commitment|I\s+have\s+a\s+payment\s+commitment|pagar\s+\d|pay\s+\d|cita\s+de\s+pago/i.test(
-      text
-    );
-  if (!hasCommitment) return null;
-
-  const pagarMatch = text.match(/(?:pagar|pay)\s+(\d+(?:[.,]\d+)?)/i);
-  const amount = parseAmountFromText(text) ?? (pagarMatch ? parseFloat(pagarMatch[1].replace(',', '.')) : undefined);
-  const isDollars = isDollarsMentioned(text);
-
-  let debt: Debt | undefined;
-  const conMatch = text.match(/(?:compromiso\s+)?(?:con\s+)?(?:el\s+)?(?:banco\s+)?([a-záéíóúñ\w]+)/i);
-  const paraMatch = text.match(/(?:para\s+la\s+tarjeta|para\s+mi\s+préstamo|de\s+la\s+deuda\s+de)\s+([a-záéíóúñ\w\s]+)/i);
-  const debtName = (conMatch?.[1] || paraMatch?.[1] || '').trim();
-  if (debtName) debt = debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()));
-  if (!debt && debts.length > 0) debt = debts[0];
-
-  if (!debt) return null;
-  const params: Record<string, unknown> = { debtId: debt.id };
-  if (amount !== undefined) {
-    if (isDollars) params.amountDollars = amount;
-    else params.amountLocal = amount;
-  }
-  return params as { debtId: string; amountLocal?: number; amountDollars?: number };
-}
-
-/** Llamada al banco en lenguaje natural: "registrar llamada con BBVA", "llamé al banco ayer". */
-function parseNaturalCall(text: string, debts: Debt[]): { debtId: string } | null {
-  const hasCall =
-    /registrar\s+llamada|record\s+call|llamé\s+al\s+banco|llamada\s+con|hablé\s+con|registrar\s+que\s+llamé/i.test(
-      text
-    );
-  if (!hasCall) return null;
-
-  let debt: Debt | undefined;
-  const conMatch = text.match(/(?:llamada\s+)?(?:con\s+)?(?:el\s+)?(?:banco\s+)?([a-záéíóúñ\w]+)/i);
-  const paraMatch = text.match(/(?:llamada\s+)?(?:para\s+la\s+tarjeta)\s+([a-záéíóúñ\w]+)/i);
-  const debtName = (conMatch?.[1] || paraMatch?.[1] || '').trim();
-  if (debtName) debt = debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase()));
-  if (!debt && debts.length > 0) debt = debts[0];
-  if (!debt) return null;
-
-  return { debtId: debt.id };
-}
-
 export interface ParseTextContext {
   fixedExpenses?: { id: string; name: string }[];
   assets?: { id: string; name: string }[];

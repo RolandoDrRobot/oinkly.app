@@ -20,7 +20,6 @@ import {
 import { 
   FaPlus, 
   FaTrash, 
-  FaPhone, 
   FaCheck, 
   FaTimes, 
   FaFileInvoiceDollar, 
@@ -37,19 +36,11 @@ import {
   FaPiggyBank,
   FaBriefcase,
   FaBuilding,
-  FaShoppingCart,
-  FaUtensils,
-  FaGasPump,
-  FaWifi,
-  FaGamepad,
-  FaGraduationCap,
-  FaHeartbeat,
   FaDollarSign,
   FaWallet,
   FaTag,
   FaBell,
   FaQuestionCircle,
-  FaCog,
   FaBolt
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use

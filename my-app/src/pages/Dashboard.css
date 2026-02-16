@@ -171,21 +171,7 @@
   position: relative;
 }
 
-/* Mensaje tipo chat (Hola / Hello): verde marca, letra papiro */
-.dashboard-bottom-nav .ai-agent-entry-bubble {
-  display: inline-block;
-  padding: 10px 16px;
-  border-radius: 20px;
-  background: var(--primary, #569a3c);
-  border: none;
-  color: var(--text-primary, #f4e3c5);
-  font-size: 15px;
-  font-weight: 600;
-  font-family: var(--font-family, "DynaPuff", system-ui);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Botón: mismo border-radius que la burbuja (20px), imagen acercada */
+/* Botón flotante IA */
 .dashboard-bottom-nav .ai-agent-entry-button {
   display: flex;
   align-items: center;
