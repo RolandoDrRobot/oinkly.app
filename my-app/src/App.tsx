@@ -25,8 +25,6 @@ import AddIncome from './pages/AddIncome';
 import EditIncome from './pages/EditIncome';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
-import Subscription from './pages/Subscription';
-import Subscribe from './pages/Subscribe';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Contact from './pages/Contact';
 import AIChat from './pages/AIChat';
@@ -221,22 +219,8 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/subscription"
-        element={
-          <ProtectedRoute>
-            <Subscription />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/subscribe"
-        element={
-          <ProtectedRoute>
-            <Subscribe />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/subscription" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/subscribe" element={<Navigate to="/dashboard" replace />} />
       <Route
         path="/terms"
         element={

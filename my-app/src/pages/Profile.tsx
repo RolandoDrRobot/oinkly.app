@@ -43,7 +43,6 @@ const Profile: React.FC = () => {
 
   const actions = [
     { id: 'preferences', icon: FaCog, label: t('profile.preferences'), onClick: () => navigate('/preferences') },
-    { id: 'subscription', icon: FaMicrophone, label: t('profile.subscription'), onClick: () => navigate('/subscription', { state: { from: 'profile' } }) },
     { id: 'installApp', icon: FaMobileAlt, label: t('profile.installApp'), onClick: () => navigate('/install-app') },
     { id: 'contact', icon: FaEnvelope, label: t('profile.contact'), onClick: () => navigate('/contact') },
     { id: 'terms', icon: FaFileContract, label: t('profile.termsAndConditions'), onClick: () => navigate('/terms') },
@@ -127,7 +126,7 @@ const Profile: React.FC = () => {
               <li key={item.id}>
                 <motion.button
                   type="button"
-                  className={`profile-action-btn ${item.id === 'subscription' && !isPremium ? 'profile-action-subscription' : ''}`}
+                  className="profile-action-btn"
                   onClick={item.onClick}
                   whileTap={{ scale: 0.98 }}
                 >

@@ -5,7 +5,6 @@ import { FaArrowLeft, FaPaperPlane, FaMicrophone, FaMicrophoneSlash } from 'reac
 import { motion, AnimatePresence } from 'framer-motion';
 import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { useSubscription } from '../context/SubscriptionContext';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import { notify } from '../utils/notifications';
@@ -28,7 +27,6 @@ const AIChat: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isPremium } = useSubscription();
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
       const raw = localStorage.getItem(CHAT_STORAGE_KEY);
@@ -218,50 +216,6 @@ const AIChat: React.FC = () => {
     animate: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, ...pageTransition } }),
   };
 
-  if (!isPremium) {
-    return (
-      <motion.div
-        className="ai-chat-page"
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageVariants}
-        transition={pageTransition}
-      >
-        <motion.header
-          className="ai-chat-header"
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, ...pageTransition }}
-        >
-          <button type="button" className="ai-chat-back" onClick={() => navigate('/dashboard')}>
-            <Icon component={FaArrowLeft} /> {t('common.back')}
-          </button>
-        </motion.header>
-        <motion.div
-          className="ai-chat-locked"
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, ...pageTransition }}
-        >
-          <p className="ai-chat-locked-text">{t('subscription.aiLockedMessage')}</p>
-          <motion.button
-            type="button"
-            className="ai-chat-locked-cta"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => {
-              analytics.aiAssistantLockedClick('ai-chat');
-              navigate('/subscription', { state: { from: 'ai-chat' } });
-            }}
-          >
-            {t('subscription.upgradeToUseAI')}
-          </motion.button>
-        </motion.div>
-      </motion.div>
-    );
-  }
-
   return (
     <motion.div
       className="ai-chat-page"
@@ -273,6 +227,7 @@ const AIChat: React.FC = () => {
     >
       <motion.header
         className="ai-chat-header"
+        style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08, ...pageTransition }}

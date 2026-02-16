@@ -74,7 +74,7 @@ describe('Profile', () => {
   it('shows preferences and other action links', () => {
     renderProfile();
     expect(screen.getByText('profile.preferences')).toBeInTheDocument();
-    expect(screen.getByText('profile.subscription')).toBeInTheDocument();
+    expect(screen.getByText('profile.preferences')).toBeInTheDocument();
     expect(screen.getByText('profile.logout')).toBeInTheDocument();
   });
 

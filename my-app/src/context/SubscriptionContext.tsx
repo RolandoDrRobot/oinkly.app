@@ -38,9 +38,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     loadSubscription();
   }, [loadSubscription]);
 
-  const isPremium =
-    subscription?.plan === 'premium' &&
-    (subscription?.status === 'active' || subscription?.status === 'trialing');
+  // All logged-in users have active subscription (no paywall)
+  const isPremium = !!user?.id;
 
   const activatePremium = useCallback(
     async (interval: 'monthly' | 'yearly' = 'monthly') => {
