@@ -112,8 +112,6 @@ describe('AddFixedExpense creation flow', () => {
     await user.type(dollarInput, '0');
     await user.click(screen.getByRole('button', { name: /common.next/i }));
 
-    await user.click(screen.getByText(/addFixedExpense.catHousing/i));
-
     await user.click(screen.getByRole('button', { name: /common.skip/i }));
     await user.click(screen.getByRole('button', { name: /common.skip/i }));
 
@@ -126,7 +124,6 @@ describe('AddFixedExpense creation flow', () => {
         name: 'Rent',
         amountLocal: 5000,
         amountDollars: 0,
-        category: 'housing',
       })
     );
     expect(mockSaveFixedExpense.mock.calls[0][0].localCurrency).toBeDefined();

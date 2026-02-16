@@ -18,7 +18,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { 
-  FaPlus, 
   FaTrash, 
   FaCheck, 
   FaTimes, 

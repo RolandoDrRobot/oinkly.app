@@ -107,10 +107,6 @@ describe('AddDebt creation flow', () => {
       jest.advanceTimersByTime(400);
     });
 
-    const bankInput = screen.getByPlaceholderText(/addDebt.bankNamePlaceholder/i);
-    await user.type(bankInput, 'BBVA');
-    await user.click(screen.getByRole('button', { name: /common.next/i }));
-
     await user.click(screen.getByRole('button', { name: /common.skip/i }));
 
     const localFeeInput = screen.getByPlaceholderText(/common.amountPlaceholder/i);
@@ -152,7 +148,6 @@ describe('AddDebt creation flow', () => {
       expect.objectContaining({
         name: 'Bank Loan',
         type: 'prestamo',
-        bankName: 'BBVA',
         localFee: 500,
         dollarFee: 0,
         totalLocal: 10000,

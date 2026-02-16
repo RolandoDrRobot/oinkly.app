@@ -12,7 +12,6 @@ import {
   FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
-  FaTag
 } from 'react-icons/fa';
 import { FixedExpense } from '../types';
 import { storage } from '../utils/storage';

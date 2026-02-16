@@ -39,8 +39,15 @@ const Profile: React.FC = () => {
 
   const isPwaStandalone =
     typeof window !== 'undefined' &&
-    (window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as { standalone?: boolean }).standalone === true);
+    (() => {
+      try {
+        const mq = window.matchMedia?.('(display-mode: standalone)');
+        if (mq?.matches) return true;
+      } catch {
+        // ignore
+      }
+      return (window.navigator as { standalone?: boolean }).standalone === true;
+    })();
 
   const actions = [
     { id: 'preferences', icon: FaCog, label: t('profile.preferences'), onClick: () => navigate('/preferences') },
