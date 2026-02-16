@@ -159,11 +159,11 @@ describe('Dashboard', () => {
   it('shows four tabs (debt, fixedExpenses, assets, incomes)', async () => {
     renderDashboard();
     await waitFor(() => {
-      expect(screen.getByText('dashboard.debt')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'dashboard.debt' })).toBeInTheDocument();
     });
-    expect(screen.getByText('dashboard.fixedExpenses')).toBeInTheDocument();
-    expect(screen.getByText('dashboard.assets')).toBeInTheDocument();
-    expect(screen.getByText('dashboard.incomes')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'dashboard.fixedExpenses' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'dashboard.assets' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'dashboard.incomes' })).toBeInTheDocument();
   });
 
   it('shows empty state for debts when no debts', async () => {
@@ -179,7 +179,7 @@ describe('Dashboard', () => {
     await waitFor(() => {
       expect(screen.getByText('dashboard.noDebts')).toBeInTheDocument();
     });
-    await user.click(screen.getByText('dashboard.fixedExpenses'));
+    await user.click(screen.getByRole('button', { name: 'dashboard.fixedExpenses' }));
     await waitFor(() => {
       expect(screen.getByText('dashboard.noFixedExpenses')).toBeInTheDocument();
     });
@@ -189,7 +189,7 @@ describe('Dashboard', () => {
     const user = userEvent.setup();
     const { container } = renderDashboard();
     await waitFor(() => {
-      expect(screen.getByText('dashboard.debt')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'dashboard.debt' })).toBeInTheDocument();
     });
     const addDebtFab = container.querySelector('.fab-add-debt');
     expect(addDebtFab).toBeInTheDocument();
