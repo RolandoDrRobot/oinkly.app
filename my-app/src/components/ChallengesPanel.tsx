@@ -9,7 +9,7 @@ import {
   FaPiggyBank,
   FaCheckCircle,
   FaMedal,
-  FaLockOpen,
+  FaLock,
 } from 'react-icons/fa';
 import {
   getChallenges,
@@ -156,11 +156,14 @@ const ChallengesPanel: React.FC<ChallengesPanelProps> = ({ isOpen, onClose }) =>
                       >
                         <div className="challenges-item-badge">
                           {ch.completed ? (
-                            <Icon component={FaMedal} className="challenges-item-medal" />
+                            <img
+                              src={`${process.env.PUBLIC_URL || ''}/img/bannerChallange.png`}
+                              alt=""
+                              className="challenges-item-badge-img"
+                            />
                           ) : (
-                            <Icon component={FaLockOpen} className="challenges-item-lock" />
+                            <Icon component={FaLock} className="challenges-item-lock" />
                           )}
-                          <span className="challenges-item-xp">+{ch.xp}</span>
                         </div>
                         <div className="challenges-item-content">
                           {ch.completed && (

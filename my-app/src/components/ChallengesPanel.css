@@ -31,10 +31,28 @@
 
 /* —— Header (banner) —— */
 .challenges-header {
-  padding: 20px 20px 18px;
+  padding: 24px 20px 18px;
   background: none;
   color: var(--color-text-primary);
   flex-shrink: 0;
+}
+
+.challenges-header-banner {
+  width: 100%;
+  max-height: 140px;
+  margin: 0 -20px 14px -20px;
+  overflow: hidden;
+  border-radius: 0 0 16px 16px;
+  background: var(--color-overlay);
+}
+
+.challenges-header-banner-img {
+  width: 100%;
+  height: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
 }
 
 .challenges-header-top {
@@ -205,14 +223,26 @@
 
 .challenges-item-badge {
   flex-shrink: 0;
-  width: 72px;
+  width: 102px;
   height: 72px;
-  border-radius: 50%;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.challenges-item-badge-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
 }
 
 .challenges-item.locked .challenges-item-badge {
@@ -226,19 +256,9 @@
   box-shadow: 0 4px 16px rgba(244, 192, 50, 0.4);
 }
 
-.challenges-item-medal,
 .challenges-item-lock {
   font-size: 2rem;
-}
-
-.challenges-item-xp {
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: var(--color-primary-dark);
-}
-
-.challenges-item.locked .challenges-item-xp {
-  color: var(--color-text-muted);
+  display: block;
 }
 
 .challenges-item-content {
@@ -284,13 +304,16 @@
   background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: #fff;
   padding: 10px 18px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.2s;
   box-shadow: 0 2px 12px var(--color-primary-overlay-medium);
   margin-top: 6px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .challenges-item-action:hover {
@@ -323,8 +346,8 @@
   }
 
   .challenges-item-badge {
-    width: 56px;
-    height: 56px;
+    width: 90%;
+    height: 90px;
   }
 
   .challenges-item-medal,

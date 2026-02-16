@@ -161,7 +161,6 @@ function buildChallengeDefs(): ChallengeDef[] {
 const challengeDefs = buildChallengeDefs();
 
 export function getChallenges(): Array<ChallengeDef & { completed: boolean }> {
-  const progress = getChallengesProgress();
   return challengeDefs.map((def) => ({
     ...def,
     completed: def.checkComplete(),
