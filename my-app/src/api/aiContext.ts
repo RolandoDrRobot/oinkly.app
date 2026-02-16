@@ -13,6 +13,28 @@ export interface FullState {
   incomes: Income[];
 }
 
+/** Convierte ingreso a equivalente mensual según frecuencia. */
+function incomeToMonthlyLocal(income: Income): number {
+  const local = income.amountLocal ?? 0;
+  switch (income.frequency) {
+    case 'monthly': return local;
+    case 'weekly': return local * 4.33;
+    case 'biweekly': return local * 2.17;
+    case 'yearly': return local / 12;
+    default: return 0;
+  }
+}
+function incomeToMonthlyDollars(income: Income): number {
+  const dollars = income.amountDollars ?? 0;
+  switch (income.frequency) {
+    case 'monthly': return dollars;
+    case 'weekly': return dollars * 4.33;
+    case 'biweekly': return dollars * 2.17;
+    case 'yearly': return dollars / 12;
+    default: return 0;
+  }
+}
+
 export interface OverviewForAI {
   localCurrency: string;
   totalDebtLocal: number;
@@ -31,6 +53,19 @@ export interface OverviewForAI {
   expenseCount: number;
   assetCount: number;
   incomeCount: number;
+  /** Ingreso mensual equivalente (por frecuencias). */
+  totalMonthlyIncomeLocal: number;
+  totalMonthlyIncomeDollars: number;
+  /** Gastos mensuales totales (cuotas deuda + gastos fijos). */
+  totalMonthlyExpensesLocal: number;
+  totalMonthlyExpensesDollars: number;
+  /** Ingreso mensual - gastos mensuales. */
+  monthlySurplusLocal: number;
+  monthlySurplusDollars: number;
+  /** Meses para salir de deudas si todo el surplus se destina a deuda (null si surplus <= 0 o sin deuda). */
+  monthsToPayOffDebt: number | null;
+  /** Runway: meses que aguantas con patrimonio neto positivo si no hubiera ingresos (null si no aplica). */
+  runwayMonths: number | null;
 }
 
 export function getFullState(): FullState {
@@ -63,8 +98,30 @@ export function getOverviewForAI(): OverviewForAI {
   const totalIncomesLocal = incomes.reduce((s, i) => s + (i.amountLocal || 0), 0);
   const totalIncomesDollars = incomes.reduce((s, i) => s + (i.amountDollars || 0), 0);
 
+  const totalMonthlyIncomeLocal = incomes.reduce((s, i) => s + incomeToMonthlyLocal(i), 0);
+  const totalMonthlyIncomeDollars = incomes.reduce((s, i) => s + incomeToMonthlyDollars(i), 0);
+
+  const totalMonthlyExpensesLocal = totalMonthlyLocal + totalFixedExpensesLocal;
+  const totalMonthlyExpensesDollars = totalMonthlyDollars + totalFixedExpensesDollars;
+
+  const monthlySurplusLocal = totalMonthlyIncomeLocal - totalMonthlyExpensesLocal;
+  const monthlySurplusDollars = totalMonthlyIncomeDollars - totalMonthlyExpensesDollars;
+
+  const totalDebt = totalDebtLocal + totalDebtDollars;
+  const monthlySurplus = monthlySurplusLocal + monthlySurplusDollars;
+  const monthsToPayOffDebt =
+    totalDebt > 0 && monthlySurplus > 0
+      ? Math.ceil(totalDebt / monthlySurplus)
+      : null;
+
   const netWorthLocal = totalAssetsLocal - totalDebtLocal;
   const netWorthDollars = totalAssetsDollars - totalDebtDollars;
+  const netWorth = netWorthLocal + netWorthDollars;
+  const monthlyExpenses = totalMonthlyExpensesLocal + totalMonthlyExpensesDollars;
+  const runwayMonths =
+    netWorth > 0 && monthlyExpenses > 0
+      ? Math.floor(netWorth / monthlyExpenses)
+      : null;
 
   return {
     localCurrency,
@@ -84,10 +141,18 @@ export function getOverviewForAI(): OverviewForAI {
     expenseCount: fixedExpenses.length,
     assetCount: assets.length,
     incomeCount: incomes.length,
+    totalMonthlyIncomeLocal,
+    totalMonthlyIncomeDollars,
+    totalMonthlyExpensesLocal,
+    totalMonthlyExpensesDollars,
+    monthlySurplusLocal,
+    monthlySurplusDollars,
+    monthsToPayOffDebt,
+    runwayMonths,
   };
 }
 
-/** Texto resumido para respuestas en lenguaje natural (es/en). */
+/** Texto resumido para respuestas en lenguaje natural (es/en). Incluye métricas de análisis. */
 export function getSummaryText(lang: 'es' | 'en'): string {
   const state = getFullState();
   const overview = getOverviewForAI();
@@ -98,22 +163,51 @@ export function getSummaryText(lang: 'es' | 'en'): string {
     lines.push(`Tienes ${overview.debtCount} deuda(s). Total deuda: ${localCurrency} ${overview.totalDebtLocal.toLocaleString()}, USD ${overview.totalDebtDollars.toLocaleString()}.`);
     lines.push(`Pagos mensuales (deudas): ${localCurrency} ${overview.totalMonthlyLocal.toLocaleString()}, USD ${overview.totalMonthlyDollars.toLocaleString()}.`);
     lines.push(`${overview.expenseCount} gasto(s) fijo(s): ${localCurrency} ${overview.totalFixedExpensesLocal.toLocaleString()}, USD ${overview.totalFixedExpensesDollars.toLocaleString()}.`);
+    lines.push(`Gastos mensuales totales: ${localCurrency} ${overview.totalMonthlyExpensesLocal.toLocaleString()}, USD ${overview.totalMonthlyExpensesDollars.toLocaleString()}.`);
+    lines.push(`Ingreso mensual equivalente: ${localCurrency} ${overview.totalMonthlyIncomeLocal.toLocaleString()}, USD ${overview.totalMonthlyIncomeDollars.toLocaleString()}.`);
+    lines.push(`Superávit mensual: ${localCurrency} ${overview.monthlySurplusLocal.toLocaleString()}, USD ${overview.monthlySurplusDollars.toLocaleString()}.`);
+    if (overview.monthsToPayOffDebt != null) {
+      lines.push(`Meses estimados para salir de deudas (destinando todo el superávit): ${overview.monthsToPayOffDebt}.`);
+    }
+    if (overview.runwayMonths != null) {
+      lines.push(`Runway (meses que aguantas sin ingresos con patrimonio actual): ${overview.runwayMonths}.`);
+    }
     lines.push(`${overview.assetCount} activo(s): ${localCurrency} ${overview.totalAssetsLocal.toLocaleString()}, USD ${overview.totalAssetsDollars.toLocaleString()}.`);
-    lines.push(`${overview.incomeCount} ingreso(s): ${localCurrency} ${overview.totalIncomesLocal.toLocaleString()}, USD ${overview.totalIncomesDollars.toLocaleString()}.`);
     lines.push(`Patrimonio neto: ${localCurrency} ${overview.netWorthLocal.toLocaleString()}, USD ${overview.netWorthDollars.toLocaleString()}.`);
   } else {
     lines.push(`You have ${overview.debtCount} debt(s). Total debt: ${localCurrency} ${overview.totalDebtLocal.toLocaleString()}, USD ${overview.totalDebtDollars.toLocaleString()}.`);
     lines.push(`Monthly payments (debts): ${localCurrency} ${overview.totalMonthlyLocal.toLocaleString()}, USD ${overview.totalMonthlyDollars.toLocaleString()}.`);
     lines.push(`${overview.expenseCount} fixed expense(s): ${localCurrency} ${overview.totalFixedExpensesLocal.toLocaleString()}, USD ${overview.totalFixedExpensesDollars.toLocaleString()}.`);
+    lines.push(`Total monthly expenses: ${localCurrency} ${overview.totalMonthlyExpensesLocal.toLocaleString()}, USD ${overview.totalMonthlyExpensesDollars.toLocaleString()}.`);
+    lines.push(`Monthly income equivalent: ${localCurrency} ${overview.totalMonthlyIncomeLocal.toLocaleString()}, USD ${overview.totalMonthlyIncomeDollars.toLocaleString()}.`);
+    lines.push(`Monthly surplus: ${localCurrency} ${overview.monthlySurplusLocal.toLocaleString()}, USD ${overview.monthlySurplusDollars.toLocaleString()}.`);
+    if (overview.monthsToPayOffDebt != null) {
+      lines.push(`Estimated months to pay off debt (putting all surplus to debt): ${overview.monthsToPayOffDebt}.`);
+    }
+    if (overview.runwayMonths != null) {
+      lines.push(`Runway (months you can cover without income with current net worth): ${overview.runwayMonths}.`);
+    }
     lines.push(`${overview.assetCount} asset(s): ${localCurrency} ${overview.totalAssetsLocal.toLocaleString()}, USD ${overview.totalAssetsDollars.toLocaleString()}.`);
-    lines.push(`${overview.incomeCount} income(s): ${localCurrency} ${overview.totalIncomesLocal.toLocaleString()}, USD ${overview.totalIncomesDollars.toLocaleString()}.`);
     lines.push(`Net worth: ${localCurrency} ${overview.netWorthLocal.toLocaleString()}, USD ${overview.netWorthDollars.toLocaleString()}.`);
   }
 
-  if (state.debts.length > 0 && lang === 'es') {
-    lines.push(' Deudas: ' + state.debts.map((d) => d.name).join(', ') + '.');
-  } else if (state.debts.length > 0) {
-    lines.push(' Debts: ' + state.debts.map((d) => d.name).join(', ') + '.');
+  if (state.debts.length > 0) {
+    const detail = state.debts
+      .map((d) => `${d.name} total ${(d.totalLocal || 0) + (d.totalDollars || 0)} cuota ${(d.localFee || 0) + (d.dollarFee || 0)}`)
+      .join('; ');
+    lines.push(lang === 'es' ? ` Detalle deudas: ${detail}.` : ` Debt detail: ${detail}.`);
+  }
+  if (state.fixedExpenses.length > 0) {
+    const detail = state.fixedExpenses
+      .map((e) => `${e.name} ${(e.amountLocal || 0) + (e.amountDollars || 0)}`)
+      .join('; ');
+    lines.push(lang === 'es' ? ` Gastos fijos: ${detail}.` : ` Fixed expenses: ${detail}.`);
+  }
+  if (state.incomes.length > 0) {
+    const detail = state.incomes
+      .map((i) => `${i.name} ${(i.amountLocal || 0) + (i.amountDollars || 0)} ${i.frequency}`)
+      .join('; ');
+    lines.push(lang === 'es' ? ` Ingresos: ${detail}.` : ` Incomes: ${detail}.`);
   }
 
   return lines.join(' ');

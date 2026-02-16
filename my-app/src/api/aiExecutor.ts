@@ -73,6 +73,11 @@ export async function executeAIAction(
         return { success: true, data: overview };
       }
 
+      case 'reply': {
+        const message = str(params.message);
+        return { success: true, data: { message: message || '' } };
+      }
+
       case 'navigate': {
         const route = str(params.route);
         if (!route) return { success: false, error: 'Missing route' };

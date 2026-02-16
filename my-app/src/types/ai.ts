@@ -31,7 +31,9 @@ export type AIIntent =
   | 'toggle_hide_amounts'
   | 'get_overview'
   | 'get_debts'
-  | 'get_state';
+  | 'get_state'
+  // Respuesta en lenguaje natural (análisis, planes, preguntas)
+  | 'reply';
 
 export interface AIAction {
   type: AIIntent;

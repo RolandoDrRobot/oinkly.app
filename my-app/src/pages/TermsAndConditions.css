@@ -1,8 +1,48 @@
 .terms-and-conditions {
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: var(--dark-bg);
   color: var(--text-primary);
   padding-bottom: 40px;
+}
+
+/* Header: mismo patrón que Preferences */
+.terms-and-conditions .page-header {
+  color: var(--text-primary);
+  padding: 20px 20px 0 20px;
+  padding-bottom: 0;
+}
+
+.terms-and-conditions .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.terms-and-conditions .page-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+}
+
+.terms-and-conditions .btn-back {
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.terms-and-conditions .btn-back:hover {
+  background: var(--overlay-light);
 }
 
 .terms-content {

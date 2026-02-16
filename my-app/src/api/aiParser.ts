@@ -418,8 +418,8 @@ export function parseTextToAIAction(
   if (/ir al inicio|abrir dashboard|volver al inicio|go to dashboard|dashboard/i.test(lower) && !/deuda|debt|gasto|income|asset/i.test(lower)) {
     return { type: 'navigate', params: { route: '/dashboard' } };
   }
-  // —— Resumen y UI (sin captura de datos) ——
-  if (/resumen|overview|total|cuánto debo|how much|patrimonio|net worth|dame el resumen|ver resumen|cuál es mi patrimonio/i.test(lower)) {
+  // —— Resumen y UI (sin captura de datos). Incluye preguntas de análisis: sin IA devolvemos overview con métricas. ——
+  if (/resumen|overview|total|cuánto debo|how much|patrimonio|net worth|dame el resumen|ver resumen|cuál es mi patrimonio|cuánto tiempo me queda|en cuánto salgo|cuándo termino de pagar|dame un plan|how long to pay off|when do i get out of debt|payment plan/i.test(lower)) {
     return { type: 'get_overview' };
   }
   if (/listar (mis )?deudas|ver deudas|get debts/i.test(lower)) {
@@ -703,6 +703,10 @@ export function getMessageForActionResult(
   }
   if (action.type === 'get_overview' || action.type === 'get_debts') {
     return getSummaryText(lang);
+  }
+  if (action.type === 'reply') {
+    const msg = result.data && typeof result.data === 'object' && 'message' in result.data ? String((result.data as { message: string }).message) : '';
+    return msg || (lang === 'es' ? 'Listo.' : 'Done.');
   }
   if (action.type === 'get_state') {
     return lang === 'es' ? 'Estado cargado.' : 'State loaded.';

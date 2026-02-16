@@ -105,7 +105,7 @@ describe('supabaseData', () => {
       // When no debts, commitments/calls are not fetched
     });
 
-    it('returns debts with commitments and callHistory mapped', async () => {
+    it('returns debts with empty commitments and callHistory', async () => {
       setTableResults('debts', [
         {
           data: [
@@ -138,32 +138,12 @@ describe('supabaseData', () => {
           error: null,
         },
       ]);
-      setTableResult('payment_commitments', {
-        data: [
-          {
-            id: 'c1',
-            debt_id: 'd1',
-            date: '2024-02-01',
-            amount_local: 3000,
-            amount_dollars: 0,
-            status: 'pending',
-            payment_type: 'partial',
-            notes: null,
-            created_at: '2024-01-15T00:00:00Z',
-            updated_at: '2024-01-15T00:00:00Z',
-            completed_at: null,
-          },
-        ],
-        error: null,
-      });
-      setTableResult('call_records', { data: [], error: null });
 
       const list = await getDebts(userId);
       expect(list).toHaveLength(1);
       expect(list[0].name).toBe('BBVA');
       expect(list[0].localCurrency).toBe('MXN');
-      expect(list[0].commitments).toHaveLength(1);
-      expect(list[0].commitments![0].amountLocal).toBe(3000);
+      expect(list[0].commitments).toEqual([]);
       expect(list[0].callHistory).toEqual([]);
     });
 
@@ -175,12 +155,8 @@ describe('supabaseData', () => {
   });
 
   describe('saveDebt', () => {
-    it('calls upsert on debts and commitments/calls when provided', async () => {
+    it('calls upsert on debts only', async () => {
       setTableResult('debts', { error: null });
-      setTableResult('payment_commitments', { data: [], error: null });
-      setTableResult('payment_commitments', { error: null });
-      setTableResult('call_records', { data: [], error: null });
-      setTableResult('call_records', { error: null });
 
       const debt = {
         id: 'd1',
@@ -208,21 +184,15 @@ describe('supabaseData', () => {
       await saveDebt(userId, debt);
 
       expect(getMock().fromCalls).toContain('debts');
-      expect(getMock().fromCalls).toContain('payment_commitments');
-      expect(getMock().fromCalls).toContain('call_records');
     });
   });
 
   describe('deleteDebt', () => {
-    it('calls delete on payment_commitments, call_records, then debts', async () => {
-      setTableResult('payment_commitments', { error: null });
-      setTableResult('call_records', { error: null });
+    it('calls delete on debts only', async () => {
       setTableResult('debts', { error: null });
 
       await deleteDebt(userId, 'd1');
 
-      expect(getMock().fromCalls).toContain('payment_commitments');
-      expect(getMock().fromCalls).toContain('call_records');
       expect(getMock().fromCalls).toContain('debts');
     });
   });
@@ -443,8 +413,6 @@ describe('supabaseData', () => {
   describe('hydrateFromSupabase', () => {
     it('returns all entities from parallel getters', async () => {
       setTableResult('debts', { data: [], error: null });
-      setTableResult('payment_commitments', { data: [], error: null });
-      setTableResult('call_records', { data: [], error: null });
       setTableResult('fixed_expenses', { data: [], error: null });
       setTableResult('assets', { data: [], error: null });
       setTableResult('incomes', { data: [], error: null });

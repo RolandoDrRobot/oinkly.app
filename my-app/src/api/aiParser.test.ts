@@ -30,6 +30,12 @@ describe('parseTextToAIAction', () => {
     expect(parseTextToAIAction('how much do I owe', emptyDebts)).toEqual({ type: 'get_overview' });
   });
 
+  it('returns get_overview for analysis-style questions (fallback when no AI)', () => {
+    expect(parseTextToAIAction('cuánto tiempo me queda de pago', emptyDebts)).toEqual({ type: 'get_overview' });
+    expect(parseTextToAIAction('dame un plan', emptyDebts)).toEqual({ type: 'get_overview' });
+    expect(parseTextToAIAction('en cuánto salgo de deudas', emptyDebts)).toEqual({ type: 'get_overview' });
+  });
+
   it('returns toggle_hide_amounts for "ocultar montos" and "hide amounts"', () => {
     expect(parseTextToAIAction('ocultar montos', emptyDebts)).toEqual({ type: 'toggle_hide_amounts' });
     expect(parseTextToAIAction('hide amounts', emptyDebts)).toEqual({ type: 'toggle_hide_amounts' });
@@ -87,5 +93,12 @@ describe('getMessageForActionResult', () => {
     expect(getMessageForActionResult(action, { success: true, message: 'Debt created' }, 'en')).toBe('Debt created');
     expect(getMessageForActionResult(action, { success: true }, 'es')).toBe('Listo.');
     expect(getMessageForActionResult(action, { success: true }, 'en')).toBe('Done.');
+  });
+
+  it('returns result.data.message for reply action (AI analysis)', () => {
+    const action: AIAction = { type: 'reply', params: { message: 'Con tu superávit actual saldrías en ~24 meses.' } };
+    const result = { success: true, data: { message: 'Con tu superávit actual saldrías en ~24 meses.' } };
+    expect(getMessageForActionResult(action, result, 'es')).toBe('Con tu superávit actual saldrías en ~24 meses.');
+    expect(getMessageForActionResult(action, { success: true, data: {} }, 'es')).toBe('Listo.');
   });
 });

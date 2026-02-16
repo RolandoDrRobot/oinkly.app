@@ -1,13 +1,16 @@
 /**
  * Capa de datos Supabase: CRUD para todas las entidades de la app.
  * Todas las funciones son async y requieren userId (auth.uid()).
+ *
+ * Tablas en uso (deben coincidir con el esquema en Supabase):
+ * - debts, fixed_expenses, assets, incomes, notifications,
+ *   subscriptions, user_preferences, list_orders.
+ * (payment_commitments y call_records fueron eliminadas; ver migración 003.)
  */
 
 import { supabase } from './supabase';
 import type {
   Debt,
-  PaymentCommitment,
-  CallRecord,
   FixedExpense,
   Asset,
   Income,
@@ -35,7 +38,7 @@ function num(val: unknown): number {
   return 0;
 }
 
-// ============ DEBTS (with commitments + call_records) ============
+// ============ DEBTS ============
 
 export async function getDebts(userId: string): Promise<Debt[]> {
   const { data: rows, error } = await supabase
@@ -49,42 +52,6 @@ export async function getDebts(userId: string): Promise<Debt[]> {
     return [];
   }
   if (!rows?.length) return [];
-
-  const debtIds = rows.map((r: any) => r.id);
-  const [commitmentsRes, callsRes] = await Promise.all([
-    supabase.from('payment_commitments').select('*').in('debt_id', debtIds),
-    supabase.from('call_records').select('*').in('debt_id', debtIds),
-  ]);
-
-  const commitmentsByDebt: Record<string, PaymentCommitment[]> = {};
-  (commitmentsRes.data || []).forEach((c: any) => {
-    if (!commitmentsByDebt[c.debt_id]) commitmentsByDebt[c.debt_id] = [];
-    commitmentsByDebt[c.debt_id].push({
-      id: c.id,
-      debtId: c.debt_id,
-      date: c.date || '',
-      amountLocal: num(c.amount_local),
-      amountDollars: num(c.amount_dollars),
-      status: c.status || 'pending',
-      paymentType: c.payment_type,
-      notes: c.notes,
-      createdAt: c.created_at || '',
-      updatedAt: c.updated_at,
-      completedAt: c.completed_at,
-    });
-  });
-  const callsByDebt: Record<string, CallRecord[]> = {};
-  (callsRes.data || []).forEach((c: any) => {
-    if (!callsByDebt[c.debt_id]) callsByDebt[c.debt_id] = [];
-    callsByDebt[c.debt_id].push({
-      id: c.id,
-      debtId: c.debt_id,
-      date: c.date || '',
-      notes: c.notes || '',
-      commitmentsCreated: c.commitments_created || [],
-      createdAt: c.created_at || '',
-    });
-  });
 
   return rows.map((r: any) => ({
     id: r.id,
@@ -109,8 +76,8 @@ export async function getDebts(userId: string): Promise<Debt[]> {
     closedAt: toISODateTime(r.closed_at),
     createdAt: r.created_at || '',
     updatedAt: r.updated_at || '',
-    commitments: commitmentsByDebt[r.id] || [],
-    callHistory: callsByDebt[r.id] || [],
+    commitments: [],
+    callHistory: [],
   }));
 }
 
@@ -146,52 +113,9 @@ export async function saveDebt(userId: string, debt: Debt): Promise<void> {
     console.warn('[supabaseData] saveDebt upsert error:', debtError);
     throw debtError;
   }
-
-  const commitments = debt.commitments || [];
-  const existingIds = commitments.map((c) => c.id);
-  const { data: existing } = await supabase.from('payment_commitments').select('id').eq('debt_id', debt.id);
-  const toDelete = (existing || []).filter((e: any) => !existingIds.includes(e.id)).map((e: any) => e.id);
-  if (toDelete.length) {
-    await supabase.from('payment_commitments').delete().in('id', toDelete);
-  }
-  for (const c of commitments) {
-    await supabase.from('payment_commitments').upsert({
-      id: c.id,
-      debt_id: debt.id,
-      date: c.date,
-      amount_local: c.amountLocal ?? 0,
-      amount_dollars: c.amountDollars ?? 0,
-      status: c.status || 'pending',
-      payment_type: c.paymentType || null,
-      notes: c.notes || null,
-      created_at: c.createdAt || now,
-      updated_at: c.updatedAt || now,
-      completed_at: c.completedAt || null,
-    }, { onConflict: 'id' });
-  }
-
-  const calls = debt.callHistory || [];
-  const callIds = calls.map((c) => c.id);
-  const { data: existingCalls } = await supabase.from('call_records').select('id').eq('debt_id', debt.id);
-  const toDeleteCalls = (existingCalls || []).filter((e: any) => !callIds.includes(e.id)).map((e: any) => e.id);
-  if (toDeleteCalls.length) {
-    await supabase.from('call_records').delete().in('id', toDeleteCalls);
-  }
-  for (const c of calls) {
-    await supabase.from('call_records').upsert({
-      id: c.id,
-      debt_id: debt.id,
-      date: c.date,
-      notes: c.notes || '',
-      commitments_created: c.commitmentsCreated || [],
-      created_at: c.createdAt || now,
-    }, { onConflict: 'id' });
-  }
 }
 
 export async function deleteDebt(userId: string, id: string): Promise<void> {
-  await supabase.from('payment_commitments').delete().eq('debt_id', id);
-  await supabase.from('call_records').delete().eq('debt_id', id);
   await supabase.from('debts').delete().eq('id', id).eq('user_id', userId);
 }
 

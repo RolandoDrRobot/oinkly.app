@@ -29,6 +29,7 @@ export const AI_ACTION_TYPES: AIIntent[] = [
   'get_overview',
   'get_debts',
   'get_state',
+  'reply',
 ];
 
 /** Parámetros requeridos/opcionales por intent (para validación y docs). */
@@ -122,6 +123,7 @@ export const AI_ACTION_PARAMS: Record<
   get_overview: {},
   get_debts: {},
   get_state: {},
+  reply: { required: ['message'], optional: [] },
 };
 
 export function isValidAIIntent(type: string): type is AIIntent {
