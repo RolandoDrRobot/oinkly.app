@@ -10,7 +10,6 @@ import {
 import { Debt } from '../types';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
-import { addXP, XP_ACTIONS } from '../utils/challenges';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
@@ -113,7 +112,6 @@ const CompleteDebt: React.FC = () => {
         };
 
         storage.saveDebt(updatedDebt);
-        addXP(XP_ACTIONS.completeDebt);
         analytics.completeDebt();
         notify.overviewUpdated();
         navigate('/dashboard');

@@ -16,7 +16,6 @@ import {
 import { CallRecord, Debt, PaymentCommitment } from '../types';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
-import { addXP, XP_ACTIONS } from '../utils/challenges';
 import { notify } from '../utils/notifications';
 import './AddDebt.css';
 
@@ -316,7 +315,6 @@ const AddCall: React.FC = () => {
 
         const totalCallsBefore = storage.getDebts().reduce((s, d) => s + (d.callHistory?.length ?? 0), 0);
         storage.saveDebt(updatedDebt);
-        addXP(XP_ACTIONS.logCall);
         if (totalCallsBefore === 0) analytics.firstCallRecorded();
         analytics.recordCall();
         navigate('/dashboard');

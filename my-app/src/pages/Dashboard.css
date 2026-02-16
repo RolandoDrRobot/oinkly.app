@@ -90,13 +90,8 @@
   border: 0;
   background: transparent;
   padding: 0;
-  cursor: pointer;
   color: inherit;
   font: inherit;
-}
-
-.header-title-wrapper:hover {
-  opacity: 0.9;
 }
 
 .header-logo {

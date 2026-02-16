@@ -21,7 +21,6 @@ import {
 import { Asset } from '../types';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
-import { addXP, XP_ACTIONS } from '../utils/challenges';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -242,7 +241,6 @@ const AddAsset: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveAsset(newAsset);
-        addXP(XP_ACTIONS.addAsset);
         analytics.addAsset();
         notify.overviewUpdated();
         navigate('/dashboard');

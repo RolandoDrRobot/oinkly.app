@@ -60,7 +60,6 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
-import ChallengesPanel from '../components/ChallengesPanel';
 import AIChatModal from '../components/AIChatModal';
 import './Dashboard.css';
 
@@ -94,7 +93,6 @@ const Dashboard: React.FC = () => {
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-  const [isChallengesOpen, setIsChallengesOpen] = useState(false);
   const [isAIChatModalOpen, setIsAIChatModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -2513,10 +2511,6 @@ const Dashboard: React.FC = () => {
           updateUnreadNotificationsCount();
         }}
       />
-      <ChallengesPanel
-        isOpen={isChallengesOpen}
-        onClose={() => setIsChallengesOpen(false)}
-      />
       <AIChatModal
         isOpen={isAIChatModalOpen}
         onClose={() => setIsAIChatModalOpen(false)}
@@ -2528,19 +2522,14 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <button
-            type="button"
-            className="header-title-wrapper"
-            onClick={() => setIsChallengesOpen(true)}
-            title={t('challenges.title')}
-          >
+          <div className="header-title-wrapper">
             <img 
               src={`${process.env.PUBLIC_URL}/logo.png`} 
               alt={t('dashboard.logoAlt')} 
               className="header-logo"
             />
             <h1>{t('dashboard.title')}</h1>
-          </button>
+          </div>
           <div className="header-actions">
             <motion.button
               whileHover={{ scale: 1.05 }}
