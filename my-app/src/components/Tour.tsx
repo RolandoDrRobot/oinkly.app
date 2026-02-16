@@ -33,12 +33,6 @@ const Tour: React.FC<TourProps> = ({ run, onComplete }) => {
       placement: 'top',
     },
     {
-      target: '.fab-add-debt',
-      content: t('tour.step3.content'),
-      title: t('tour.step3.title'),
-      placement: 'left',
-    },
-    {
       target: '.debt-card',
       content: t('tour.step4.content'),
       title: t('tour.step4.title'),

@@ -6,7 +6,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
-import AddDebt from './pages/AddDebt';
 import EditDebt from './pages/EditDebt';
 import AddCommitment from './pages/AddCommitment';
 import AddCall from './pages/AddCall';
@@ -17,11 +16,8 @@ import CompleteCommitment from './pages/CompleteCommitment';
 import DeleteDebt from './pages/DeleteDebt';
 import CompleteDebt from './pages/CompleteDebt';
 import CompleteAsset from './pages/CompleteAsset';
-import AddFixedExpense from './pages/AddFixedExpense';
 import EditFixedExpense from './pages/EditFixedExpense';
-import AddAsset from './pages/AddAsset';
 import EditAsset from './pages/EditAsset';
-import AddIncome from './pages/AddIncome';
 import EditIncome from './pages/EditIncome';
 import Profile from './pages/Profile';
 import Preferences from './pages/Preferences';
@@ -48,14 +44,6 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-debt"
-        element={
-          <ProtectedRoute>
-            <AddDebt />
           </ProtectedRoute>
         }
       />
@@ -140,26 +128,10 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/add-fixed-expense"
-        element={
-          <ProtectedRoute>
-            <AddFixedExpense />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/edit-fixed-expense/:id"
         element={
           <ProtectedRoute>
             <EditFixedExpense />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-asset"
-        element={
-          <ProtectedRoute>
-            <AddAsset />
           </ProtectedRoute>
         }
       />
@@ -176,14 +148,6 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <CompleteAsset />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-income"
-        element={
-          <ProtectedRoute>
-            <AddIncome />
           </ProtectedRoute>
         }
       />

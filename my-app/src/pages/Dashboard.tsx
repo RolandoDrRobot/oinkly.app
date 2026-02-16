@@ -2771,23 +2771,6 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Botón Asistente AI: abre chat en modal */}
-        <motion.button
-          type="button"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="ai-agent-entry-button"
-          onClick={() => setIsAIChatModalOpen(true)}
-          aria-label={t('aiAgent.assistantLabel')}
-        >
-          <span
-            className="ai-agent-entry-image"
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
-          />
-          <span className="ai-agent-entry-label">{t('aiAgent.assistantLabel')}</span>
-        </motion.button>
-
         {/* Menu de 4 botones */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -2877,61 +2860,24 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* FAB buttons for adding items */}
-      <AnimatePresence>
-        {activeTab === 'debt' && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="fab-add fab-add-debt"
-            onClick={() => navigate('/add-debt')}
-          >
-            <Icon component={FaPlus} />
-          </motion.button>
-        )}
-        {activeTab === 'fixedExpenses' && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="fab-add"
-            onClick={() => navigate('/add-fixed-expense')}
-          >
-            <Icon component={FaPlus} />
-          </motion.button>
-        )}
-        {activeTab === 'assets' && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="fab-add"
-            onClick={() => navigate('/add-asset')}
-          >
-            <Icon component={FaPlus} />
-          </motion.button>
-        )}
-        {activeTab === 'incomes' && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="fab-add"
-            onClick={() => navigate('/add-income')}
-          >
-            <Icon component={FaPlus} />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Nav fija al fondo: botón Oinkly AI */}
+      <nav className="dashboard-bottom-nav" aria-label={t('aiAgent.assistantLabel')}>
+        <motion.button
+          type="button"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="ai-agent-entry-button"
+          onClick={() => setIsAIChatModalOpen(true)}
+          aria-label={t('aiAgent.assistantLabel')}
+        >
+          <span
+            className="ai-agent-entry-image"
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
+          />
+          <span className="ai-agent-entry-label">{t('aiAgent.assistantLabel')}</span>
+        </motion.button>
+      </nav>
     </motion.div>
   );
 };

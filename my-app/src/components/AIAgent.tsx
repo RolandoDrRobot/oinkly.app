@@ -106,9 +106,9 @@ const AIAgent: React.FC<AIAgentProps> = ({ debts, onAction, isOpen, onClose }) =
   const parseCommand = (text: string): AgentAction | null => {
     const lowerText = text.toLowerCase().trim();
 
-    // Add debt
+    // Add debt / create items: only via AI chat (no navigate to add screens)
     if (lowerText.includes('agregar deuda') || lowerText.includes('add debt') || lowerText.includes('nueva deuda') || lowerText.includes('new debt')) {
-      return { type: 'navigate', params: { route: '/add-debt' } };
+      return { type: 'show_info', params: { value: t('aiAgent.addViaChat') } };
     }
 
     // Show overview/info

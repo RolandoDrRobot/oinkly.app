@@ -608,7 +608,8 @@
     "amountsToggled": "Visibilidad de montos cambiada.",
     "actionExecuted": "¡Listo! He ejecutado esa acción por ti.",
     "notUnderstood": "No entendí bien eso. Prueba diciendo: 'Agregar una deuda', 'Mostrar resumen', 'Agregar compromiso a [nombre de deuda]', o 'Registrar llamada para [nombre de deuda]'.",
-    "overviewResponse": "Aquí está tu resumen financiero:\n\nDeuda Total:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nPagos Mensuales:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}"
+    "overviewResponse": "Aquí está tu resumen financiero:\n\nDeuda Total:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nPagos Mensuales:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}",
+    "addViaChat": "Para agregar deudas, gastos, activos o ingresos usa el chat de la AI (ícono en el header). Di por ejemplo: 'Agregar deuda BBVA 5000', 'Gasto internet 50 dólares', 'Activo casa 2 millones', 'Ingreso salario 3000 mensual'."
   },
   "deleteCommitment": {
     "title": "Eliminar Compromiso",

@@ -185,15 +185,4 @@ describe('Dashboard', () => {
     });
   });
 
-  it('add debt FAB navigates to /add-debt', async () => {
-    const user = userEvent.setup();
-    const { container } = renderDashboard();
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'dashboard.debt' })).toBeInTheDocument();
-    });
-    const addDebtFab = container.querySelector('.fab-add-debt');
-    expect(addDebtFab).toBeInTheDocument();
-    await user.click(addDebtFab!);
-    expect(mockNavigate).toHaveBeenCalledWith('/add-debt');
-  });
 });

@@ -98,7 +98,7 @@ edit_income — params: incomeId (requerido). Atributos editables: name, amountL
 delete_income: incomeId. delete_all_incomes: {}.
 
 —— NAVEGACIÓN ——
-navigate: params: { route: "/dashboard"|"/add-debt"|"/edit-debt/ID"|"/delete-debt/ID"|"/complete-debt/ID"|"/add-commitment/ID"|"/edit-commitment/DEBT_ID/COMMITMENT_ID"|"/add-call/ID"|"/edit-call/DEBT_ID/CALL_ID"|"/add-fixed-expense"|"/edit-fixed-expense/ID"|"/add-asset"|"/edit-asset/ID"|"/complete-asset/ID"|"/add-income"|"/edit-income/ID"|"/profile"|"/preferences"|"/about"|"/terms" }. Reemplaza ID por el id real.
+navigate: params: { route: "/dashboard"|"/edit-debt/ID"|"/delete-debt/ID"|"/complete-debt/ID"|"/add-commitment/ID"|"/edit-commitment/DEBT_ID/COMMITMENT_ID"|"/add-call/ID"|"/edit-call/DEBT_ID/CALL_ID"|"/edit-fixed-expense/ID"|"/edit-asset/ID"|"/complete-asset/ID"|"/edit-income/ID"|"/profile"|"/preferences"|"/about"|"/terms" }. Reemplaza ID por el id real. No uses /add-debt, /add-fixed-expense, /add-asset ni /add-income; crear solo con acciones add_debt, add_fixed_expense, add_asset, add_income y los params.
 
 —— CONSULTAS Y UI ——
 get_overview, get_debts, get_state: sin params. toggle_hide_amounts: sin params.
@@ -110,7 +110,7 @@ CREAR: "tengo una deuda con BBVA de 15000" → add_debt { name: "BBVA", totalLoc
 ACTUALIZAR (solo los atributos que mencione): "cambiar la cuota de la deuda BBVA a 50 mil" → edit_debt { debtId, localFee: 50000 }. "cambiar la fecha de pago de BBVA al día 20" → edit_debt { debtId, paymentDate: "20" }. "cambiar el monto del compromiso de BBVA a 4000" → edit_commitment { debtId, commitmentId, amountLocal: 4000 }. "actualizar notas de la llamada de Scotiabank a 'me dieron plazo'" → edit_call { debtId, callId, notes: "me dieron plazo" }. "cambiar el gasto de internet a 60 dólares" → edit_fixed_expense { expenseId, amountDollars: 60 }. "cambiar el valor del activo casa a 2.5 millones" → edit_asset { assetId, valueLocal: 2500000 }. "cambiar mi ingreso de Forj a 6000" → edit_income { incomeId, amountLocal: 6000 }. "editar deuda Santander" (sin atributos) → navigate { route: "/edit-debt/ID" }.
 ELIMINAR: "eliminar deuda BBVA" → delete_debt { debtId }. "eliminar todas las deudas" → delete_all_debts {}. "eliminar compromiso de BBVA" → delete_commitment { debtId, commitmentId }. "eliminar llamada de Scotiabank" → delete_call { debtId, callId }. "eliminar gasto internet" → delete_fixed_expense { expenseId }. "eliminar activo carro" → delete_asset { assetId }. "eliminar ingreso Forj" → delete_income { incomeId }.
 COMPLETAR: "completar deuda Scotiabank" / "marcar deuda BBVA como pagada" → complete_debt { debtId }. "completar compromiso de BBVA" → complete_commitment { debtId, commitmentId }. "liquidar activo casa" → complete_asset { assetId }.
-OTROS: "resumen" / "¿cuánto debo?" → get_overview. "ocultar montos" → toggle_hide_amounts. "ir al inicio" → navigate { route: "/dashboard" }. "agregar deuda" (sin más) → navigate { route: "/add-debt" }.
+OTROS: "resumen" / "¿cuánto debo?" → get_overview. "ocultar montos" → toggle_hide_amounts. "ir al inicio" → navigate { route: "/dashboard" }. "agregar deuda" (sin más) → responde en JSON con type "reply" o pide nombre/monto en chat; no navegues a /add-debt.
 `;
 
   return `${langNote}\n\n${actionsDoc}`;

@@ -608,7 +608,8 @@
     "amountsToggled": "Toggled amount visibility.",
     "actionExecuted": "Done! I've executed that action for you.",
     "notUnderstood": "I didn't quite understand that. Try saying: 'Add a debt', 'Show overview', 'Add commitment to [debt name]', or 'Record call for [debt name]'.",
-    "overviewResponse": "Here's your financial overview:\n\nTotal Debt:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nMonthly Payments:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}"
+    "overviewResponse": "Here's your financial overview:\n\nTotal Debt:\n{{currency}} {{totalLocal}}\nUSD {{totalDollars}}\n\nMonthly Payments:\n{{currency}} {{monthlyLocal}}\nUSD {{monthlyDollars}}",
+    "addViaChat": "To add debts, expenses, assets or income use the AI chat (header icon). Say for example: 'Add debt BBVA 5000', 'Expense internet 50 dollars', 'Asset house 2 million', 'Income salary 3000 monthly'."
   },
   "deleteCommitment": {
     "title": "Delete Commitment",

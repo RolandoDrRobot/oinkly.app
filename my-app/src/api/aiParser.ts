@@ -471,18 +471,6 @@ export function parseTextToAIAction(
   if (/ir al inicio|abrir dashboard|volver al inicio|go to dashboard|dashboard/i.test(lower) && !/deuda|debt|gasto|income|asset/i.test(lower)) {
     return { type: 'navigate', params: { route: '/dashboard' } };
   }
-  if (/^(agregar|add|nueva|new)\s+(deuda|debt)$/i.test(trimmed) || /abrir (formulario |pantalla )?para agregar deuda/i.test(lower)) {
-    return { type: 'navigate', params: { route: '/add-debt' } };
-  }
-  if (/^(agregar|add)\s+(gasto|expense)$/i.test(trimmed) && !/\d/.test(trimmed)) {
-    return { type: 'navigate', params: { route: '/add-fixed-expense' } };
-  }
-  if (/^(agregar|add|nuevo|new)\s+(activo|asset)$/i.test(trimmed) && !/\d/.test(trimmed)) {
-    return { type: 'navigate', params: { route: '/add-asset' } };
-  }
-  if (/^(agregar|add|nuevo|new)\s+(ingreso|income)$/i.test(trimmed) && !/\d/.test(trimmed)) {
-    return { type: 'navigate', params: { route: '/add-income' } };
-  }
   if (/^(agregar|add|crear)\s+(compromiso|commitment)$/i.test(trimmed) && !/\d/.test(trimmed) && debts.length > 0) {
     return { type: 'navigate', params: { route: `/add-commitment/${debts[0].id}` } };
   }
@@ -684,7 +672,7 @@ export function parseTextToAIAction(
   if (/^(agregar|add|nueva|new)\s+(deuda|debt)/i.test(trimmed)) {
     const rest = stripPrefix(trimmed, /^(agregar|add|nueva|new)\s+(deuda|debt)\s+/i);
     const { name, amountLocal, amountDollars } = parseNameAndAmount(rest);
-    if (!name) return { type: 'navigate', params: { route: '/add-debt' } };
+    if (!name) return null;
     const params: Record<string, unknown> = { name };
     if (amountLocal != null) params.totalLocal = amountLocal;
     if (amountDollars != null) params.totalDollars = amountDollars;
@@ -722,7 +710,7 @@ export function parseTextToAIAction(
   if (/^(agregar|add|nuevo|new)\s+(ingreso|income)/i.test(trimmed)) {
     const rest = stripPrefix(trimmed, /^(agregar|add|nuevo|new)\s+(ingreso|income)\s+/i);
     const { name, amountLocal, amountDollars } = parseNameAndAmount(rest);
-    if (!name) return { type: 'navigate', params: { route: '/add-income' } };
+    if (!name) return null;
     const params: Record<string, unknown> = { name };
     if (amountLocal != null) params.amountLocal = amountLocal;
     if (amountDollars != null) params.amountDollars = amountDollars;
@@ -744,7 +732,7 @@ export function parseTextToAIAction(
   if (/^(agregar|add)\s+(gasto|expense)|gasto fijo|fixed expense/i.test(trimmed)) {
     const rest = stripPrefix(trimmed, /^(agregar|add)\s+(gasto|expense)\s+|gasto fijo\s+|fixed expense\s+/i);
     const { name, amountLocal, amountDollars } = parseNameAndAmount(rest);
-    if (!name) return { type: 'navigate', params: { route: '/add-fixed-expense' } };
+    if (!name) return null;
     const params: Record<string, unknown> = { name };
     if (amountLocal != null) params.amountLocal = amountLocal;
     if (amountDollars != null) params.amountDollars = amountDollars;
@@ -766,7 +754,7 @@ export function parseTextToAIAction(
   if (/^(agregar|add|nuevo|new)\s+(activo|asset)/i.test(trimmed)) {
     const rest = stripPrefix(trimmed, /^(agregar|add|nuevo|new)\s+(activo|asset)\s+/i);
     const { name, amountLocal, amountDollars } = parseNameAndAmount(rest);
-    if (!name) return { type: 'navigate', params: { route: '/add-asset' } };
+    if (!name) return null;
     const params: Record<string, unknown> = { name };
     if (amountLocal != null) params.valueLocal = amountLocal;
     if (amountDollars != null) params.valueDollars = amountDollars;
