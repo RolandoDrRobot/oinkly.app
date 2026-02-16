@@ -327,28 +327,32 @@ const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, ...pageTransition }}
       >
-        <input
-          type="text"
-          value={aiInputText}
-          onChange={(e) => setAiInputText(e.target.value)}
-          placeholder={t('aiAgent.placeholder')}
-          className="ai-chat-input"
-          disabled={isProcessing}
-        />
-        <motion.button type="submit" className="ai-chat-send" disabled={!aiInputText.trim() || isProcessing} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Icon component={FaPaperPlane} />
-        </motion.button>
-        <motion.button
-          type="button"
-          className={`ai-chat-mic ${isListening ? 'listening' : ''}`}
-          onClick={isListening ? stopListening : startListening}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
-          disabled={isProcessing}
-        >
-          <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
-        </motion.button>
+        <div className="ai-chat-form-mic-row">
+          <motion.button
+            type="button"
+            className={`ai-chat-mic ${isListening ? 'listening' : ''}`}
+            onClick={isListening ? stopListening : startListening}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title={isListening ? t('aiAgent.stopListening') : t('aiAgent.startListening')}
+            disabled={isProcessing}
+          >
+            <Icon component={isListening ? FaMicrophoneSlash : FaMicrophone} />
+          </motion.button>
+        </div>
+        <div className="ai-chat-form-text-row">
+          <input
+            type="text"
+            value={aiInputText}
+            onChange={(e) => setAiInputText(e.target.value)}
+            placeholder={t('aiAgent.placeholder')}
+            className="ai-chat-input"
+            disabled={isProcessing}
+          />
+          <motion.button type="submit" className="ai-chat-send" disabled={!aiInputText.trim() || isProcessing} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Icon component={FaPaperPlane} />
+          </motion.button>
+        </div>
       </motion.form>
     </motion.div>
   );
