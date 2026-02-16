@@ -595,6 +595,7 @@
   },
   "aiAgent": {
     "assistantLabel": "Oinkly AI",
+    "chatBubble": "Hola",
     "title": "Controla tus finanzas solo con la voz",
     "welcome": "¡Hola! Soy tu asistente de IA. Puedo ayudarte a gestionar tus deudas. Prueba diciendo: 'Agregar una deuda', 'Muéstrame el resumen', 'Agregar un compromiso a [nombre de deuda]', o 'Registrar una llamada para [nombre de deuda]'. ¡También puedes escribir o usar comandos de voz!",
     "placeholder": "Escribe o habla tu comando...",

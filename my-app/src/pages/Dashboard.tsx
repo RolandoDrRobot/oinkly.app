@@ -2860,23 +2860,25 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Nav fija al fondo: botón Oinkly AI */}
+      {/* Nav fija al fondo: botón redondo + mensaje tipo chat que abre el modal */}
       <nav className="dashboard-bottom-nav" aria-label={t('aiAgent.assistantLabel')}>
-        <motion.button
-          type="button"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="ai-agent-entry-button"
-          onClick={() => setIsAIChatModalOpen(true)}
-          aria-label={t('aiAgent.assistantLabel')}
-        >
-          <span
-            className="ai-agent-entry-image"
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
-          />
-          <span className="ai-agent-entry-label">{t('aiAgent.assistantLabel')}</span>
-        </motion.button>
+        <div className="ai-agent-entry-wrap">
+          <span className="ai-agent-entry-bubble" aria-hidden="true">{t('aiAgent.chatBubble')}</span>
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="ai-agent-entry-button"
+            onClick={() => setIsAIChatModalOpen(true)}
+            aria-label={t('aiAgent.assistantLabel')}
+          >
+            <span
+              className="ai-agent-entry-image"
+              style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ai.png)` }}
+            />
+          </motion.button>
+        </div>
       </nav>
     </motion.div>
   );

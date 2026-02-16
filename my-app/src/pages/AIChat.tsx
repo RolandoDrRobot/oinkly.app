@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaArrowLeft, FaPaperPlane, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import { FaTimes, FaPaperPlane, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { executeAIAction, parseTextToAIAction, getMessageForActionResult, interpretWithAI, isAIVoiceEnabled, getLastAIVoiceError, getSummaryText } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -236,21 +236,14 @@ const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
       variants={pageVariants}
       transition={pageTransition}
     >
-      <motion.header
-        className="ai-chat-header"
-        style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/banner.png)` }}
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08, ...pageTransition }}
+      <button
+        type="button"
+        className="ai-chat-close-x"
+        onClick={onClose ?? (() => navigate('/dashboard'))}
+        aria-label={t('common.close')}
       >
-        <button
-          type="button"
-          className="ai-chat-back"
-          onClick={onClose ?? (() => navigate('/dashboard'))}
-        >
-          <Icon component={FaArrowLeft} /> {onClose ? t('common.close') : t('common.back')}
-        </button>
-      </motion.header>
+        <Icon component={FaTimes} />
+      </button>
 
       <motion.div
         className="ai-chat-messages"
