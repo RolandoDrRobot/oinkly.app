@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 26px;
+  padding: 20px 26px;
   border-bottom: 1px solid var(--bg-tertiary);
   flex-shrink: 0;
   background-size: cover;

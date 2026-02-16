@@ -61,6 +61,7 @@ import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
 import ChallengesPanel from '../components/ChallengesPanel';
+import AIChatModal from '../components/AIChatModal';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -94,6 +95,7 @@ const Dashboard: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [isChallengesOpen, setIsChallengesOpen] = useState(false);
+  const [isAIChatModalOpen, setIsAIChatModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -2515,6 +2517,10 @@ const Dashboard: React.FC = () => {
         isOpen={isChallengesOpen}
         onClose={() => setIsChallengesOpen(false)}
       />
+      <AIChatModal
+        isOpen={isAIChatModalOpen}
+        onClose={() => setIsAIChatModalOpen(false)}
+      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -2765,14 +2771,14 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Botón Asistente AI: 50% imagen 50% texto → abre oficina del chat */}
+        {/* Botón Asistente AI: abre chat en modal */}
         <motion.button
           type="button"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="ai-agent-entry-button"
-          onClick={() => navigate('/ai-chat')}
+          onClick={() => setIsAIChatModalOpen(true)}
           aria-label={t('aiAgent.assistantLabel')}
         >
           <span

@@ -23,9 +23,17 @@ interface ChatMessage {
 
 const AI_AVATAR_URL = `${process.env.PUBLIC_URL || ''}/img/ai.png`;
 
-const AIChat: React.FC = () => {
+export interface AIChatProps {
+  /** When set, chat is shown in a modal: show close button and use this for executeAIAction navigation */
+  onClose?: () => void;
+  /** Override navigate (e.g. close modal then navigate). Used when onClose is set. */
+  navigateOverride?: (path: string) => void;
+}
+
+const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const effectiveNavigate = navigateOverride ?? ((path: string) => navigate(path));
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
@@ -107,7 +115,7 @@ const AIChat: React.FC = () => {
       }
 
       if (action) {
-        const result = await executeAIAction(action, { navigate });
+        const result = await executeAIAction(action, { navigate: effectiveNavigate });
         if (result.success) analytics.aiAssistantUsed(action.type);
         const replyText = getMessageForActionResult(action, result, lang);
         setMessages((prev) => [...prev, { role: 'assistant', text: replyText }]);
@@ -132,7 +140,7 @@ const AIChat: React.FC = () => {
       }
       setIsProcessing(false);
     },
-    [lang, debts, fixedExpenses, assets, incomes, voiceCommitments, voiceCalls, navigate, t]
+    [lang, debts, fixedExpenses, assets, incomes, voiceCommitments, voiceCalls, effectiveNavigate, t]
   );
 
   const initializeSpeechRecognition = useCallback(() => {
@@ -232,8 +240,12 @@ const AIChat: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08, ...pageTransition }}
       >
-        <button type="button" className="ai-chat-back" onClick={() => navigate('/dashboard')}>
-          <Icon component={FaArrowLeft} /> {t('common.back')}
+        <button
+          type="button"
+          className="ai-chat-back"
+          onClick={onClose ?? (() => navigate('/dashboard'))}
+        >
+          <Icon component={FaArrowLeft} /> {onClose ? t('common.close') : t('common.back')}
         </button>
       </motion.header>
 
