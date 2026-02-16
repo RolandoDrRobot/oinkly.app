@@ -10,7 +10,6 @@ import {
   FaDownload,
   FaChevronRight,
   FaSignOutAlt,
-  FaCrown,
   FaEnvelope,
   FaMobileAlt,
 } from 'react-icons/fa';
@@ -40,9 +39,16 @@ const Profile: React.FC = () => {
         })()
       : null);
 
+  const isPwaStandalone =
+    typeof window !== 'undefined' &&
+    (window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as { standalone?: boolean }).standalone === true);
+
   const actions = [
     { id: 'preferences', icon: FaCog, label: t('profile.preferences'), onClick: () => navigate('/preferences') },
-    { id: 'installApp', icon: FaMobileAlt, label: t('profile.installApp'), onClick: () => navigate('/install-app') },
+    ...(!isPwaStandalone
+      ? [{ id: 'installApp' as const, icon: FaMobileAlt, label: t('profile.installApp'), onClick: () => navigate('/install-app') }]
+      : []),
     { id: 'contact', icon: FaEnvelope, label: t('profile.contact'), onClick: () => navigate('/contact') },
     { id: 'terms', icon: FaFileContract, label: t('profile.termsAndConditions'), onClick: () => navigate('/terms') },
     { id: 'export', icon: FaDownload, label: t('profile.exportData'), onClick: exportAllDataToCSV },
@@ -105,12 +111,6 @@ const Profile: React.FC = () => {
           <div className="profile-user-info">
             <h2 className="profile-name">{displayUser?.name ?? '—'}</h2>
             <p className="profile-email">{displayUser?.email ?? '—'}</p>
-            {isPremium && (
-              <span className="profile-premium-badge">
-                <Icon component={FaCrown} className="profile-premium-badge-icon" size={14} />
-                {t('profile.premiumBadge')}
-              </span>
-            )}
           </div>
         </motion.section>
 

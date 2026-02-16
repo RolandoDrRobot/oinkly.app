@@ -46,7 +46,7 @@
 }
 
 .profile-content {
-  padding: 40px 20px 60px;
+  padding: 30px 20px 60px;
   max-width: 420px;
   margin: 0 auto;
 }
@@ -148,39 +148,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Badge Premium en la tarjeta de perfil: solo texto e icono dorados, sin fondo */
-@keyframes profile-premium-badge-glow {
-  0%, 100% { opacity: 0.9; filter: drop-shadow(0 0 4px rgba(244, 192, 50, 0.4)); }
-  50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(244, 192, 50, 0.6)); }
-}
-
-.profile-premium-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin: 6px 0 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #f4c032;
-  background: none;
-  white-space: nowrap;
-  animation: profile-premium-badge-glow 2s ease-in-out infinite;
-}
-
-.profile-premium-badge-icon {
-  flex-shrink: 0;
-  color: #f4c032;
-  width: 12px;
-  height: 12px;
-}
-
-.profile-card-premium:hover .profile-premium-badge {
-  animation: none;
-  opacity: 1;
-  filter: drop-shadow(0 0 6px rgba(244, 192, 50, 0.5));
 }
 
 /* Actions list */
