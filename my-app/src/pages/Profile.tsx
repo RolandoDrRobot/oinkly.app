@@ -8,7 +8,6 @@ import {
   FaCog,
   FaFileContract,
   FaDownload,
-  FaMicrophone,
   FaChevronRight,
   FaSignOutAlt,
   FaCrown,
