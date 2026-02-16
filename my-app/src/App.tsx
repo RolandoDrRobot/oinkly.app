@@ -192,7 +192,7 @@ function App() {
           <MobileOnlyGate>
           <Router>
             <GoogleAnalyticsRouteTracker />
-            <Suspense fallback={<div className="app-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>{i18n.t('common.loading')}</div>}>
+            <Suspense fallback={<div className="app-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>{(i18n.t as (key: string) => string)('common.loading')}</div>}>
               <AppRoutes />
             </Suspense>
             <Toaster

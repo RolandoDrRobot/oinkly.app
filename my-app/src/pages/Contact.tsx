@@ -7,7 +7,7 @@ import {
   FaMapMarkerAlt,
   FaEnvelope,
   FaMapPin,
-  FaTwitter,
+  FaTiktok,
 } from 'react-icons/fa';
 import './Contact.css';
 
@@ -21,7 +21,7 @@ const Contact: React.FC = () => {
   const CONTACT_EMAIL = 'neodeveloper.eth@gmail.com';
 
   const socialLinks = [
-    { id: 'x', icon: FaTwitter, url: 'https://x.com/oinklyapp', label: 'X (Oinkly)' },
+    { id: 'tiktok', icon: FaTiktok, url: 'https://www.tiktok.com/@oinklyapp?_r=1&_t=ZS-93ygrMOun4O', label: 'TikTok (Oinkly)' },
   ];
 
   return (
