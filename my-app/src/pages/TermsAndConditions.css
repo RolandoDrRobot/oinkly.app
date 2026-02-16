@@ -41,10 +41,6 @@
   color: var(--text-primary);
 }
 
-.terms-and-conditions .btn-back:hover {
-  background: var(--overlay-light);
-}
-
 .terms-content {
   max-width: 900px;
   margin: 0 auto;

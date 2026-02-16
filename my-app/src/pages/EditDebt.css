@@ -25,10 +25,6 @@
   align-items: center;
 }
 
-.btn-back:hover {
-  
-}
-
 .page-header h1 {
   margin: 0;
   font-size: 32px;
@@ -134,24 +130,9 @@
   
 }
 
-.btn-cancel:hover {
-  
-  color: var(--text-primary);
-}
-
 .btn-submit {
   background: var(--primary);
   color: var(--text-primary);
   
 }
 
-.btn-submit:hover {
-  background: var(--primary-bright);
-  
-  transform: translateY(-2px);
-}
-
-.btn-cancel:active,
-.btn-submit:active {
-  transform: scale(0.98);
-}

@@ -28,11 +28,6 @@
   transition: background 0.2s, transform 0.2s;
 }
 
-.ai-chat-close-x:hover {
-  background: rgba(0, 0, 0, 0.45);
-  transform: scale(1.08);
-}
-
 .ai-chat-close-x svg {
   width: 16px;
   height: 16px;
@@ -181,11 +176,6 @@
   transition: all 0.2s;
 }
 
-.ai-chat-form-mic-row .ai-chat-mic:hover:not(:disabled) {
-  background: var(--primary-bright, #6ab04c);
-  transform: scale(1.05);
-}
-
 .ai-chat-form-mic-row .ai-chat-mic:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -252,10 +242,6 @@
   transition: all 0.2s;
 }
 
-.ai-chat-send:hover:not(:disabled) {
-  background: var(--primary-bright, #6ab04c);
-}
-
 .ai-chat-send:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -296,6 +282,3 @@
   font-family: var(--font-family, "DynaPuff", system-ui);
 }
 
-.ai-chat-locked-cta:hover {
-  filter: brightness(1.1);
-}

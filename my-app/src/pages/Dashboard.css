@@ -58,11 +58,6 @@
   height: 20px;
 }
 
-.btn-profile:hover {
-  color: var(--primary);
-  background: var(--primary-overlay);
-}
-
 .btn-notifications {
   position: relative;
 }
@@ -118,11 +113,6 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.btn-logout:hover {
-  
-  color: var(--text-primary);
 }
 
 .dashboard-content {
@@ -187,15 +177,6 @@
   overflow: hidden;
   flex-shrink: 0;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-}
-
-.dashboard-bottom-nav .ai-agent-entry-button:hover {
-  transform: scale(1.08);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4), 0 0 28px rgba(86, 154, 60, 0.35);
-}
-
-.dashboard-bottom-nav .ai-agent-entry-button:active {
-  transform: scale(1.02);
 }
 
 .dashboard-bottom-nav .ai-agent-entry-image {
@@ -304,12 +285,6 @@
   animation: ai-cta-pulse 2s ease-in-out infinite;
 }
 
-.ai-agent-locked-cta:hover {
-  filter: brightness(1.15);
-  transform: scale(1.04);
-  box-shadow: 0 4px 20px rgba(86, 154, 60, 0.45);
-  animation: none;
-}
 
 .ai-agent-input-container {
   display: flex;
@@ -363,12 +338,6 @@
   flex-shrink: 0;
 }
 
-.ai-agent-mic:hover,
-.ai-agent-send:hover {
-  background: var(--primary-bright, #6ab04c);
-  transform: scale(1.05);
-}
-
 .ai-agent-mic:disabled,
 .ai-agent-send:disabled {
   opacity: 0.5;
@@ -412,11 +381,6 @@
   cursor: pointer;
 }
 
-.summary-card.overall-summary.collapsed:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-}
-
 .btn-close-summary {
   position: absolute;
   top: 0;
@@ -434,12 +398,6 @@
   transition: all 0.2s;
 }
 
-.btn-close-summary:hover {
-  opacity: 1;
-  background: var(--overlay);
-  border-color: var(--accent-color);
-  color: var(--text-primary);
-}
 
 
 .summary-section {
@@ -602,16 +560,6 @@
   margin-top: 8px;
 }
 
-.btn-add-first-debt:hover {
-  background: var(--primary-bright);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(86, 154, 60, 0.3);
-}
-
-.btn-add-first-debt:active {
-  transform: translateY(0);
-}
-
 .debts-section-title {
   font-size: 24px;
   font-weight: 700;
@@ -641,11 +589,6 @@
 .debt-card[data-dragging="true"] {
   opacity: 0.6;
   transform: scale(0.99);
-}
-
-.debt-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  border-color: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
 }
 
 .debt-header {
@@ -683,12 +626,6 @@
   height: 32px;
 }
 
-.btn-close-debt:hover {
-  background: var(--overlay);
-  color: var(--text-primary);
-  transform: scale(1.1);
-}
-
 .debt-header-actions {
   display: flex;
   justify-content: flex-end;
@@ -705,10 +642,6 @@
   border-radius: 8px;
   transition: background 0.2s ease;
   width: 100%;
-}
-
-.debt-header-main:hover {
-  background: var(--overlay-light, rgba(255, 255, 255, 0.04));
 }
 
 .debt-header-main > div:first-child {
@@ -886,16 +819,6 @@
   flex-shrink: 0;
 }
 
-.btn-edit:hover {
-  background: var(--primary-overlay);
-  color: var(--primary);
-}
-
-.btn-delete:hover {
-  background: var(--error-light, rgba(244, 67, 54, 0.12));
-  color: var(--error, #f44336);
-}
-
 .btn-delete {
   display: flex;
   justify-content: center;
@@ -936,11 +859,6 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-}
-
-.btn-edit-debt:hover {
-  background: var(--primary-bright);
-  transform: translateY(-1px);
 }
 
 .debt-payments {
@@ -1068,21 +986,10 @@
   user-select: none;
 }
 
-.task-button:hover {
-  background: var(--overlay-light);
-  transform: translateY(-1px);
-}
-
 .task-button.active {
   background: var(--dark-card, #014a3a);
   color: var(--primary);
   border: 2px solid var(--primary);
-}
-
-.task-button.active:hover {
-  background: var(--dark-card, #014a3a);
-  border-color: var(--primary-bright);
-  color: var(--primary-bright);
 }
 
 .task-button svg {
@@ -1100,11 +1007,6 @@
   padding: 6px 0;
   border-radius: 4px;
   display: inline-block;
-}
-
-.editable-field:hover {
-  background: var(--overlay-medium);
-  color: var(--primary-bright);
 }
 
 .inline-edit-input {
@@ -1186,11 +1088,6 @@
   stroke: #f4e3c5;
 }
 
-.btn-add-commitment:hover {
-  background: var(--primary-bright);
-  transform: translateY(-1px);
-}
-
 .commitments-list {
   display: flex;
   flex-direction: column;
@@ -1222,12 +1119,6 @@
   gap: 12px;
 }
 
-.commitment-item:hover {
-  transform: translateX(4px);
-  background: var(--overlay-light);
-  border-color: var(--primary);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
 
 .commitment-info {
   display: flex;
@@ -1320,10 +1211,6 @@
   margin-left: 8px;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.commitment-alert-badge:hover {
-  transform: scale(1.05);
 }
 
 /* Commitments Progress */
@@ -1435,11 +1322,6 @@
   height: 32px;
 }
 
-.btn-complete-item:hover {
-  background: var(--primary-bright);
-  transform: scale(1.1);
-}
-
 .commitment-actions {
   display: flex;
   gap: 8px;
@@ -1474,27 +1356,6 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-commitment-action:hover::after {
-  opacity: 0.1;
-  transform: scale(1);
-}
-
-.btn-commitment-action:hover {
-  background: var(--overlay-light);
-  
-  color: var(--primary);
-  transform: scale(1.1);
-}
-
-.btn-commitment-action:active {
-  transform: scale(0.95);
-}
-
-.btn-commitment-action.btn-delete:hover {
-  background: var(--error-light);
-  
-  color: var(--error);
-}
 
 .commitments-empty {
   text-align: left;
@@ -1568,11 +1429,6 @@
   height: 32px;
 }
 
-.modal-close:hover {
-  background: var(--overlay-light);
-  color: var(--text-primary);
-}
-
 .modal-form {
   padding: 24px;
 }
@@ -1643,19 +1499,9 @@
   
 }
 
-.modal-actions .btn-cancel:hover {
-  background: var(--overlay-light);
-  
-  color: var(--text-primary);
-}
-
 .modal-actions .btn-submit {
   background: var(--primary);
   color: var(--text-primary);
-}
-
-.modal-actions .btn-submit:hover {
-  background: var(--primary-bright);
 }
 
 /* Call History Section */
@@ -1709,11 +1555,6 @@
   width: 100%;
 }
 
-.btn-add-call:hover {
-  background: var(--primary-bright);
-  transform: translateY(-1px);
-}
-
 .calls-list {
   display: flex;
   flex-direction: column;
@@ -1739,13 +1580,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   gap: 12px;
   position: relative;
-}
-
-.call-item:hover {
-  transform: translateX(4px);
-  background: var(--overlay-light);
-  border-color: var(--primary);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .call-content {
@@ -2017,11 +1851,6 @@
   font-family: "DynaPuff", system-ui;
 }
 
-.btn-add:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}
-
 .btn-add svg {
   width: 16px;
   height: 16px;
@@ -2046,19 +1875,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-.item-card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
-
 .item-card[data-dragging="true"] {
   opacity: 0.5;
   transform: scale(0.98);
-}
-
-.item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: var(--primary);
 }
 
 .item-header {
@@ -2172,10 +1991,6 @@
   width: 100%;
 }
 
-.item-header-main:hover {
-  background: var(--overlay-light);
-}
-
 .item-header-info {
   display: flex;
   flex-direction: column;
@@ -2228,17 +2043,6 @@
   height: 32px;
 }
 
-.btn-edit-item:hover {
-  background: var(--overlay);
-  color: var(--text-primary);
-  transform: scale(1.1);
-}
-
-.btn-delete-item:hover {
-  background: var(--overlay);
-  color: var(--error);
-  transform: scale(1.1);
-}
 
 .item-card h3,
 .item-name {
@@ -2466,17 +2270,8 @@
   color: var(--text-secondary);
 }
 
-.modal-actions button[type="button"]:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
 .modal-actions button[type="submit"] {
   background: var(--primary);
   color: white;
 }
 
-.modal-actions button[type="submit"]:hover {
-  background: var(--primary-hover);
-  transform: translateY(-2px);
-}

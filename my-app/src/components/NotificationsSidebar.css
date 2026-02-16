@@ -76,11 +76,6 @@
   height: 36px;
 }
 
-.btn-close-sidebar:hover {
-  background: var(--overlay);
-  color: var(--text-primary);
-}
-
 .notifications-actions {
   display: flex;
   gap: 8px;
@@ -103,16 +98,6 @@
   align-items: center;
   gap: 4px;
   font-weight: 500;
-}
-
-.btn-mark-all-read:hover {
-  background: var(--primary-overlay);
-  color: var(--primary);
-}
-
-.btn-clear-all:hover {
-  background: var(--error-overlay);
-  color: var(--error);
 }
 
 .notifications-list {
@@ -232,16 +217,6 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-}
-
-.btn-mark-read:hover {
-  background: var(--primary-overlay);
-  color: var(--primary);
-}
-
-.btn-delete-notification:hover {
-  background: var(--error-overlay);
-  color: var(--error);
 }
 
 /* Mobile responsiveness */

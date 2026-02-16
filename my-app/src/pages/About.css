@@ -24,10 +24,6 @@
   transition: background-color 0.2s;
 }
 
-.btn-back:hover {
-  background-color: var(--bg-secondary);
-}
-
 .about-content {
   display: flex;
   flex-direction: column;
@@ -133,11 +129,6 @@
   transition: transform 0.2s;
 }
 
-.step-card:hover {
-  transform: translateY(-4px);
-  
-}
-
 .step-number {
   display: none;
 }
@@ -231,11 +222,6 @@
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
-}
-
-.btn-primary:hover {
-  background: var(--accent-color-hover, var(--accent-color));
-  transform: translateY(-2px);
 }
 
 /* Responsive */

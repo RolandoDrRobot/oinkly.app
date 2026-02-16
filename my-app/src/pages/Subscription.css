@@ -65,11 +65,6 @@
   transition: all 0.2s;
 }
 
-.btn-cancel-subscription:hover {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
-}
 
 /* Same attractive animations as AI locked / checkout */
 @keyframes plan-float {
@@ -199,13 +194,6 @@
 
 .btn-plan-premium:not(:disabled) {
   animation: plan-btn-pulse 2s ease-in-out infinite;
-}
-
-.btn-plan-premium:not(:disabled):hover {
-  filter: brightness(1.15);
-  transform: scale(1.04);
-  box-shadow: 0 4px 20px rgba(86, 154, 60, 0.45);
-  animation: none;
 }
 
 /* Plan actual (pagado): mismo verde marca de fondo */

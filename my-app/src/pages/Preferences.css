@@ -42,17 +42,9 @@
   color: var(--text-primary);
 }
 
-.btn-back:hover {
-  background: var(--overlay-light);
-}
-
 .btn-go-dashboard {
   background: var(--primary);
   color: var(--text-primary);
-}
-
-.btn-go-dashboard:hover {
-  filter: brightness(1.1);
 }
 
 .preferences-content {
@@ -124,11 +116,6 @@
   font-weight: 500;
 }
 
-.mode-button:hover {
-  
-  background: var(--primary-overlay-light);
-}
-
 .mode-button.active {
   
   background: var(--primary-overlay);
@@ -168,10 +155,6 @@
   text-align: left;
 }
 
-.currency-button:hover {
-  
-  background: var(--primary-overlay-light);
-}
 
 .currency-button.active {
   
@@ -239,10 +222,6 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.preferences-openai-save:hover {
-  filter: brightness(1.1);
 }
 
 .preferences-openai-feedback {

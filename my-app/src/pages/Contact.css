@@ -41,10 +41,6 @@
   color: var(--text-primary);
 }
 
-.contact .btn-back:hover {
-  background: var(--overlay-light);
-}
-
 .contact-content {
   padding: 20px;
   max-width: 520px;
@@ -140,11 +136,6 @@
   word-break: break-word;
 }
 
-a.contact-info-value:hover {
-  color: var(--primary);
-  text-decoration: underline;
-}
-
 /* Social links */
 .contact-social-section .contact-section-title {
   margin-bottom: 14px;
@@ -166,11 +157,6 @@ a.contact-info-value:hover {
   align-items: center;
   justify-content: center;
   transition: background 0.2s, color 0.2s;
-}
-
-.contact-social-link:hover {
-  background: var(--primary-overlay, rgba(86, 154, 60, 0.2));
-  color: var(--primary);
 }
 
 /* Social section: message + links */

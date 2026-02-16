@@ -41,10 +41,6 @@
   color: var(--text-primary);
 }
 
-.install-app .btn-back:hover {
-  background: var(--overlay-light);
-}
-
 .install-app-content {
   padding: 20px 20px 40px;
   max-width: 480px;
@@ -132,10 +128,6 @@
   cursor: pointer;
   transition: filter 0.2s;
   box-shadow: 0 4px 14px rgba(86, 154, 60, 0.35);
-}
-
-.install-app-cta:hover:not(:disabled) {
-  filter: brightness(1.1);
 }
 
 .install-app-cta:disabled {
