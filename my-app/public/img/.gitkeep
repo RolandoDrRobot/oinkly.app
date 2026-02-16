@@ -1,0 +1,6 @@
+# Imágenes de fondo de los botones del menú (Dashboard):
+# - debt.png        (botón Deuda)
+# - gasts_fijos.png (botón Gastos)
+# - activos.png     (botón Activos)
+# - ingresos.png    (botón Ingresos)
+# Formatos: .png, .jpg, .webp (si usas otro, cambia la extensión en Dashboard.tsx)

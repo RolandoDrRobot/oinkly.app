@@ -1825,6 +1825,9 @@
   padding: 4px;
   border: 1px solid var(--bg-tertiary);
   background: var(--bg-secondary);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--text-secondary);
   border-radius: 12px;
   font-size: 11px;
@@ -1840,13 +1843,30 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
+.menu-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+  transition: background 0.3s;
+}
+
+/* Las imágenes de fondo se asignan por inline style en Dashboard.tsx (PUBLIC_URL) para que el bundler no intente resolverlas desde CSS). */
+
 .menu-button:hover {
-  background: var(--bg-tertiary);
   border-color: var(--primary);
   color: var(--text-primary);
   transform: translateY(-2px);
+}
+
+.menu-button:hover::before {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .menu-button:active {
@@ -1854,37 +1874,15 @@
 }
 
 .menu-button.active {
-  background: var(--primary);
   border-color: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 255, 163, 0.3);
+  box-shadow: none;
 }
 
-.menu-button-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-bottom: 4px;
+.menu-button.active::before {
+  background: rgba(0, 0, 0, 0.05);
 }
 
-.menu-button-icon svg {
-  width: 28px;
-  height: 28px;
-}
-
-.menu-button.active .menu-button-icon svg {
-  width: 30px;
-  height: 30px;
-}
-
-.menu-button-text {
-  font-size: 11px;
-  line-height: 1.2;
-  text-align: center;
-  word-wrap: break-word;
-  max-width: 100%;
-}
 
 /* Dashboard Screens Container */
 .dashboard-screens-container {
@@ -2362,12 +2360,6 @@
 
   .menu-button {
     padding: 4px;
-    font-size: 12px;
-  }
-
-  .menu-button svg {
-    width: 16px;
-    height: 16px;
   }
 
   .screen-header {

@@ -3044,41 +3044,33 @@ const Dashboard: React.FC = () => {
           className="dashboard-menu"
         >
           <button
-            className={`menu-button ${activeTab === 'debt' ? 'active' : ''}`}
+            className={`menu-button menu-button--debt ${activeTab === 'debt' ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/debt.png)` }}
             onClick={() => setActiveTab('debt')}
-          >
-            <div className="menu-button-icon">
-              <Icon component={FaFileInvoiceDollar} />
-            </div>
-            <span className="menu-button-text">{t('dashboard.debt')}</span>
-          </button>
+            title={t('dashboard.debt')}
+            aria-label={t('dashboard.debt')}
+          />
           <button
-            className={`menu-button ${activeTab === 'fixedExpenses' ? 'active' : ''}`}
+            className={`menu-button menu-button--gastos ${activeTab === 'fixedExpenses' ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/gasts_fijos.png)` }}
             onClick={() => setActiveTab('fixedExpenses')}
-          >
-            <div className="menu-button-icon">
-              <Icon component={FaMoneyBillWave} />
-            </div>
-            <span className="menu-button-text">{t('dashboard.fixedExpenses')}</span>
-          </button>
+            title={t('dashboard.fixedExpenses')}
+            aria-label={t('dashboard.fixedExpenses')}
+          />
           <button
-            className={`menu-button ${activeTab === 'assets' ? 'active' : ''}`}
+            className={`menu-button menu-button--activos ${activeTab === 'assets' ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/activos.png)` }}
             onClick={() => setActiveTab('assets')}
-          >
-            <div className="menu-button-icon">
-              <Icon component={FaLandmark} />
-            </div>
-            <span className="menu-button-text">{t('dashboard.assets')}</span>
-          </button>
+            title={t('dashboard.assets')}
+            aria-label={t('dashboard.assets')}
+          />
           <button
-            className={`menu-button ${activeTab === 'incomes' ? 'active' : ''}`}
+            className={`menu-button menu-button--ingresos ${activeTab === 'incomes' ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ingresos.png)` }}
             onClick={() => setActiveTab('incomes')}
-          >
-            <div className="menu-button-icon">
-              <Icon component={FaChartLine} />
-            </div>
-            <span className="menu-button-text">{t('dashboard.incomes')}</span>
-          </button>
+            title={t('dashboard.incomes')}
+            aria-label={t('dashboard.incomes')}
+          />
         </motion.div>
 
         {/* Contenedor de pantallas */}
