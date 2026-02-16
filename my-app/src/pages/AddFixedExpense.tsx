@@ -26,6 +26,7 @@ import {
 import { FixedExpense } from '../types';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
+import { addXP, XP_ACTIONS } from '../utils/challenges';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -258,6 +259,7 @@ const AddFixedExpense: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveFixedExpense(newExpense);
+        addXP(XP_ACTIONS.addFixedExpense);
         analytics.addFixedExpense();
         notify.overviewUpdated();
         navigate('/dashboard');

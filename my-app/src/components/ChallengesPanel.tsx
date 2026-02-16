@@ -1,32 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import {
   FaTimes,
   FaFire,
+  FaTrophy,
   FaMoneyBillWave,
-  FaPiggyBank,
+  FaCalendarCheck,
   FaCheckCircle,
-  FaMedal,
-  FaLock,
+  FaPhoneAlt,
+  FaPiggyBank,
+  FaBriefcase,
+  FaTag,
+  FaMobileAlt,
 } from 'react-icons/fa';
 import {
-  getChallenges,
   getChallengesProgress,
-  updateChallengesStreak,
-  type ChallengeCategory,
+  getTotalXP,
+  getLevel,
+  getProgressToNextLevel,
+  grantOpenAppXPIfNeeded,
+  XP_ACTIONS,
 } from '../utils/challenges';
 import './ChallengesPanel.css';
 
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) =>
   Component ? <Component {...props} /> : null;
 
-const CATEGORY_ICON: Record<ChallengeCategory, any> = {
-  debt: FaMoneyBillWave,
-  assets: FaPiggyBank,
-  habit: FaFire,
-};
+const XP_TABLE_ROWS: Array<{ key: keyof typeof XP_ACTIONS; icon: any }> = [
+  { key: 'addDebt', icon: FaMoneyBillWave },
+  { key: 'addCommitment', icon: FaCalendarCheck },
+  { key: 'completeDebt', icon: FaCheckCircle },
+  { key: 'logCall', icon: FaPhoneAlt },
+  { key: 'addAsset', icon: FaPiggyBank },
+  { key: 'addIncome', icon: FaBriefcase },
+  { key: 'addFixedExpense', icon: FaTag },
+  { key: 'openAppToday', icon: FaMobileAlt },
+];
 
 interface ChallengesPanelProps {
   isOpen: boolean;
@@ -35,51 +45,23 @@ interface ChallengesPanelProps {
 
 const ChallengesPanel: React.FC<ChallengesPanelProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [challenges, setChallenges] = useState<ReturnType<typeof getChallenges>>([]);
   const [progress, setProgress] = useState(getChallengesProgress());
+  const [totalXP, setTotalXP] = useState(getTotalXP());
 
   useEffect(() => {
     if (isOpen) {
-      updateChallengesStreak();
+      grantOpenAppXPIfNeeded();
       refresh();
     }
   }, [isOpen]);
 
   const refresh = () => {
-    setChallenges(getChallenges());
     setProgress(getChallengesProgress());
+    setTotalXP(getTotalXP());
   };
 
-  const completedCount = challenges.filter((c) => c.completed).length;
-  const totalCount = challenges.length;
-
-  const categoryLabel = (cat: ChallengeCategory): string =>
-    t(`challenges.categories.${cat}`);
-
-  const goToAction = (challengeId: string) => {
-    onClose();
-    if (challengeId === 'add_first_debt' || challengeId === 'add_commitment' || challengeId === 'log_call') {
-      navigate('/add-debt');
-    } else if (challengeId === 'add_first_asset' || challengeId === 'add_3_assets') {
-      navigate('/add-asset');
-    } else if (challengeId === 'add_income') {
-      navigate('/add-income');
-    } else if (challengeId === 'add_fixed_expense') {
-      navigate('/add-fixed-expense');
-    }
-  };
-
-  const grouped = challenges.reduce<Record<ChallengeCategory, typeof challenges>>(
-    (acc, c) => {
-      if (!acc[c.category]) acc[c.category] = [];
-      acc[c.category].push(c);
-      return acc;
-    },
-    { debt: [], assets: [], habit: [] } as Record<ChallengeCategory, typeof challenges>
-  );
-
-  const categories: ChallengeCategory[] = ['debt', 'assets', 'habit'];
+  const level = getLevel(totalXP);
+  const { current: xpInLevel, needed: xpNeeded, percent: progressPct } = getProgressToNextLevel(totalXP);
 
   return (
     <>
@@ -112,6 +94,21 @@ const ChallengesPanel: React.FC<ChallengesPanelProps> = ({ isOpen, onClose }) =>
                 </button>
               </div>
 
+              <div className="challenges-level-block">
+                <div className="challenges-level-bar-wrap">
+                  <motion.div
+                    className="challenges-level-bar-fill"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPct}%` }}
+                    transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+                  />
+                </div>
+                <div className="challenges-level-xp">
+                  <span>{xpInLevel} / {xpNeeded} XP</span>
+                  <small>{t('challenges.nextLevel')}</small>
+                </div>
+              </div>
+
               <div className="challenges-stats">
                 <div className="challenges-stat challenges-stat-streak">
                   <Icon component={FaFire} />
@@ -120,75 +117,36 @@ const ChallengesPanel: React.FC<ChallengesPanelProps> = ({ isOpen, onClose }) =>
                     <small>{t('challenges.streakDays')}</small>
                   </div>
                 </div>
-                <div className="challenges-stat challenges-stat-total">
-                  <Icon component={FaMedal} />
-                  <div>
-                    <span>{completedCount}/{totalCount}</span>
-                    <small>{t('challenges.achievements')}</small>
+                <div className="challenges-stat challenges-stat-level">
+                  <div className="challenges-level-badge">
+                    <Icon component={FaTrophy} />
+                    <span>{t('challenges.level')} {level}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="challenges-body">
-              {categories.map((cat, catIndex) => (
-                <motion.div
-                  key={cat}
-                  className="challenges-section"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * catIndex }}
-                >
-                  <h3 className="challenges-section-title">
-                    <span className="challenges-section-icon">
-                      <Icon component={CATEGORY_ICON[cat]} />
-                    </span>
-                    {categoryLabel(cat)}
-                  </h3>
-                  <ul className="challenges-list">
-                    {grouped[cat].map((ch, idx) => (
-                      <motion.li
-                        key={ch.id}
-                        initial={{ opacity: 0, x: 12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.03 * idx }}
-                        className={`challenges-item challenges-achievement ${ch.completed ? 'completed' : 'locked'}`}
-                      >
-                        <div className="challenges-item-badge">
-                          {ch.completed ? (
-                            <img
-                              src={`${process.env.PUBLIC_URL || ''}/img/bannerChallange.png`}
-                              alt=""
-                              className="challenges-item-badge-img"
-                            />
-                          ) : (
-                            <Icon component={FaLock} className="challenges-item-lock" />
-                          )}
-                        </div>
-                        <div className="challenges-item-content">
-                          {ch.completed && (
-                            <span className="challenges-item-completed-label">
-                              {t('challenges.completed')}
-                            </span>
-                          )}
-                          <strong>{t(ch.titleKey)}</strong>
-                          <p>{t(ch.descriptionKey)}</p>
-                          {!ch.completed && (
-                            <button
-                              type="button"
-                              className="challenges-item-action"
-                              onClick={() => goToAction(ch.id)}
-                            >
-                              <Icon component={FaCheckCircle} />
-                              {t('challenges.go')}
-                            </button>
-                          )}
-                        </div>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
+              <div className="challenges-xp-table-wrap">
+                <div className="challenges-xp-table-banner">
+                  <img
+                    src={`${process.env.PUBLIC_URL || ''}/img/bannerChallange.png`}
+                    alt=""
+                    className="challenges-xp-table-banner-img"
+                  />
+                </div>
+                <div className="challenges-xp-table">
+                  {XP_TABLE_ROWS.map(({ key, icon }) => (
+                    <div key={key} className="challenges-xp-table-row">
+                      <span className="challenges-xp-table-icon">
+                        <Icon component={icon} />
+                      </span>
+                      <span className="challenges-xp-table-label">{t(`challenges.xpAction_${key}`)}</span>
+                      <span className="challenges-xp-table-xp">+{XP_ACTIONS[key]} XP</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

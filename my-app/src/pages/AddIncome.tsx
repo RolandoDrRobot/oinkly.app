@@ -22,6 +22,7 @@ import {
 import { Income } from '../types';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
+import { addXP, XP_ACTIONS } from '../utils/challenges';
 import { notify } from '../utils/notifications';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
@@ -260,6 +261,7 @@ const AddIncome: React.FC = () => {
           updatedAt: new Date().toISOString(),
         };
         storage.saveIncome(newIncome);
+        addXP(XP_ACTIONS.addIncome);
         analytics.addIncome();
         notify.overviewUpdated();
         navigate('/dashboard');
