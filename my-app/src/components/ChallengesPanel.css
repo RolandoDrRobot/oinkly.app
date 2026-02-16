@@ -97,8 +97,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #f4c032;
-  color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  color:  var(--color-text-primary);
   padding: 8px 14px;
   border-radius: 999px;
   font-weight: 800;
