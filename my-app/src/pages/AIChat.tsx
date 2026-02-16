@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FaArrowLeft, FaPaperPlane, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
@@ -33,7 +33,10 @@ export interface AIChatProps {
 const AIChat: React.FC<AIChatProps> = ({ onClose, navigateOverride }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const effectiveNavigate = navigateOverride ?? ((path: string) => navigate(path));
+  const effectiveNavigate = useMemo(
+    () => navigateOverride ?? ((path: string) => navigate(path)),
+    [navigateOverride, navigate]
+  );
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
