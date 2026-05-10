@@ -3,25 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { IconType } from 'react-icons';
-import { 
-  FaHandPaper, 
-  FaPen, 
-  FaDollarSign, 
-  FaMoneyBill, 
-  FaClipboardList, 
+import {
+  FaHandPaper,
+  FaPen,
+  FaDollarSign,
+  FaMoneyBill,
+  FaClipboardList,
   FaCheckCircle,
   FaArrowLeft,
   FaCalendarAlt,
-  FaTag,
-  FaHome,
-  FaBolt,
-  FaShieldAlt,
-  FaCar,
-  FaUtensils,
-  FaHeart,
-  FaGraduationCap,
-  FaFilm,
-  FaEllipsisH
 } from 'react-icons/fa';
 import { FixedExpense } from '../types';
 import { storage } from '../utils/storage';
