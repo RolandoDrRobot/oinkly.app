@@ -8,7 +8,6 @@ import {
   FaCog,
   FaFileContract,
   FaChevronRight,
-  FaSignOutAlt,
   FaEnvelope,
   FaMobileAlt,
 } from 'react-icons/fa';
