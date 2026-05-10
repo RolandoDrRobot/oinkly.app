@@ -1747,10 +1747,10 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <div className="header-title-wrapper">
-            <img 
-              src={`${process.env.PUBLIC_URL}/logo.png`} 
-              alt={t('dashboard.logoAlt')} 
+          <div className="header-title-wrapper" style={{ cursor: 'pointer' }} onClick={() => navigate('/plan')}>
+            <img
+              src={`${process.env.PUBLIC_URL}/logo.png`}
+              alt={t('dashboard.logoAlt')}
               className="header-logo"
             />
             <h1>{t('dashboard.title')}</h1>

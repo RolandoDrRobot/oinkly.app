@@ -12,6 +12,7 @@ import './App.css';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Plan = lazy(() => import('./pages/Plan'));
 const AddDebt = lazy(() => import('./pages/AddDebt'));
 const AddFixedExpense = lazy(() => import('./pages/AddFixedExpense'));
 const AddAsset = lazy(() => import('./pages/AddAsset'));
@@ -47,6 +48,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/plan"
+        element={
+          <ProtectedRoute>
+            <Plan />
           </ProtectedRoute>
         }
       />
