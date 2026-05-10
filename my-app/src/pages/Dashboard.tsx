@@ -1167,181 +1167,131 @@ const Dashboard: React.FC = () => {
                 {fixedExpenses.map((expense, index) => (
                   <SortableItemCard key={expense.id} id={expense.id} index={index}>
                     {({ dragAttributes, dragListeners, isDragging }) => (
-                      <div className="item-card" data-dragging={isDragging}>
-                        <div className="item-header">
-                          <div className="item-header-main">
-                            <div className="item-content-row">
-                              <div className="item-content">
-                                <div className="item-header-info">
-                                  <div className="item-icon-wrapper">
-                                    <Icon component={fixedExpenseIcon} className="item-main-icon" />
-                                  </div>
-                                  {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'name' ? (
-                                    <input
-                                      type="text"
-                                      value={editValue}
-                                      onChange={(e) => setEditValue(e.target.value)}
-                                      onBlur={() => saveFixedExpenseEdit(expense.id, 'name')}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'name');
-                                        if (e.key === 'Escape') cancelEdit();
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-edit-input"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <h3 className="item-name editable-field" onClick={(e) => {
-                                      e.stopPropagation();
-                                      startEditingFixedExpense(expense.id, 'name', expense.name, e);
-                                    }}>
-                                      {expense.name}
-                                    </h3>
-                                  )}
-                                  {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'paymentDate' ? (
-                                    <input
-                                      type="date"
-                                      value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
-                                      onChange={(e) => setEditValue(e.target.value)}
-                                      onBlur={() => saveFixedExpenseEdit(expense.id, 'paymentDate')}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'paymentDate');
-                                        if (e.key === 'Escape') cancelEdit();
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-edit-input"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <p className="item-payment-date editable-field" onClick={(e) => {
-                                      e.stopPropagation();
-                                      const dateValue = expense.paymentDate ? (expense.paymentDate.includes('T') ? expense.paymentDate.split('T')[0] : expense.paymentDate) : '';
-                                      startEditingFixedExpense(expense.id, 'paymentDate', dateValue || '', e);
-                                    }}>
-                                      <Icon component={FaCalendarAlt} className="item-type-icon" />
-                                      {expense.paymentDate && expense.paymentDate.trim() !== '' ? formatDateLocal(expense.paymentDate) : t('dashboard.noPaymentDate')}
-                                    </p>
-                                  )}
-                                </div>
+                      <div className="expense-card-compact" data-dragging={isDragging}>
+                        {/* Left: name + date */}
+                        <div className="expense-info">
+                          <div className="expense-name-row">
+                            <Icon component={fixedExpenseIcon} className="expense-type-icon" />
+                            {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'name' ? (
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveFixedExpenseEdit(expense.id, 'name')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'name');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input expense-name-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-name editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingFixedExpense(expense.id, 'name', expense.name, e);
+                              }}>
+                                {expense.name}
+                              </span>
+                            )}
+                          </div>
+                          {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'paymentDate' ? (
+                            <input
+                              type="date"
+                              value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={() => saveFixedExpenseEdit(expense.id, 'paymentDate')}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'paymentDate');
+                                if (e.key === 'Escape') cancelEdit();
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-edit-input"
+                              autoFocus
+                            />
+                          ) : (
+                            <span className="expense-date editable-field" onClick={(e) => {
+                              e.stopPropagation();
+                              const dateValue = expense.paymentDate ? (expense.paymentDate.includes('T') ? expense.paymentDate.split('T')[0] : expense.paymentDate) : '';
+                              startEditingFixedExpense(expense.id, 'paymentDate', dateValue || '', e);
+                            }}>
+                              <Icon component={FaCalendarAlt} size={10} style={{ marginRight: 3 }} />
+                              {expense.paymentDate && expense.paymentDate.trim() !== '' ? formatDateLocal(expense.paymentDate) : '—'}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Right: amounts + delete */}
+                        {!hideAmounts && (
+                          <div className="expense-amounts">
+                            {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountLocal' ? (
+                              <input
+                                type="number" inputMode="decimal" step="0.01"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveFixedExpenseEdit(expense.id, 'amountLocal')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountLocal');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-amount editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingFixedExpense(expense.id, 'amountLocal', expense.amountLocal, e);
+                              }}>
+                                {formatCurrency(expense.amountLocal, expense.localCurrency)}
+                              </span>
+                            )}
+                            {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountDollars' ? (
+                              <input
+                                type="number" inputMode="decimal" step="0.01"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveFixedExpenseEdit(expense.id, 'amountDollars')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountDollars');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-amount editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingFixedExpense(expense.id, 'amountDollars', expense.amountDollars, e);
+                              }}>
+                                {formatCurrency(expense.amountDollars, 'USD')}
+                              </span>
+                            )}
+                            <div className="expense-actions-col">
+                              <div
+                                {...dragAttributes}
+                                {...dragListeners}
+                                className="expense-drag"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
+                                  <circle cx="5" cy="4" r="1.5" /><circle cx="11" cy="4" r="1.5" />
+                                  <circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" />
+                                  <circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="12" r="1.5" />
+                                </svg>
                               </div>
-                              {!hideAmounts && (
-                                <div className="item-amounts">
-                                  <div className="item-header-actions-top item-header-actions-top-v2">
-                                    <div
-                                      {...dragAttributes}
-                                      {...dragListeners}
-                                      className="drag-handle"
-                                      style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        cursor: isDragging ? 'grabbing' : 'grab',
-                                        touchAction: 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: '6px',
-                                        background: 'var(--bg-tertiary)',
-                                        border: '1px solid var(--bg-tertiary)',
-                                        opacity: 0.7,
-                                        transition: 'all 0.2s',
-                                      }}
-                                      onMouseEnter={(e) => {
-                                        e.currentTarget.style.opacity = '1';
-                                        e.currentTarget.style.background = 'var(--overlay)';
-                                        e.currentTarget.style.borderColor = 'var(--accent-color)';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.currentTarget.style.opacity = '0.7';
-                                        e.currentTarget.style.background = 'var(--bg-tertiary)';
-                                        e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                                        <circle cx="3" cy="3" r="1.5" />
-                                        <circle cx="8" cy="3" r="1.5" />
-                                        <circle cx="13" cy="3" r="1.5" />
-                                        <circle cx="3" cy="8" r="1.5" />
-                                        <circle cx="8" cy="8" r="1.5" />
-                                        <circle cx="13" cy="8" r="1.5" />
-                                        <circle cx="3" cy="13" r="1.5" />
-                                        <circle cx="8" cy="13" r="1.5" />
-                                        <circle cx="13" cy="13" r="1.5" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div className="summary-item">
-                                    {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountLocal' ? (
-                                      <input
-                                        type="number"
-                                        inputMode="decimal"
-                                        step="0.01"
-                                        value={editValue}
-                                        onChange={(e) => setEditValue(e.target.value)}
-                                        onBlur={() => saveFixedExpenseEdit(expense.id, 'amountLocal')}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountLocal');
-                                          if (e.key === 'Escape') cancelEdit();
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="inline-edit-input"
-                                        autoFocus
-                                      />
-                                    ) : (
-                                      <span className="summary-value editable-field" onClick={(e) => {
-                                        e.stopPropagation();
-                                        startEditingFixedExpense(expense.id, 'amountLocal', expense.amountLocal, e);
-                                      }}>
-                                        {formatCurrency(expense.amountLocal, expense.localCurrency)}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="item-amounts-row">
-                                    <div className="summary-item">
-                                      {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'amountDollars' ? (
-                                        <input
-                                          type="number"
-                                          inputMode="decimal"
-                                          step="0.01"
-                                          value={editValue}
-                                          onChange={(e) => setEditValue(e.target.value)}
-                                          onBlur={() => saveFixedExpenseEdit(expense.id, 'amountDollars')}
-                                          onKeyDown={(e) => {
-                                            if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'amountDollars');
-                                            if (e.key === 'Escape') cancelEdit();
-                                          }}
-                                          onClick={(e) => e.stopPropagation()}
-                                          className="inline-edit-input"
-                                          autoFocus
-                                        />
-                                      ) : (
-                                        <span className="summary-value editable-field" onClick={(e) => {
-                                          e.stopPropagation();
-                                          startEditingFixedExpense(expense.id, 'amountDollars', expense.amountDollars, e);
-                                        }}>
-                                          {formatCurrency(expense.amountDollars, 'USD')}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="item-header-actions">
-                                    <motion.button
-                                      className="btn-delete"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/delete-fixed-expense/${expense.id}`);
-                                      }}
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                    >
-                                      <Icon component={FaTrash} />
-                                    </motion.button>
-                                  </div>
-                                </div>
-                              )}
+                              <motion.button
+                                className="btn-delete expense-delete"
+                                onClick={(e) => { e.stopPropagation(); navigate(`/delete-fixed-expense/${expense.id}`); }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                              >
+                                <Icon component={FaTrash} size={12} />
+                              </motion.button>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     )}
                   </SortableItemCard>

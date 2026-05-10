@@ -478,6 +478,112 @@
   margin-top: 10px;
 }
 
+/* Compact fixed expense card */
+.expense-card-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dark-section);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  transition: opacity 0.2s;
+}
+
+.expense-card-compact[data-dragging="true"] {
+  opacity: 0.5;
+}
+
+.expense-actions-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.expense-drag {
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.expense-drag:active {
+  cursor: grabbing;
+}
+
+.expense-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.expense-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.expense-type-icon {
+  font-size: 13px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.expense-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expense-name-input {
+  font-size: 14px;
+  width: 100%;
+}
+
+.expense-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+}
+
+.expense-date svg {
+  color: var(--primary);
+  opacity: 1;
+}
+
+.expense-amounts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.expense-amount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.expense-delete {
+  padding: 4px 6px;
+  opacity: 0.6;
+}
+
+.expense-delete:hover {
+  opacity: 1;
+}
+
 /* Asset passive income badge */
 .asset-passive-income {
   display: flex;
