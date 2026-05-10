@@ -23,25 +23,6 @@ function str(p: unknown): string {
   return '';
 }
 
-/** Convierte fecha ISO o día del mes (1-31) a ISO string para paymentDate/cutDate. Evita UTC para que "día 30" no se convierta en 29. */
-function toDateISO(p: unknown): string | undefined {
-  if (p == null || p === '') return undefined;
-  const s = str(p).trim();
-  if (!s) return undefined;
-  const dayNum = parseInt(s, 10);
-  if (dayNum >= 1 && dayNum <= 31 && s === String(dayNum)) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    return `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-  }
-  const parsed = new Date(s);
-  if (isNaN(parsed.getTime())) return undefined;
-  const y = parsed.getFullYear();
-  const m = parsed.getMonth() + 1;
-  const d = parsed.getDate();
-  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-}
 
 export interface AIExecutorContext {
   navigate: (path: string) => void;

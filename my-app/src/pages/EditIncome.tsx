@@ -21,7 +21,6 @@ import {
 import { Income } from '../types';
 import { storage } from '../utils/storage';
 import { notify } from '../utils/notifications';
-import { toLocalYYYYMMDD } from '../utils/dateUtils';
 import { formatCurrencyInput, getCurrencyForField, formatNumberWithSeparators } from '../utils/currencyFormatter';
 import './AddDebt.css';
 

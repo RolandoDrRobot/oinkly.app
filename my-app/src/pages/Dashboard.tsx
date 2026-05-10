@@ -45,7 +45,6 @@ import {
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
-import { formatDateLocal } from '../utils/dateUtils';
 import { notify, ensureReminders, ensureFixedExpenseReminders } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
