@@ -40,17 +40,18 @@ const Plan: React.FC = () => {
     const cashflowUSD = totalIncomeUSD - totalExpensesUSD;
     const totalSavingsUSD = savingsUSD + toUSD(savingsLocal);
 
-    // For display: only active debts, sorted by monthly fee descending
+    // For display: only active debts with fee > 0, sorted by efficiency
+    // Efficiency = feeUSD / totalUSD — cuánto cashflow mensual liberas por cada $ que pagas
     const debtsSorted = allDebts
       .filter(d => !d.closedAt)
-      .map(d => ({
-        id: d.id,
-        name: d.name,
-        totalUSD: (d.totalDollars || 0) + toUSD(d.totalLocal || 0),
-        feeUSD: (d.dollarFee || 0) + toUSD(d.localFee || 0),
-      }))
-      .filter(d => d.feeUSD > 0)
-      .sort((a, b) => b.feeUSD - a.feeUSD);
+      .map(d => {
+        const totalUSD = (d.totalDollars || 0) + toUSD(d.totalLocal || 0);
+        const feeUSD = (d.dollarFee || 0) + toUSD(d.localFee || 0);
+        const efficiency = totalUSD > 0 ? feeUSD / totalUSD : 0;
+        return { id: d.id, name: d.name, totalUSD, feeUSD, efficiency };
+      })
+      .filter(d => d.feeUSD > 0 && d.totalUSD > 0)
+      .sort((a, b) => b.efficiency - a.efficiency);
 
     return {
       allDebts, debtsSorted, rate, toUSD,
@@ -115,7 +116,7 @@ const Plan: React.FC = () => {
             <Icon component={FaBolt} className="plan-icon" />
             <div>
               <h2 className="plan-question">¿Qué deuda libera más cashflow si la pagas de golpe?</h2>
-              <p className="plan-subtitle">Ordenadas de mayor a menor impacto mensual. La primera es la que más te libera.</p>
+              <p className="plan-subtitle">Ordenadas por eficiencia: cuánto cashflow mensual liberas por cada dólar que pagas. La primera tiene mejor relación costo/beneficio.</p>
             </div>
           </div>
 
@@ -140,10 +141,11 @@ const Plan: React.FC = () => {
                       <div className="plan-debt-rank">{i + 1}</div>
                       <div className="plan-debt-info">
                         <span className="plan-debt-name">{d.name}</span>
-                        <span className="plan-debt-total">Costo de pagar: {fmt(d.totalUSD)}</span>
+                        <span className="plan-debt-total">Pagar: {fmt(d.totalUSD)}</span>
                       </div>
                       <div className="plan-debt-impact">
                         <span className="plan-debt-freed">+{fmt(d.feeUSD)}/mes</span>
+                        <span className="plan-debt-efficiency">{(d.efficiency * 100).toFixed(1)}% eficiencia</span>
                         <span className={`plan-debt-cf-after ${cfAfter >= 0 ? 'plan-green' : 'plan-red'}`}>
                           → {fmt(cfAfter)}/mes
                         </span>
