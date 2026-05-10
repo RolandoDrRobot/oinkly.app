@@ -81,6 +81,16 @@ const Dashboard: React.FC = () => {
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const [savingsLocal, setSavingsLocal] = useState<number>(() => {
+    const raw = localStorage.getItem('cashflow_savings_local');
+    return raw ? parseFloat(raw) : 0;
+  });
+  const [savingsUSD, setSavingsUSD] = useState<number>(() => {
+    const raw = localStorage.getItem('cashflow_savings_usd');
+    return raw ? parseFloat(raw) : 0;
+  });
+  const [editingSavings, setEditingSavings] = useState<'local' | 'usd' | null>(null);
+  const [savingsInput, setSavingsInput] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -649,6 +659,16 @@ const Dashboard: React.FC = () => {
       ...totals,
       mostCommonCurrency: localCurrency,
     };
+  };
+
+  const calculateCashflow = () => {
+    const localCurrency = storage.getLocalCurrency();
+    const monthlyIncome = incomes.reduce((acc, i) => acc + (i.amountLocal || 0), 0);
+    const monthlyFixedExpenses = fixedExpenses.reduce((acc, e) => acc + (e.amountLocal || 0), 0);
+    const monthlyDebtPayments = debts.reduce((acc, d) => acc + (d.localFee || 0), 0);
+    const totalExpenses = monthlyFixedExpenses + monthlyDebtPayments;
+    const cashflow = monthlyIncome - totalExpenses;
+    return { monthlyIncome, monthlyFixedExpenses, monthlyDebtPayments, totalExpenses, cashflow, currency: localCurrency };
   };
 
   // Render functions for each screen
@@ -2095,6 +2115,138 @@ const Dashboard: React.FC = () => {
                 )}
               </AnimatePresence>
             </motion.div>
+
+            {/* Cashflow Card */}
+            {(() => {
+              const cf = calculateCashflow();
+              const cashflowPositive = cf.cashflow >= 0;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="summary-card cashflow-card"
+                >
+                  <div className="cashflow-header">
+                    <Icon component={FaWallet} className="summary-icon" />
+                    <span className="summary-label">Cashflow mensual</span>
+                  </div>
+
+                  <div className="cashflow-row">
+                    <span className="cashflow-row-label">
+                      <Icon component={FaMoneyBillWave} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
+                      Ingresos
+                    </span>
+                    <span className="cashflow-row-amount cashflow-positive">
+                      +{formatCurrency(cf.monthlyIncome, cf.currency)}
+                    </span>
+                  </div>
+                  <div className="cashflow-row">
+                    <span className="cashflow-row-label">
+                      <Icon component={FaFileInvoiceDollar} size={13} style={{ marginRight: 6, color: 'var(--error, #ef4444)' }} />
+                      Gastos fijos
+                    </span>
+                    <span className="cashflow-row-amount cashflow-negative">
+                      -{formatCurrency(cf.monthlyFixedExpenses, cf.currency)}
+                    </span>
+                  </div>
+                  <div className="cashflow-row">
+                    <span className="cashflow-row-label">
+                      <Icon component={FaCreditCard} size={13} style={{ marginRight: 6, color: 'var(--error, #ef4444)' }} />
+                      Pagos deudas
+                    </span>
+                    <span className="cashflow-row-amount cashflow-negative">
+                      -{formatCurrency(cf.monthlyDebtPayments, cf.currency)}
+                    </span>
+                  </div>
+
+                  <div className="cashflow-divider" />
+
+                  <div className="cashflow-row cashflow-row--total">
+                    <span className="cashflow-row-label">
+                      <Icon component={FaChartLine} size={13} style={{ marginRight: 6 }} />
+                      Cashflow
+                    </span>
+                    <span className={`cashflow-row-amount cashflow-total ${cashflowPositive ? 'cashflow-positive' : 'cashflow-negative'}`}>
+                      {cashflowPositive ? '+' : ''}{formatCurrency(cf.cashflow, cf.currency)}
+                    </span>
+                  </div>
+
+                  <div className="cashflow-divider" />
+
+                  <div className="cashflow-row">
+                    <span className="cashflow-row-label">
+                      <Icon component={FaPiggyBank} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
+                      Ahorros
+                    </span>
+                    <div className="cashflow-savings-cols">
+                      {/* Local currency */}
+                      <div className="cashflow-savings-col">
+                        <span className="cashflow-savings-currency">{cf.currency}</span>
+                        {editingSavings === 'local' ? (
+                          <input
+                            className="cashflow-savings-input"
+                            type="number"
+                            value={savingsInput}
+                            autoFocus
+                            onChange={(e) => setSavingsInput(e.target.value)}
+                            onBlur={() => {
+                              const val = parseFloat(savingsInput) || 0;
+                              setSavingsLocal(val);
+                              localStorage.setItem('cashflow_savings_local', String(val));
+                              setEditingSavings(null);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                              if (e.key === 'Escape') setEditingSavings(null);
+                            }}
+                          />
+                        ) : (
+                          <span
+                            className="cashflow-row-amount cashflow-savings-value"
+                            onClick={() => { setSavingsInput(String(savingsLocal)); setEditingSavings('local'); }}
+                            title="Toca para editar"
+                          >
+                            {formatCurrency(savingsLocal, cf.currency)}
+                          </span>
+                        )}
+                      </div>
+                      {/* USD */}
+                      <div className="cashflow-savings-col">
+                        <span className="cashflow-savings-currency">USD</span>
+                        {editingSavings === 'usd' ? (
+                          <input
+                            className="cashflow-savings-input"
+                            type="number"
+                            value={savingsInput}
+                            autoFocus
+                            onChange={(e) => setSavingsInput(e.target.value)}
+                            onBlur={() => {
+                              const val = parseFloat(savingsInput) || 0;
+                              setSavingsUSD(val);
+                              localStorage.setItem('cashflow_savings_usd', String(val));
+                              setEditingSavings(null);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                              if (e.key === 'Escape') setEditingSavings(null);
+                            }}
+                          />
+                        ) : (
+                          <span
+                            className="cashflow-row-amount cashflow-savings-value"
+                            onClick={() => { setSavingsInput(String(savingsUSD)); setEditingSavings('usd'); }}
+                            title="Toca para editar"
+                          >
+                            {formatCurrency(savingsUSD, 'USD')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
           </motion.div>
         )}
 
