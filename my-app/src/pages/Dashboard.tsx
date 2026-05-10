@@ -91,6 +91,12 @@ const Dashboard: React.FC = () => {
   });
   const [editingSavings, setEditingSavings] = useState<'local' | 'usd' | null>(null);
   const [savingsInput, setSavingsInput] = useState('');
+  const [exchangeRate, setExchangeRate] = useState<number>(() => {
+    const raw = localStorage.getItem('cashflow_exchange_rate');
+    return raw ? parseFloat(raw) : 500;
+  });
+  const [editingRate, setEditingRate] = useState(false);
+  const [rateInput, setRateInput] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -663,12 +669,17 @@ const Dashboard: React.FC = () => {
 
   const calculateCashflow = () => {
     const localCurrency = storage.getLocalCurrency();
-    const monthlyIncome = incomes.reduce((acc, i) => acc + (i.amountLocal || 0), 0);
-    const monthlyFixedExpenses = fixedExpenses.reduce((acc, e) => acc + (e.amountLocal || 0), 0);
-    const monthlyDebtPayments = debts.reduce((acc, d) => acc + (d.localFee || 0), 0);
-    const totalExpenses = monthlyFixedExpenses + monthlyDebtPayments;
-    const cashflow = monthlyIncome - totalExpenses;
-    return { monthlyIncome, monthlyFixedExpenses, monthlyDebtPayments, totalExpenses, cashflow, currency: localCurrency };
+    const rate = exchangeRate || 1;
+
+    const toUSD = (local: number) => local / rate;
+
+    const incomeUSD = incomes.reduce((acc, i) => acc + (i.amountDollars || 0) + toUSD(i.amountLocal || 0), 0);
+    const fixedExpensesUSD = fixedExpenses.reduce((acc, e) => acc + (e.amountDollars || 0) + toUSD(e.amountLocal || 0), 0);
+    const debtPaymentsUSD = debts.reduce((acc, d) => acc + (d.dollarFee || 0) + toUSD(d.localFee || 0), 0);
+    const totalExpensesUSD = fixedExpensesUSD + debtPaymentsUSD;
+    const cashflowUSD = incomeUSD - totalExpensesUSD;
+
+    return { incomeUSD, fixedExpensesUSD, debtPaymentsUSD, totalExpensesUSD, cashflowUSD, currency: localCurrency };
   };
 
   // Render functions for each screen
@@ -2119,7 +2130,6 @@ const Dashboard: React.FC = () => {
             {/* Cashflow Card */}
             {(() => {
               const cf = calculateCashflow();
-              const cashflowPositive = cf.cashflow >= 0;
               return (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -2132,13 +2142,50 @@ const Dashboard: React.FC = () => {
                     <span className="summary-label">Cashflow mensual</span>
                   </div>
 
+                  {/* Tipo de cambio */}
+                  <div className="cashflow-rate-row">
+                    <span className="cashflow-rate-label">Tipo de cambio</span>
+                    <div className="cashflow-rate-value-wrap">
+                      <span className="cashflow-rate-tag">{cf.currency} / USD</span>
+                      {editingRate ? (
+                        <input
+                          className="cashflow-rate-input"
+                          type="number"
+                          value={rateInput}
+                          autoFocus
+                          onChange={(e) => setRateInput(e.target.value)}
+                          onBlur={() => {
+                            const val = parseFloat(rateInput) || 500;
+                            setExchangeRate(val);
+                            localStorage.setItem('cashflow_exchange_rate', String(val));
+                            setEditingRate(false);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                            if (e.key === 'Escape') setEditingRate(false);
+                          }}
+                        />
+                      ) : (
+                        <span
+                          className="cashflow-rate-number"
+                          onClick={() => { setRateInput(String(exchangeRate)); setEditingRate(true); }}
+                          title="Toca para editar"
+                        >
+                          {exchangeRate.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="cashflow-divider" />
+
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaMoneyBillWave} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
                       Ingresos
                     </span>
                     <span className="cashflow-row-amount cashflow-positive">
-                      +{formatCurrency(cf.monthlyIncome, cf.currency)}
+                      +{formatCurrency(cf.incomeUSD, 'USD')}
                     </span>
                   </div>
                   <div className="cashflow-row">
@@ -2147,7 +2194,7 @@ const Dashboard: React.FC = () => {
                       Gastos fijos
                     </span>
                     <span className="cashflow-row-amount cashflow-negative">
-                      -{formatCurrency(cf.monthlyFixedExpenses, cf.currency)}
+                      -{formatCurrency(cf.fixedExpensesUSD, 'USD')}
                     </span>
                   </div>
                   <div className="cashflow-row">
@@ -2156,7 +2203,7 @@ const Dashboard: React.FC = () => {
                       Pagos deudas
                     </span>
                     <span className="cashflow-row-amount cashflow-negative">
-                      -{formatCurrency(cf.monthlyDebtPayments, cf.currency)}
+                      -{formatCurrency(cf.debtPaymentsUSD, 'USD')}
                     </span>
                   </div>
 
@@ -2165,10 +2212,10 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row cashflow-row--total">
                     <span className="cashflow-row-label">
                       <Icon component={FaChartLine} size={13} style={{ marginRight: 6 }} />
-                      Cashflow
+                      Cashflow USD
                     </span>
-                    <span className={`cashflow-row-amount cashflow-total ${cashflowPositive ? 'cashflow-positive' : 'cashflow-negative'}`}>
-                      {cashflowPositive ? '+' : ''}{formatCurrency(cf.cashflow, cf.currency)}
+                    <span className={`cashflow-row-amount cashflow-total ${cf.cashflowUSD >= 0 ? 'cashflow-positive' : 'cashflow-negative'}`}>
+                      {cf.cashflowUSD >= 0 ? '+' : ''}{formatCurrency(cf.cashflowUSD, 'USD')}
                     </span>
                   </div>
 
