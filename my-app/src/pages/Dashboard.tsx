@@ -673,13 +673,15 @@ const Dashboard: React.FC = () => {
 
     const toUSD = (local: number) => local / rate;
 
-    const incomeUSD = incomes.reduce((acc, i) => acc + (i.amountDollars || 0) + toUSD(i.amountLocal || 0), 0);
+    const activeIncomeUSD = incomes.reduce((acc, i) => acc + (i.amountDollars || 0) + toUSD(i.amountLocal || 0), 0);
+    const passiveIncomeUSD = assets.reduce((acc, a) => acc + (a.monthlyIncomeUSD || 0) + toUSD(a.monthlyIncomeLocal || 0), 0);
+    const incomeUSD = activeIncomeUSD + passiveIncomeUSD;
     const fixedExpensesUSD = fixedExpenses.reduce((acc, e) => acc + (e.amountDollars || 0) + toUSD(e.amountLocal || 0), 0);
     const debtPaymentsUSD = debts.reduce((acc, d) => acc + (d.dollarFee || 0) + toUSD(d.localFee || 0), 0);
     const totalExpensesUSD = fixedExpensesUSD + debtPaymentsUSD;
     const cashflowUSD = incomeUSD - totalExpensesUSD;
 
-    return { incomeUSD, fixedExpensesUSD, debtPaymentsUSD, totalExpensesUSD, cashflowUSD, currency: localCurrency };
+    return { activeIncomeUSD, passiveIncomeUSD, incomeUSD, fixedExpensesUSD, debtPaymentsUSD, totalExpensesUSD, cashflowUSD, currency: localCurrency };
   };
 
   // Render functions for each screen
@@ -1566,6 +1568,22 @@ const Dashboard: React.FC = () => {
                                       )}
                                     </div>
                                   </div>
+                                  {((asset.monthlyIncomeLocal || 0) > 0 || (asset.monthlyIncomeUSD || 0) > 0) && (
+                                    <div className="asset-passive-income">
+                                      <Icon component={FaPiggyBank} size={11} style={{ marginRight: 5, color: 'var(--primary)' }} />
+                                      <span className="asset-passive-income-label">Ingreso mensual:</span>
+                                      {(asset.monthlyIncomeLocal || 0) > 0 && (
+                                        <span className="asset-passive-income-amount">
+                                          {formatCurrency(asset.monthlyIncomeLocal!, asset.localCurrency)}
+                                        </span>
+                                      )}
+                                      {(asset.monthlyIncomeUSD || 0) > 0 && (
+                                        <span className="asset-passive-income-amount">
+                                          {formatCurrency(asset.monthlyIncomeUSD!, 'USD')}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
                                   <div className="item-header-actions">
                                     <motion.button
                                       className="btn-delete"
@@ -2042,27 +2060,6 @@ const Dashboard: React.FC = () => {
                           <div className="summary-divider"></div>
                         </>
                       )}
-                      {fixedExpenses.length > 0 && (
-                        <>
-                          <div className="summary-section">
-                            <div className="summary-card-header">
-                              <Icon component={FaBolt} className="summary-icon" />
-                              <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
-                            </div>
-                            <div className="summary-values">
-                              <div className="summary-value">
-                                <span className="summary-currency">{calculateFixedExpensesTotals().mostCommonCurrency}</span>
-                                <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalLocal, calculateFixedExpensesTotals().mostCommonCurrency)}</span>
-                              </div>
-                              <div className="summary-value">
-                                <span className="summary-currency">USD</span>
-                                <span className="summary-amount">{formatCurrency(calculateFixedExpensesTotals().totalDollars, 'USD')}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="summary-divider"></div>
-                        </>
-                      )}
                       {assets.length > 0 && (
                         <>
                           <div className="summary-section">
@@ -2084,31 +2081,11 @@ const Dashboard: React.FC = () => {
                           <div className="summary-divider"></div>
                         </>
                       )}
-                      {incomes.length > 0 && (
-                        <>
-                          <div className="summary-section">
-                            <div className="summary-card-header">
-                              <Icon component={FaMoneyBillWave} className="summary-icon" />
-                              <span className="summary-label">{t('dashboard.totalIncomes')}</span>
-                            </div>
-                            <div className="summary-values">
-                              <div className="summary-value">
-                                <span className="summary-currency">{calculateIncomesTotals().mostCommonCurrency}</span>
-                                <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalLocal, calculateIncomesTotals().mostCommonCurrency)}</span>
-                              </div>
-                              <div className="summary-value">
-                                <span className="summary-currency">USD</span>
-                                <span className="summary-amount">{formatCurrency(calculateIncomesTotals().totalDollars, 'USD')}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="summary-divider"></div>
-                        </>
-                      )}
                       <div className="summary-section">
                         <div className="summary-card-header">
                           <Icon component={FaChartLine} className="summary-icon" />
                           <span className="summary-label">{t('dashboard.netWorth')}</span>
+                          <span className="networth-formula-badge">Activos − Deudas</span>
                         </div>
                         <div className="summary-values">
                           <div className="summary-value">
@@ -2182,12 +2159,23 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaMoneyBillWave} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
-                      Ingresos
+                      Ingresos activos
                     </span>
                     <span className="cashflow-row-amount cashflow-positive">
-                      +{formatCurrency(cf.incomeUSD, 'USD')}
+                      +{formatCurrency(cf.activeIncomeUSD, 'USD')}
                     </span>
                   </div>
+                  {cf.passiveIncomeUSD > 0 && (
+                    <div className="cashflow-row">
+                      <span className="cashflow-row-label">
+                        <Icon component={FaPiggyBank} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
+                        Ingresos pasivos
+                      </span>
+                      <span className="cashflow-row-amount cashflow-positive">
+                        +{formatCurrency(cf.passiveIncomeUSD, 'USD')}
+                      </span>
+                    </div>
+                  )}
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaFileInvoiceDollar} size={13} style={{ marginRight: 6, color: 'var(--error, #ef4444)' }} />

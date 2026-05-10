@@ -90,6 +90,8 @@ export interface Asset {
   type: 'property' | 'vehicle' | 'investment' | 'savings' | 'other';
   valueLocal: number;
   valueDollars: number;
+  monthlyIncomeLocal?: number;
+  monthlyIncomeUSD?: number;
   localCurrency: string;
   purchaseDate?: string;
   notes?: string;

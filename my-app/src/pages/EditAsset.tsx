@@ -57,6 +57,8 @@ interface StepData {
   type?: 'property' | 'vehicle' | 'investment' | 'savings' | 'other';
   valueLocal?: number;
   valueDollars?: number;
+  monthlyIncomeLocal?: number;
+  monthlyIncomeUSD?: number;
   purchaseDate?: string;
   notes?: string;
 }
@@ -79,6 +81,8 @@ const EditAsset: React.FC = () => {
           type: foundAsset.type,
           valueLocal: foundAsset.valueLocal,
           valueDollars: foundAsset.valueDollars,
+          monthlyIncomeLocal: foundAsset.monthlyIncomeLocal || 0,
+          monthlyIncomeUSD: foundAsset.monthlyIncomeUSD || 0,
           purchaseDate: foundAsset.purchaseDate || '',
           notes: foundAsset.notes || '',
         });
@@ -143,6 +147,26 @@ const EditAsset: React.FC = () => {
       field: 'valueDollars' as keyof StepData,
       placeholder: '0.00',
       type: 'number',
+    },
+    {
+      id: 'monthlyIncomeLocal',
+      title: 'Ingreso mensual en ' + getCurrencyName(storage.getLocalCurrency()),
+      subtitle: '¿Este activo genera ingreso mensual en colones? (alquiler, dividendos, etc.)',
+      icon: FaMoneyBill,
+      field: 'monthlyIncomeLocal' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+      optional: true,
+    },
+    {
+      id: 'monthlyIncomeUSD',
+      title: 'Ingreso mensual en USD',
+      subtitle: '¿Este activo genera ingreso mensual en dólares?',
+      icon: FaDollarSign,
+      field: 'monthlyIncomeUSD' as keyof StepData,
+      placeholder: '0.00',
+      type: 'number',
+      optional: true,
     },
     {
       id: 'purchaseDate',
@@ -254,6 +278,8 @@ const EditAsset: React.FC = () => {
           type: formData.type || 'other',
           valueLocal: formData.valueLocal || 0,
           valueDollars: formData.valueDollars || 0,
+          monthlyIncomeLocal: formData.monthlyIncomeLocal || 0,
+          monthlyIncomeUSD: formData.monthlyIncomeUSD || 0,
           purchaseDate: formData.purchaseDate || undefined,
           notes: formData.notes || undefined,
           updatedAt: new Date().toISOString(),
