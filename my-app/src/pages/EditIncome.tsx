@@ -17,7 +17,6 @@ import {
   FaChartLine,
   FaHome,
   FaEllipsisH,
-  FaClock
 } from 'react-icons/fa';
 import { Income } from '../types';
 import { storage } from '../utils/storage';
@@ -131,19 +130,6 @@ const EditIncome: React.FC = () => {
       ],
     },
     {
-      id: 'frequency',
-      title: t('addIncome.frequency'),
-      subtitle: t('addIncome.frequencySubtitle'),
-      icon: FaClock,
-      options: [
-        { value: 'monthly', label: t('dashboard.monthly'), icon: FaCalendarAlt },
-        { value: 'weekly', label: t('dashboard.weekly'), icon: FaCalendarAlt },
-        { value: 'biweekly', label: t('dashboard.biweekly'), icon: FaCalendarAlt },
-        { value: 'yearly', label: t('dashboard.yearly'), icon: FaCalendarAlt },
-        { value: 'one-time', label: t('dashboard.oneTime'), icon: FaCalendarAlt },
-      ],
-    },
-    {
       id: 'amountLocal',
       title: t('addIncome.amountLocal'),
       subtitle: t('addIncome.amountLocalSubtitle', { currency: getCurrencyName(storage.getLocalCurrency()) }),
@@ -208,8 +194,6 @@ const EditIncome: React.FC = () => {
     const step = steps[currentStep];
     if (step.id === 'type') {
       setFormData({ ...formData, type: value as Income['type'] });
-    } else if (step.id === 'frequency') {
-      setFormData({ ...formData, frequency: value as Income['frequency'] });
     }
     setTimeout(() => handleNext(), 300);
   };
