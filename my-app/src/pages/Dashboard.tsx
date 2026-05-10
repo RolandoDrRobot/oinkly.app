@@ -86,10 +86,6 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!localStorage.getItem('hasSeenInitialSetup')) {
-      navigate('/preferences', { replace: true });
-      return;
-    }
     loadDebts();
     loadFixedExpenses();
     loadAssets();

@@ -10,6 +10,9 @@ import {
   type HydratePayload,
 } from '../lib/supabaseData';
 
+// Bypass Supabase auth and use localStorage only. Set to false to re-enable cloud auth.
+const LOCAL_MODE = true;
+
 const DEFAULT_PREFS = {
   localCurrency: 'USD',
   language: 'en',
@@ -52,6 +55,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (LOCAL_MODE) {
+      const existing = storage.getUser();
+      const localUser: User = existing || { id: 'local-user', email: 'user@local.app', name: 'Usuario' };
+      storage.setUser(localUser);
+      setUser(localUser);
+      setIsAuthenticated(true);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     async function initAuth() {

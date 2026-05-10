@@ -21,7 +21,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 
 const Profile: React.FC = () => {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { isPremium } = useSubscription();
   const navigate = useNavigate();
   const displayUser =
@@ -143,24 +143,6 @@ const Profile: React.FC = () => {
             ))}
           </ul>
 
-          <motion.button
-            type="button"
-            className="profile-logout-btn"
-            onClick={async () => {
-              try {
-                await logout();
-                navigate('/');
-              } catch (e) {
-                console.error(e);
-              }
-            }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="profile-action-icon profile-logout-icon">
-              <Icon component={FaSignOutAlt} size={20} />
-            </span>
-            <span className="profile-action-label">{t('profile.logout')}</span>
-          </motion.button>
         </motion.section>
       </div>
     </motion.div>
