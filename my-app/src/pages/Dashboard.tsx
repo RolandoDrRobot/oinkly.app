@@ -1379,179 +1379,123 @@ const Dashboard: React.FC = () => {
                 {assets.map((asset, index) => (
                   <SortableItemCard key={asset.id} id={asset.id} index={index}>
                     {({ dragAttributes, dragListeners, isDragging }) => (
-                      <div className="item-card" data-dragging={isDragging}>
-                        <div className="item-header">
-                          <div className="item-header-main">
-                            <div className="item-content-row">
-                              <div className="item-content">
-                                <div className="item-header-info">
-                                  <div className="item-icon-wrapper">
-                                    <Icon component={getAssetIcon(asset.type)} className="item-main-icon" />
-                                  </div>
-                                  {editingAsset?.assetId === asset.id && editingAsset?.field === 'name' ? (
-                                    <input
-                                      type="text"
-                                      value={editValue}
-                                      onChange={(e) => setEditValue(e.target.value)}
-                                      onBlur={() => saveAssetEdit(asset.id, 'name')}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') saveAssetEdit(asset.id, 'name');
-                                        if (e.key === 'Escape') cancelEdit();
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-edit-input"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <h3 className="item-name editable-field" onClick={(e) => {
-                                      e.stopPropagation();
-                                      startEditingAsset(asset.id, 'name', asset.name, e);
-                                    }}>
-                                      {asset.name}
-                                    </h3>
-                                  )}
-                                  <div className="item-type-row">
-                                    <p className="item-type">
-                                      <Icon component={FaTag} className="item-type-icon" />
-                                      {t(`dashboard.${asset.type}`)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              {!hideAmounts && (
-                                <div className="item-amounts">
-                                  <div className="item-header-actions-top item-header-actions-top-v2">
-                                    <div
-                                      {...dragAttributes}
-                                      {...dragListeners}
-                                      className="drag-handle"
-                                      style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        cursor: isDragging ? 'grabbing' : 'grab',
-                                        touchAction: 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: '6px',
-                                        background: 'var(--bg-tertiary)',
-                                        border: '1px solid var(--bg-tertiary)',
-                                        opacity: 0.7,
-                                        transition: 'all 0.2s',
-                                      }}
-                                      onMouseEnter={(e) => {
-                                        e.currentTarget.style.opacity = '1';
-                                        e.currentTarget.style.background = 'var(--overlay)';
-                                        e.currentTarget.style.borderColor = 'var(--accent-color)';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.currentTarget.style.opacity = '0.7';
-                                        e.currentTarget.style.background = 'var(--bg-tertiary)';
-                                        e.currentTarget.style.borderColor = 'var(--bg-tertiary)';
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                                        <circle cx="3" cy="3" r="1.5" />
-                                        <circle cx="8" cy="3" r="1.5" />
-                                        <circle cx="13" cy="3" r="1.5" />
-                                        <circle cx="3" cy="8" r="1.5" />
-                                        <circle cx="8" cy="8" r="1.5" />
-                                        <circle cx="13" cy="8" r="1.5" />
-                                        <circle cx="3" cy="13" r="1.5" />
-                                        <circle cx="8" cy="13" r="1.5" />
-                                        <circle cx="13" cy="13" r="1.5" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div className="summary-item">
-                                    {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueLocal' ? (
-                                      <input
-                                        type="number"
-                                        inputMode="decimal"
-                                        step="0.01"
-                                        value={editValue}
-                                        onChange={(e) => setEditValue(e.target.value)}
-                                        onBlur={() => saveAssetEdit(asset.id, 'valueLocal')}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueLocal');
-                                          if (e.key === 'Escape') cancelEdit();
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="inline-edit-input"
-                                        autoFocus
-                                      />
-                                    ) : (
-                                      <span className="summary-value editable-field" onClick={(e) => {
-                                        e.stopPropagation();
-                                        startEditingAsset(asset.id, 'valueLocal', asset.valueLocal, e);
-                                      }}>
-                                        {formatCurrency(asset.valueLocal, asset.localCurrency)}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="item-amounts-row">
-                                    <div className="summary-item">
-                                      {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueDollars' ? (
-                                        <input
-                                          type="number"
-                                          inputMode="decimal"
-                                          step="0.01"
-                                          value={editValue}
-                                          onChange={(e) => setEditValue(e.target.value)}
-                                          onBlur={() => saveAssetEdit(asset.id, 'valueDollars')}
-                                          onKeyDown={(e) => {
-                                            if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueDollars');
-                                            if (e.key === 'Escape') cancelEdit();
-                                          }}
-                                          onClick={(e) => e.stopPropagation()}
-                                          className="inline-edit-input"
-                                          autoFocus
-                                        />
-                                      ) : (
-                                        <span className="summary-value editable-field" onClick={(e) => {
-                                          e.stopPropagation();
-                                          startEditingAsset(asset.id, 'valueDollars', asset.valueDollars, e);
-                                        }}>
-                                          {formatCurrency(asset.valueDollars, 'USD')}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {((asset.monthlyIncomeLocal || 0) > 0 || (asset.monthlyIncomeUSD || 0) > 0) && (
-                                    <div className="asset-passive-income">
-                                      <Icon component={FaPiggyBank} size={11} style={{ marginRight: 5, color: 'var(--primary)' }} />
-                                      <span className="asset-passive-income-label">Ingreso mensual:</span>
-                                      {(asset.monthlyIncomeLocal || 0) > 0 && (
-                                        <span className="asset-passive-income-amount">
-                                          {formatCurrency(asset.monthlyIncomeLocal!, asset.localCurrency)}
-                                        </span>
-                                      )}
-                                      {(asset.monthlyIncomeUSD || 0) > 0 && (
-                                        <span className="asset-passive-income-amount">
-                                          {formatCurrency(asset.monthlyIncomeUSD!, 'USD')}
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                  <div className="item-header-actions">
-                                    <motion.button
-                                      className="btn-delete"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate(`/delete-asset/${asset.id}`);
-                                      }}
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                    >
-                                      <Icon component={FaTrash} />
-                                    </motion.button>
-                                  </div>
-                                </div>
+                      <div className="expense-card-compact" data-dragging={isDragging}>
+                        {/* Left: icon + name + type + passive income */}
+                        <div className="expense-info">
+                          <div className="expense-name-row">
+                            <Icon component={getAssetIcon(asset.type)} className="expense-type-icon" />
+                            {editingAsset?.assetId === asset.id && editingAsset?.field === 'name' ? (
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveAssetEdit(asset.id, 'name')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveAssetEdit(asset.id, 'name');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input expense-name-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-name editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingAsset(asset.id, 'name', asset.name, e);
+                              }}>
+                                {asset.name}
+                              </span>
+                            )}
+                          </div>
+                          <span className="expense-date">
+                            <Icon component={FaTag} size={10} style={{ marginRight: 3, color: 'var(--primary)', opacity: 1 }} />
+                            {t(`dashboard.${asset.type}`)}
+                          </span>
+                          {((asset.monthlyIncomeLocal || 0) > 0 || (asset.monthlyIncomeUSD || 0) > 0) && (
+                            <div className="asset-passive-income">
+                              <Icon component={FaPiggyBank} size={11} style={{ marginRight: 5, color: 'var(--primary)' }} />
+                              <span className="asset-passive-income-label">Ingreso mensual:</span>
+                              {(asset.monthlyIncomeLocal || 0) > 0 && (
+                                <span className="asset-passive-income-amount">{formatCurrency(asset.monthlyIncomeLocal!, asset.localCurrency)}</span>
+                              )}
+                              {(asset.monthlyIncomeUSD || 0) > 0 && (
+                                <span className="asset-passive-income-amount">{formatCurrency(asset.monthlyIncomeUSD!, 'USD')}</span>
                               )}
                             </div>
-                          </div>
+                          )}
                         </div>
+
+                        {/* Right: amounts + actions col */}
+                        {!hideAmounts && (
+                          <div className="expense-amounts">
+                            {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueLocal' ? (
+                              <input
+                                type="number" inputMode="decimal" step="0.01"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveAssetEdit(asset.id, 'valueLocal')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueLocal');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-amount editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingAsset(asset.id, 'valueLocal', asset.valueLocal, e);
+                              }}>
+                                {formatCurrency(asset.valueLocal, asset.localCurrency)}
+                              </span>
+                            )}
+                            {editingAsset?.assetId === asset.id && editingAsset?.field === 'valueDollars' ? (
+                              <input
+                                type="number" inputMode="decimal" step="0.01"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onBlur={() => saveAssetEdit(asset.id, 'valueDollars')}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveAssetEdit(asset.id, 'valueDollars');
+                                  if (e.key === 'Escape') cancelEdit();
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-edit-input"
+                                autoFocus
+                              />
+                            ) : (
+                              <span className="expense-amount editable-field" onClick={(e) => {
+                                e.stopPropagation();
+                                startEditingAsset(asset.id, 'valueDollars', asset.valueDollars, e);
+                              }}>
+                                {formatCurrency(asset.valueDollars, 'USD')}
+                              </span>
+                            )}
+                            <div className="expense-actions-col">
+                              <div
+                                {...dragAttributes}
+                                {...dragListeners}
+                                className="expense-drag"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
+                                  <circle cx="5" cy="4" r="1.5" /><circle cx="11" cy="4" r="1.5" />
+                                  <circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" />
+                                  <circle cx="5" cy="12" r="1.5" /><circle cx="11" cy="12" r="1.5" />
+                                </svg>
+                              </div>
+                              <motion.button
+                                className="btn-delete expense-delete"
+                                onClick={(e) => { e.stopPropagation(); navigate(`/delete-asset/${asset.id}`); }}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                              >
+                                <Icon component={FaTrash} size={12} />
+                              </motion.button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </SortableItemCard>
