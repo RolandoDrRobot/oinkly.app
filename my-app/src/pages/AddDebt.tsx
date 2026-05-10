@@ -243,23 +243,19 @@ const AddDebt: React.FC = () => {
   const handleCurrencyInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const step = steps[currentStep];
     if (step.field && step.type === 'number') {
-      const currency = getCurrencyForField(step.id, storage.getLocalCurrency());
+      const isPercent = step.id === 'interestRate';
+      const currency = isPercent ? '' : getCurrencyForField(step.id, storage.getLocalCurrency());
       const inputValue = e.target.value;
-      
-      // Remove currency prefix and spaces if present
-      let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
-      
-      // Remove all thousand separators (commas) to get raw numeric string
+
+      let cleanedValue = isPercent
+        ? inputValue.replace(/%\s*$/, '').trim()
+        : inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
       cleanedValue = cleanedValue.replace(/,/g, '');
-      
-      // Extract only numbers and decimal point
       const numericString = cleanedValue.replace(/[^\d.]/g, '');
-      
-      // Format with thousand separators
       const formattedNumber = formatNumberWithSeparators(numericString);
-      
-      // Store the display value (with currency prefix and formatted number)
-      const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+      const displayValue = isPercent
+        ? (formattedNumber ? `${formattedNumber}%` : '')
+        : (formattedNumber ? `${currency} ${formattedNumber}` : '');
       setCurrencyDisplayValues(prev => ({
         ...prev,
         [step.field!]: displayValue
@@ -286,6 +282,7 @@ const AddDebt: React.FC = () => {
       const value = formData[fieldKey];
       if (value === undefined || value === null || (typeof value === 'number' && (isNaN(value) || value === 0))) return '';
       if (typeof value === 'number') {
+        if (step.id === 'interestRate') return `${value}%`;
         const currency = getCurrencyForField(step.id, storage.getLocalCurrency());
         return formatCurrencyInput(value, currency);
       }

@@ -67,22 +67,18 @@ const EditDebt: React.FC = () => {
     
     if (!formData) return;
     
-    const currency = getCurrencyForField(name, formData.localCurrency || storage.getLocalCurrency());
-    
-    // Remove currency prefix and spaces if present
-    let cleanedValue = inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
-    
-    // Remove all thousand separators (commas) to get raw numeric string
+    const isPercent = name === 'interestRate';
+    const currency = isPercent ? '' : getCurrencyForField(name, formData.localCurrency || storage.getLocalCurrency());
+
+    let cleanedValue = isPercent
+      ? inputValue.replace(/%\s*$/, '').trim()
+      : inputValue.replace(new RegExp(`^${currency}\\s*`, 'i'), '').trim();
     cleanedValue = cleanedValue.replace(/,/g, '');
-    
-    // Extract only numbers and decimal point
     const numericString = cleanedValue.replace(/[^\d.]/g, '');
-    
-    // Format with thousand separators
     const formattedNumber = formatNumberWithSeparators(numericString);
-    
-    // Store the display value (with currency prefix and formatted number)
-    const displayValue = formattedNumber ? `${currency} ${formattedNumber}` : '';
+    const displayValue = isPercent
+      ? (formattedNumber ? `${formattedNumber}%` : '')
+      : (formattedNumber ? `${currency} ${formattedNumber}` : '');
     setCurrencyDisplayValues(prev => ({
       ...prev,
       [name]: displayValue
