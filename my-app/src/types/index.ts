@@ -42,8 +42,8 @@ export interface Debt {
   updatedAt: string;
   // Nuevos campos opcionales
   lastCallDate?: string;
-  paymentDate?: string; // Fecha de pago (ISO string)
-  cutDate?: string; // Fecha de corte (solo para tarjetas de crédito, ISO string)
+  paymentDay?: number; // Día del mes (1-31)
+  cutDay?: number; // Día de corte (solo para tarjetas de crédito, 1-31)
   interestRate?: number; // Tasa de interés que está pagando la deuda (%)
   commitments?: PaymentCommitment[];
   callHistory?: CallRecord[];
@@ -75,8 +75,7 @@ export interface FixedExpense {
   amountDollars: number;
   localCurrency: string;
   category?: string;
-  dueDate?: string; // Día del mes (1-31)
-  paymentDate?: string; // Fecha completa de pago (ISO string)
+  paymentDay?: number; // Día del mes (1-31)
   /** Month this expense was last marked "up to date" (YYYY-MM) */
   paidForMonth?: string;
   notes?: string;
@@ -107,7 +106,7 @@ export interface Income {
   localCurrency: string;
   type: 'salary' | 'freelance' | 'investment' | 'rental' | 'other';
   frequency: 'monthly' | 'weekly' | 'biweekly' | 'yearly' | 'one-time';
-  nextPaymentDate?: string;
+  paymentDay?: number; // Día del mes (1-31)
   notes?: string;
   createdAt: string;
   updatedAt: string;

@@ -59,7 +59,7 @@ interface StepData {
   frequency?: 'monthly' | 'weekly' | 'biweekly' | 'yearly' | 'one-time';
   amountLocal?: number;
   amountDollars?: number;
-  nextPaymentDate?: string;
+  paymentDay?: number;
   notes?: string;
 }
 
@@ -82,7 +82,7 @@ const EditIncome: React.FC = () => {
           frequency: foundIncome.frequency,
           amountLocal: foundIncome.amountLocal,
           amountDollars: foundIncome.amountDollars,
-          nextPaymentDate: foundIncome.nextPaymentDate ? toLocalYYYYMMDD(foundIncome.nextPaymentDate) : '',
+          paymentDay: foundIncome.paymentDay ?? undefined,
           notes: foundIncome.notes || '',
         });
       } else {
@@ -148,14 +148,13 @@ const EditIncome: React.FC = () => {
       type: 'number',
     },
     {
-      id: 'nextPaymentDate',
+      id: 'paymentDay',
       title: t('addIncome.nextPaymentDate'),
-      subtitle: t('addIncome.nextPaymentDateSubtitle'),
+      subtitle: 'Día del mes en que recibes el ingreso (1-31)',
       icon: FaCalendarAlt,
-      field: 'nextPaymentDate' as keyof StepData,
-      placeholder: t('addIncome.nextPaymentDatePlaceholder'),
+      field: 'paymentDay' as keyof StepData,
+      placeholder: 'Ej: 28',
       optional: true,
-      type: 'date',
     },
     {
       id: 'notes',
@@ -251,7 +250,6 @@ const EditIncome: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete' && income) {
       const timer = setTimeout(() => {
-        const nextDate = formData.nextPaymentDate?.trim();
         const updatedIncome: Income = {
           ...income,
           name: formData.name || '',
@@ -259,7 +257,7 @@ const EditIncome: React.FC = () => {
           frequency: formData.frequency || 'monthly',
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
-          nextPaymentDate: nextDate ? nextDate.split('T')[0] : undefined,
+          paymentDay: formData.paymentDay ? Math.min(31, Math.max(1, Math.round(Number(formData.paymentDay)))) : undefined,
           notes: formData.notes || undefined,
           updatedAt: new Date().toISOString(),
         };

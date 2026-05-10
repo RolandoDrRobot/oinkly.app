@@ -168,8 +168,8 @@ function parseNaturalDebt(text: string): {
   bankName?: string;
   localFee?: number;
   dollarFee?: number;
-  paymentDate?: string;
-  cutDate?: string;
+  paymentDay?: string;
+  cutDay?: string;
   interestRate?: number;
 } | null {
   if (isEditDeleteCompleteIntent(text)) return null;
@@ -225,14 +225,14 @@ function parseNaturalDebt(text: string): {
   }
 
   // Fecha de pago (día del mes)
-  const paymentDate = parseDayOfMonth(text);
+  const paymentDay = parseDayOfMonth(text);
 
   // Fecha de corte (tarjetas)
-  let cutDate: string | undefined;
+  let cutDay: string | undefined;
   const corteMatch = text.match(/cort[ae]\s+(?:el\s+)?(\d{1,2})\b/i);
   if (corteMatch) {
     const d = parseInt(corteMatch[1], 10);
-    if (d >= 1 && d <= 31) cutDate = String(d);
+    if (d >= 1 && d <= 31) cutDay = String(d);
   }
 
   // Tasa de interés
@@ -271,8 +271,8 @@ function parseNaturalDebt(text: string): {
   }
   if (localFee != null) params.localFee = localFee;
   if (dollarFee != null) params.dollarFee = dollarFee;
-  if (paymentDate) params.paymentDate = paymentDate;
-  if (cutDate) params.cutDate = cutDate;
+  if (paymentDay) params.paymentDay = paymentDay;
+  if (cutDay) params.cutDay = cutDay;
   if (interestRate != null) params.interestRate = interestRate;
   return params as {
     name: string;
@@ -282,14 +282,14 @@ function parseNaturalDebt(text: string): {
     bankName?: string;
     localFee?: number;
     dollarFee?: number;
-    paymentDate?: string;
-    cutDate?: string;
+    paymentDay?: string;
+    cutDay?: string;
     interestRate?: number;
   };
 }
 
 /** Gasto fijo en lenguaje natural: "tengo un gasto de renta", "pago 8000 de internet el día 5". */
-function parseNaturalExpense(text: string): { name: string; amountLocal?: number; amountDollars?: number; dueDate?: string; category?: string } | null {
+function parseNaturalExpense(text: string): { name: string; amountLocal?: number; amountDollars?: number; paymentDay?: string; category?: string } | null {
   if (isEditDeleteCompleteIntent(text)) return null;
   const hasExpense =
     /tengo\s+(un\s+)?gasto|I\s+have\s+a\s+fixed\s+expense|pago\s+\d|I\s+pay|gasto\s+fijo|fixed\s+expense|agregar\s+gasto|add\s+expense|mi\s+gasto\s+de|renta|internet|luz|seguro|colegiatura|gym|streaming|teléfono|phone\s+bill/i.test(
@@ -320,14 +320,14 @@ function parseNaturalExpense(text: string): { name: string; amountLocal?: number
   if (!name && /agua|water/i.test(text)) name = 'Agua';
   if (!name) name = 'Gasto';
 
-  const dueDate = parseDayOfMonth(text);
+  const paymentDay = parseDayOfMonth(text);
   const category = name.trim() || undefined;
 
-  const result: { name: string; amountLocal?: number; amountDollars?: number; dueDate?: string; category?: string } = {
+  const result: { name: string; amountLocal?: number; amountDollars?: number; paymentDay?: string; category?: string } = {
     name: name.trim(),
     ...(amount !== undefined && (isDollars ? { amountDollars: amount } : { amountLocal: amount })),
   };
-  if (dueDate) result.dueDate = dueDate;
+  if (paymentDay) result.paymentDay = paymentDay;
   if (category) result.category = category;
   return result;
 }
@@ -510,7 +510,7 @@ export function parseTextToAIAction(
       const debtNameMatch = lower.match(/(?:deuda\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+(?:al\s+)?d[ií]a/i);
       const debtName = debtNameMatch?.[1]?.trim();
       const debt = debtName ? debts.find((d) => d.name.toLowerCase().includes(debtName.toLowerCase())) : debts[0];
-      if (debt && day != null && day >= 1 && day <= 31) return { type: 'edit_debt', params: { debtId: debt.id, paymentDate: String(day) } };
+      if (debt && day != null && day >= 1 && day <= 31) return { type: 'edit_debt', params: { debtId: debt.id, paymentDay: String(day) } };
     }
     if (/(?:cambiar|actualizar)\s+(?:el\s+)?(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+\d/i.test(lower) && fixedExpenses.length > 0) {
       const nameMatch = lower.match(/(?:gasto\s+)?(?:de\s+)?([a-záéíóúñ\w\s]+?)\s+a\s+/i);
@@ -562,8 +562,8 @@ export function parseTextToAIAction(
     if (naturalDebt.bankName) params.bankName = naturalDebt.bankName;
     if (naturalDebt.localFee != null) params.localFee = naturalDebt.localFee;
     if (naturalDebt.dollarFee != null) params.dollarFee = naturalDebt.dollarFee;
-    if (naturalDebt.paymentDate) params.paymentDate = naturalDebt.paymentDate;
-    if (naturalDebt.cutDate) params.cutDate = naturalDebt.cutDate;
+    if (naturalDebt.paymentDay) params.paymentDay = naturalDebt.paymentDay;
+    if (naturalDebt.cutDay) params.cutDay = naturalDebt.cutDay;
     if (naturalDebt.interestRate != null) params.interestRate = naturalDebt.interestRate;
     return { type: 'add_debt', params };
   }
@@ -596,7 +596,7 @@ export function parseTextToAIAction(
     const params: Record<string, unknown> = { name: naturalExpense.name };
     if (naturalExpense.amountLocal != null) params.amountLocal = naturalExpense.amountLocal;
     if (naturalExpense.amountDollars != null) params.amountDollars = naturalExpense.amountDollars;
-    if (naturalExpense.dueDate) params.dueDate = naturalExpense.dueDate;
+    if (naturalExpense.paymentDay) params.paymentDay = naturalExpense.paymentDay;
     if (naturalExpense.category) params.category = naturalExpense.category;
     return { type: 'add_fixed_expense', params };
   }

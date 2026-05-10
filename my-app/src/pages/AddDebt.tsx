@@ -64,8 +64,8 @@ interface StepData {
   totalLocal?: number;
   totalDollars?: number;
   currentPlan?: string;
-  paymentDate?: string;
-  cutDate?: string;
+  paymentDay?: number;
+  cutDay?: number;
   interestRate?: number;
   hasCallTask?: boolean;
 }
@@ -165,21 +165,21 @@ const AddDebt: React.FC = () => {
       placeholder: t('addDebt.paymentPlanPlaceholder'),
     },
     {
-      id: 'paymentDate',
+      id: 'paymentDay',
       title: t('addDebt.paymentDate'),
-      subtitle: t('addDebt.paymentDateSubtitle'),
+      subtitle: 'Día del mes en que se realiza el pago (1-31)',
       icon: FaCalendarAlt,
-      field: 'paymentDate' as keyof StepData,
-      type: 'date',
+      field: 'paymentDay' as keyof StepData,
+      placeholder: 'Ej: 15',
       optional: true,
     },
     ...(formData.type === 'tarjeta' ? [{
-      id: 'cutDate',
+      id: 'cutDay',
       title: t('addDebt.cutDate'),
-      subtitle: t('addDebt.cutDateSubtitle'),
+      subtitle: 'Día de corte de la tarjeta (1-31)',
       icon: FaCalendarAlt,
-      field: 'cutDate' as keyof StepData,
-      type: 'date',
+      field: 'cutDay' as keyof StepData,
+      placeholder: 'Ej: 5',
       optional: true,
     }] : []),
     {
@@ -319,8 +319,8 @@ const AddDebt: React.FC = () => {
           currentPlan: formData.currentPlan || '',
           bankName: formData.bankName || '',
           bankPhone: formData.bankPhone || '',
-          paymentDate: formData.paymentDate ? new Date(formData.paymentDate).toISOString() : undefined,
-          cutDate: formData.cutDate ? new Date(formData.cutDate).toISOString() : undefined,
+          paymentDay: formData.paymentDay ? Math.min(31, Math.max(1, Math.round(Number(formData.paymentDay)))) : undefined,
+          cutDay: formData.cutDay ? Math.min(31, Math.max(1, Math.round(Number(formData.cutDay)))) : undefined,
           interestRate: formData.interestRate,
           hasCallTask: formData.hasCallTask || false,
           callCompleted: false,

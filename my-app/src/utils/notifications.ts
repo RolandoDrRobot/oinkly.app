@@ -51,16 +51,16 @@ export const ensureReminders = (debts: Debt[]): void => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Payment due reminder: debt has paymentDate within next 3 days or today
-    if (debt.paymentDate) {
-      const payDate = new Date(debt.paymentDate);
-      payDate.setHours(0, 0, 0, 0);
-      const diffDays = Math.ceil((payDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    // Payment due reminder: debt has paymentDay within next 3 days or today
+    if (debt.paymentDay && debt.paymentDay >= 1 && debt.paymentDay <= 31) {
+      const dayOfMonth = today.getDate();
+      const diffDays = debt.paymentDay - dayOfMonth;
       if (diffDays >= 0 && diffDays <= 3) {
+        const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(debt.paymentDay).padStart(2, '0')}`;
         const meta: NotificationMeta = {
           reminderType: 'payment_reminder',
           debtId: debt.id,
-          paymentDate: debt.paymentDate,
+          paymentDate: monthKey,
         };
         if (!hasReminderNotification(existing, meta)) {
           const message =
@@ -91,7 +91,7 @@ export const ensureFixedExpenseReminders = (fixedExpenses: FixedExpense[]): void
   const month = currentMonth();
 
   for (const expense of fixedExpenses) {
-    const dueDay = expense.dueDate ? parseInt(String(expense.dueDate).replace(/\D/g, ''), 10) : 0;
+    const dueDay = expense.paymentDay ?? 0;
     if (dueDay < 1 || dueDay > 31) continue;
     const isPaidThisMonth = expense.paidForMonth === month;
     if (isPaidThisMonth) continue;

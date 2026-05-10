@@ -53,7 +53,7 @@ interface StepData {
   amountLocal?: number;
   amountDollars?: number;
   category?: string;
-  dueDate?: string;
+  paymentDay?: number;
   notes?: string;
 }
 
@@ -107,12 +107,12 @@ const AddFixedExpense: React.FC = () => {
       type: 'number',
     },
     {
-      id: 'dueDate',
+      id: 'paymentDay',
       title: t('addFixedExpense.dueDate'),
-      subtitle: t('addFixedExpense.dueDateSubtitle'),
+      subtitle: 'Día del mes en que se paga (1-31)',
       icon: FaCalendarAlt,
-      field: 'dueDate' as keyof StepData,
-      placeholder: t('addFixedExpense.dueDatePlaceholder'),
+      field: 'paymentDay' as keyof StepData,
+      placeholder: 'Ej: 5',
       optional: true,
     },
     {
@@ -209,20 +209,13 @@ const AddFixedExpense: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
-        const dayNum = formData.dueDate ? parseInt(String(formData.dueDate).replace(/\D/g, ''), 10) : 0;
-        const t = new Date();
-        const paymentDate =
-          dayNum >= 1 && dayNum <= 31
-            ? `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
-            : undefined;
         const newExpense: FixedExpense = {
           id: Date.now().toString(),
           name: formData.name || '',
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
           localCurrency: storage.getLocalCurrency(),
-          dueDate: formData.dueDate || undefined,
-          paymentDate,
+          paymentDay: formData.paymentDay ? Math.min(31, Math.max(1, Math.round(Number(formData.paymentDay)))) : undefined,
           notes: formData.notes || undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

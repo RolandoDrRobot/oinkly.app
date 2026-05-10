@@ -55,18 +55,10 @@ const EditDebt: React.FC = () => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    // Handle date fields - convert to ISO string
-    if (type === 'date' && value) {
-      setFormData(prev => ({
-        ...prev!,
-        [name]: new Date(value).toISOString(),
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev!,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
-    }
+    setFormData(prev => ({
+      ...prev!,
+      [name]: type === 'checkbox' ? checked : type === 'number' ? (value === '' ? undefined : Number(value)) : value,
+    }));
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,22 +285,26 @@ const EditDebt: React.FC = () => {
 
           <div className="form-group">
             <input
-              name="paymentDate"
-              type="date"
-              value={formData.paymentDate ? (formData.paymentDate.includes('T') ? formData.paymentDate.split('T')[0] : formData.paymentDate) : ''}
+              name="paymentDay"
+              type="number"
+              inputMode="numeric"
+              min={1} max={31}
+              value={formData.paymentDay ?? ''}
               onChange={handleChange}
-              placeholder={t('editDebt.paymentDate')}
+              placeholder="Día de pago (1-31)"
             />
           </div>
 
           {formData.type === 'tarjeta' && (
             <div className="form-group">
               <input
-                name="cutDate"
-                type="date"
-                value={formData.cutDate ? (formData.cutDate.includes('T') ? formData.cutDate.split('T')[0] : formData.cutDate) : ''}
+                name="cutDay"
+                type="number"
+                inputMode="numeric"
+                min={1} max={31}
+                value={formData.cutDay ?? ''}
                 onChange={handleChange}
-                placeholder={t('editDebt.cutDate')}
+                placeholder="Día de corte (1-31)"
               />
             </div>
           )}

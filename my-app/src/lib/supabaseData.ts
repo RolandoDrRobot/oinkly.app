@@ -70,8 +70,8 @@ export async function getDebts(userId: string): Promise<Debt[]> {
     bankPhone: r.bank_phone,
     hasCallTask: !!r.has_call_task,
     callCompleted: !!r.call_completed,
-    paymentDate: toISODate(r.payment_date),
-    cutDate: toISODate(r.cut_date),
+    paymentDay: r.payment_date ? parseInt(String(r.payment_date).slice(8, 10), 10) || undefined : undefined,
+    cutDay: r.cut_date ? parseInt(String(r.cut_date).slice(8, 10), 10) || undefined : undefined,
     interestRate: r.interest_rate != null ? num(r.interest_rate) : undefined,
     closedAt: toISODateTime(r.closed_at),
     createdAt: r.created_at || '',
@@ -101,8 +101,8 @@ export async function saveDebt(userId: string, debt: Debt): Promise<void> {
     bank_phone: debt.bankPhone ?? null,
     has_call_task: debt.hasCallTask ?? false,
     call_completed: debt.callCompleted ?? false,
-    payment_date: debt.paymentDate || null,
-    cut_date: debt.cutDate || null,
+    payment_date: debt.paymentDay ? `2000-01-${String(debt.paymentDay).padStart(2, '0')}` : null,
+    cut_date: debt.cutDay ? `2000-01-${String(debt.cutDay).padStart(2, '0')}` : null,
     interest_rate: debt.interestRate ?? null,
     closed_at: debt.closedAt || null,
     updated_at: now,
@@ -122,9 +122,6 @@ export async function deleteDebt(userId: string, id: string): Promise<void> {
 // ============ FIXED EXPENSES ============
 
 function fixedExpenseToRow(e: FixedExpense, userId: string): Record<string, unknown> {
-  const paymentDate = e.paymentDate
-    ? (typeof e.paymentDate === 'string' && e.paymentDate.length >= 10 ? e.paymentDate.slice(0, 10) : e.paymentDate)
-    : null;
   return {
     id: e.id,
     user_id: userId,
@@ -132,9 +129,8 @@ function fixedExpenseToRow(e: FixedExpense, userId: string): Record<string, unkn
     amount_local: e.amountLocal ?? 0,
     amount_dollars: e.amountDollars ?? 0,
     local_currency: e.localCurrency || 'USD',
-    category: e.category || null,
-    due_date: e.dueDate || null,
-    payment_date: paymentDate,
+    due_date: e.paymentDay ? String(e.paymentDay) : null,
+    payment_date: e.paymentDay ? `2000-01-${String(e.paymentDay).padStart(2, '0')}` : null,
     paid_for_month: e.paidForMonth || null,
     notes: e.notes || null,
     created_at: e.createdAt,
@@ -154,9 +150,7 @@ export async function getFixedExpenses(userId: string): Promise<FixedExpense[]> 
     amountLocal: num(r.amount_local),
     amountDollars: num(r.amount_dollars),
     localCurrency: r.local_currency || 'USD',
-    category: r.category,
-    dueDate: r.due_date,
-    paymentDate: r.payment_date ? toISODate(r.payment_date) : undefined,
+    paymentDay: r.due_date ? parseInt(String(r.due_date), 10) || undefined : undefined,
     paidForMonth: r.paid_for_month,
     notes: r.notes,
     createdAt: r.created_at || '',
@@ -234,7 +228,7 @@ export async function getIncomes(userId: string): Promise<Income[]> {
     localCurrency: r.local_currency || 'USD',
     type: r.type || 'other',
     frequency: r.frequency || 'monthly',
-    nextPaymentDate: toISODate(r.next_payment_date),
+    paymentDay: r.next_payment_date ? parseInt(String(r.next_payment_date).slice(8, 10), 10) || undefined : undefined,
     notes: r.notes,
     createdAt: r.created_at || '',
     updatedAt: r.updated_at || '',
@@ -251,7 +245,7 @@ export async function saveIncome(userId: string, income: Income): Promise<void> 
     local_currency: income.localCurrency || 'USD',
     type: income.type,
     frequency: income.frequency,
-    next_payment_date: income.nextPaymentDate || null,
+    next_payment_date: income.paymentDay ? `2000-01-${String(income.paymentDay).padStart(2, '0')}` : null,
     notes: income.notes || null,
     created_at: income.createdAt,
     updated_at: income.updatedAt,

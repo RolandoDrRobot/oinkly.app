@@ -59,7 +59,7 @@ interface StepData {
   frequency?: 'monthly' | 'weekly' | 'biweekly' | 'yearly' | 'one-time';
   amountLocal?: number;
   amountDollars?: number;
-  nextPaymentDate?: string;
+  paymentDay?: number;
   notes?: string;
 }
 
@@ -126,14 +126,13 @@ const AddIncome: React.FC = () => {
       type: 'number',
     },
     {
-      id: 'nextPaymentDate',
+      id: 'paymentDay',
       title: t('addIncome.nextPaymentDate'),
-      subtitle: t('addIncome.nextPaymentDateSubtitle'),
+      subtitle: 'Día del mes en que recibes el ingreso (1-31)',
       icon: FaCalendarAlt,
-      field: 'nextPaymentDate' as keyof StepData,
-      placeholder: t('addIncome.nextPaymentDatePlaceholder'),
+      field: 'paymentDay' as keyof StepData,
+      placeholder: 'Ej: 28',
       optional: true,
-      type: 'date',
     },
     {
       id: 'notes',
@@ -229,7 +228,6 @@ const AddIncome: React.FC = () => {
   useEffect(() => {
     if (currentStep === steps.length - 1 && steps[currentStep].id === 'complete') {
       const timer = setTimeout(() => {
-        const nextDate = formData.nextPaymentDate?.trim();
         const newIncome: Income = {
           id: Date.now().toString(),
           name: formData.name || '',
@@ -238,7 +236,7 @@ const AddIncome: React.FC = () => {
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
           localCurrency: storage.getLocalCurrency(),
-          nextPaymentDate: nextDate ? nextDate.split('T')[0] : undefined,
+          paymentDay: formData.paymentDay ? Math.min(31, Math.max(1, Math.round(Number(formData.paymentDay)))) : undefined,
           notes: formData.notes || undefined,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

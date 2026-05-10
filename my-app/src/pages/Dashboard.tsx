@@ -367,16 +367,9 @@ const Dashboard: React.FC = () => {
     let newValue: string | number = editValue;
     
     // Define numeric fields at the top level
-    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars', 'interestRate'];
-    
-    // Handle date fields - convert to ISO string if not empty
-    if (field === 'paymentDate' || field === 'cutDate') {
-      newValue = editValue ? new Date(editValue).toISOString() : '';
-    } else {
-      // Convert to number if it's a numeric field
-      if (numericFields.includes(field)) {
-        newValue = parseFloat(editValue) || 0;
-      }
+    const numericFields = ['localFee', 'dollarFee', 'totalLocal', 'totalDollars', 'interestRate', 'paymentDay', 'cutDay'];
+    if (numericFields.includes(field)) {
+      newValue = parseFloat(editValue) || 0;
     }
 
     const oldValue = debt[field as keyof Debt] as number;
@@ -421,14 +414,9 @@ const Dashboard: React.FC = () => {
 
     let newValue: string | number = editValue;
     
-    const numericFields = ['amountLocal', 'amountDollars'];
+    const numericFields = ['amountLocal', 'amountDollars', 'paymentDay'];
     if (numericFields.includes(field)) {
       newValue = parseFloat(editValue) || 0;
-    }
-    
-    // Handle date fields - convert to ISO string if not empty
-    if (field === 'paymentDate') {
-      newValue = editValue ? new Date(editValue).toISOString() : '';
     }
 
     const updated = {
@@ -488,14 +476,9 @@ const Dashboard: React.FC = () => {
 
     let newValue: string | number = editValue;
     
-    const numericFields = ['amountLocal', 'amountDollars'];
+    const numericFields = ['amountLocal', 'amountDollars', 'paymentDay'];
     if (numericFields.includes(field)) {
       newValue = parseFloat(editValue) || 0;
-    }
-    
-    // Handle date fields - store YYYY-MM-DD only (no ISO to avoid timezone shift)
-    if (field === 'nextPaymentDate') {
-      newValue = editValue ? editValue.trim().split('T')[0] : '';
     }
 
     const updated = {
@@ -994,14 +977,16 @@ const Dashboard: React.FC = () => {
                                       </div>
                                       <div className="payment-item">
                                         <span className="payment-label">{t('dashboard.paymentDate')}</span>
-                                        {editingField?.debtId === debt.id && editingField?.field === 'paymentDate' ? (
+                                        {editingField?.debtId === debt.id && editingField?.field === 'paymentDay' ? (
                                           <input
-                                            type="date"
-                                            value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                                            type="number"
+                                            inputMode="numeric"
+                                            min={1} max={31}
+                                            value={editValue}
                                             onChange={(e) => setEditValue(e.target.value)}
-                                            onBlur={() => saveEdit(debt.id, 'paymentDate')}
+                                            onBlur={() => saveEdit(debt.id, 'paymentDay')}
                                             onKeyDown={(e) => {
-                                              if (e.key === 'Enter') saveEdit(debt.id, 'paymentDate');
+                                              if (e.key === 'Enter') saveEdit(debt.id, 'paymentDay');
                                               if (e.key === 'Escape') cancelEdit();
                                             }}
                                             onClick={(e) => e.stopPropagation()}
@@ -1011,24 +996,25 @@ const Dashboard: React.FC = () => {
                                         ) : (
                                           <span className="payment-value editable-field" onClick={(e) => {
                                             e.stopPropagation();
-                                            const dateValue = debt.paymentDate ? (debt.paymentDate.includes('T') ? debt.paymentDate.split('T')[0] : debt.paymentDate) : '';
-                                            startEditing(debt.id, 'paymentDate', dateValue || '', e);
+                                            startEditing(debt.id, 'paymentDay', debt.paymentDay ?? '', e);
                                           }}>
-                                            {debt.paymentDate && debt.paymentDate.trim() !== '' ? formatDateLocal(debt.paymentDate) : t('dashboard.noPaymentDate')}
+                                            {debt.paymentDay ? `Día ${debt.paymentDay}` : t('dashboard.noPaymentDate')}
                                           </span>
                                         )}
                                       </div>
                                       {debt.type === 'tarjeta' && (
                                         <div className="payment-item">
                                           <span className="payment-label">{t('dashboard.cutDate')}</span>
-                                          {editingField?.debtId === debt.id && editingField?.field === 'cutDate' ? (
+                                          {editingField?.debtId === debt.id && editingField?.field === 'cutDay' ? (
                                             <input
-                                              type="date"
-                                              value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                                              type="number"
+                                              inputMode="numeric"
+                                              min={1} max={31}
+                                              value={editValue}
                                               onChange={(e) => setEditValue(e.target.value)}
-                                              onBlur={() => saveEdit(debt.id, 'cutDate')}
+                                              onBlur={() => saveEdit(debt.id, 'cutDay')}
                                               onKeyDown={(e) => {
-                                                if (e.key === 'Enter') saveEdit(debt.id, 'cutDate');
+                                                if (e.key === 'Enter') saveEdit(debt.id, 'cutDay');
                                                 if (e.key === 'Escape') cancelEdit();
                                               }}
                                               onClick={(e) => e.stopPropagation()}
@@ -1038,10 +1024,9 @@ const Dashboard: React.FC = () => {
                                           ) : (
                                             <span className="payment-value editable-field" onClick={(e) => {
                                               e.stopPropagation();
-                                              const dateValue = debt.cutDate ? (debt.cutDate.includes('T') ? debt.cutDate.split('T')[0] : debt.cutDate) : '';
-                                              startEditing(debt.id, 'cutDate', dateValue || '', e);
+                                              startEditing(debt.id, 'cutDay', debt.cutDay ?? '', e);
                                             }}>
-                                              {debt.cutDate && debt.cutDate.trim() !== '' ? formatDateLocal(debt.cutDate) : t('dashboard.noCutDate')}
+                                              {debt.cutDay ? `Día ${debt.cutDay}` : t('dashboard.noCutDate')}
                                             </span>
                                           )}
                                         </div>
@@ -1195,14 +1180,16 @@ const Dashboard: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'paymentDate' ? (
+                          {editingFixedExpense?.expenseId === expense.id && editingFixedExpense?.field === 'paymentDay' ? (
                             <input
-                              type="date"
-                              value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                              type="number"
+                              inputMode="numeric"
+                              min={1} max={31}
+                              value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={() => saveFixedExpenseEdit(expense.id, 'paymentDate')}
+                              onBlur={() => saveFixedExpenseEdit(expense.id, 'paymentDay')}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'paymentDate');
+                                if (e.key === 'Enter') saveFixedExpenseEdit(expense.id, 'paymentDay');
                                 if (e.key === 'Escape') cancelEdit();
                               }}
                               onClick={(e) => e.stopPropagation()}
@@ -1212,11 +1199,10 @@ const Dashboard: React.FC = () => {
                           ) : (
                             <span className="expense-date editable-field" onClick={(e) => {
                               e.stopPropagation();
-                              const dateValue = expense.paymentDate ? (expense.paymentDate.includes('T') ? expense.paymentDate.split('T')[0] : expense.paymentDate) : '';
-                              startEditingFixedExpense(expense.id, 'paymentDate', dateValue || '', e);
+                              startEditingFixedExpense(expense.id, 'paymentDay', expense.paymentDay ?? '', e);
                             }}>
                               <Icon component={FaCalendarAlt} size={10} style={{ marginRight: 3 }} />
-                              {expense.paymentDate && expense.paymentDate.trim() !== '' ? formatDateLocal(expense.paymentDate) : '—'}
+                              {expense.paymentDay ? `Día ${expense.paymentDay}` : '—'}
                             </span>
                           )}
                         </div>
@@ -1611,14 +1597,16 @@ const Dashboard: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          {editingIncome?.incomeId === income.id && editingIncome?.field === 'nextPaymentDate' ? (
+                          {editingIncome?.incomeId === income.id && editingIncome?.field === 'paymentDay' ? (
                             <input
-                              type="date"
-                              value={editValue ? (editValue.includes('T') ? editValue.split('T')[0] : editValue) : ''}
+                              type="number"
+                              inputMode="numeric"
+                              min={1} max={31}
+                              value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              onBlur={() => saveIncomeEdit(income.id, 'nextPaymentDate')}
+                              onBlur={() => saveIncomeEdit(income.id, 'paymentDay')}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveIncomeEdit(income.id, 'nextPaymentDate');
+                                if (e.key === 'Enter') saveIncomeEdit(income.id, 'paymentDay');
                                 if (e.key === 'Escape') cancelEdit();
                               }}
                               onClick={(e) => e.stopPropagation()}
@@ -1628,11 +1616,10 @@ const Dashboard: React.FC = () => {
                           ) : (
                             <span className="expense-date editable-field" onClick={(e) => {
                               e.stopPropagation();
-                              const dateValue = income.nextPaymentDate ? (income.nextPaymentDate.includes('T') ? income.nextPaymentDate.split('T')[0] : income.nextPaymentDate) : '';
-                              startEditingIncome(income.id, 'nextPaymentDate', dateValue || '', e);
+                              startEditingIncome(income.id, 'paymentDay', income.paymentDay ?? '', e);
                             }}>
                               <Icon component={FaCalendarAlt} size={10} style={{ marginRight: 3 }} />
-                              {income.nextPaymentDate && income.nextPaymentDate.trim() !== '' ? formatDateLocal(income.nextPaymentDate) : '—'}
+                              {income.paymentDay ? `Día ${income.paymentDay}` : '—'}
                             </span>
                           )}
                           <span className="expense-date" style={{ opacity: 0.6 }}>

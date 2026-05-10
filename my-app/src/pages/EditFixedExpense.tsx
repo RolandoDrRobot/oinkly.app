@@ -52,7 +52,7 @@ interface StepData {
   amountLocal?: number;
   amountDollars?: number;
   category?: string;
-  dueDate?: string;
+  paymentDay?: number;
   notes?: string;
 }
 
@@ -73,7 +73,7 @@ const EditFixedExpense: React.FC = () => {
           name: foundExpense.name,
           amountLocal: foundExpense.amountLocal,
           amountDollars: foundExpense.amountDollars,
-          dueDate: foundExpense.dueDate || '',
+          paymentDay: foundExpense.paymentDay ?? undefined,
           notes: foundExpense.notes || '',
         });
       } else {
@@ -125,12 +125,12 @@ const EditFixedExpense: React.FC = () => {
       type: 'number',
     },
     {
-      id: 'dueDate',
+      id: 'paymentDay',
       title: t('addFixedExpense.dueDate'),
-      subtitle: t('addFixedExpense.dueDateSubtitle'),
+      subtitle: 'Día del mes en que se paga (1-31)',
       icon: FaCalendarAlt,
-      field: 'dueDate' as keyof StepData,
-      placeholder: t('addFixedExpense.dueDatePlaceholder'),
+      field: 'paymentDay' as keyof StepData,
+      placeholder: 'Ej: 5',
       optional: true,
     },
     {
@@ -224,7 +224,7 @@ const EditFixedExpense: React.FC = () => {
           name: formData.name || '',
           amountLocal: formData.amountLocal || 0,
           amountDollars: formData.amountDollars || 0,
-          dueDate: formData.dueDate || undefined,
+          paymentDay: formData.paymentDay ? Math.min(31, Math.max(1, Math.round(Number(formData.paymentDay)))) : undefined,
           notes: formData.notes || undefined,
           updatedAt: new Date().toISOString(),
         };
