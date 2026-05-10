@@ -51,7 +51,6 @@ import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
-import AIChatModal from '../components/AIChatModal';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -82,7 +81,6 @@ const Dashboard: React.FC = () => {
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-  const [isAIChatModalOpen, setIsAIChatModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -1855,10 +1853,6 @@ const Dashboard: React.FC = () => {
           updateUnreadNotificationsCount();
         }}
       />
-      <AIChatModal
-        isOpen={isAIChatModalOpen}
-        onClose={() => setIsAIChatModalOpen(false)}
-      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -2193,8 +2187,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Nav fija al fondo: botón que abre el modal de IA */}
-      <nav className="dashboard-bottom-nav" aria-label={t('aiAgent.assistantLabel')}>
+      {/* Nav fija al fondo: botón para agregar según el tab activo */}
+      <nav className="dashboard-bottom-nav" aria-label={t('common.add')}>
         <div className="ai-agent-entry-wrap">
           <motion.button
             type="button"
@@ -2202,13 +2196,18 @@ const Dashboard: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
             className="ai-agent-entry-button"
-            onClick={() => setIsAIChatModalOpen(true)}
-            aria-label={t('aiAgent.assistantLabel')}
+            onClick={() => {
+              const routes: Record<ActiveTab, string> = {
+                debt: '/add-debt',
+                fixedExpenses: '/add-fixed-expense',
+                assets: '/add-asset',
+                incomes: '/add-income',
+              };
+              navigate(routes[activeTab]);
+            }}
+            aria-label={t('common.add')}
           >
-            <span
-              className="ai-agent-entry-image"
-              style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ai.png)` }}
-            />
+            <span style={{ fontSize: 28, lineHeight: 1, color: '#fff', fontWeight: 300 }}>+</span>
           </motion.button>
         </div>
       </nav>

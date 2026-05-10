@@ -166,17 +166,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   border: none;
   border-radius: 20px;
-  background: transparent;
+  background: #16a34a;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 24px rgba(22, 163, 74, 0.35);
 }
 
 .dashboard-bottom-nav .ai-agent-entry-image {

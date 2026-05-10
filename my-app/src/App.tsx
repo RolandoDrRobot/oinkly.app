@@ -12,6 +12,10 @@ import './App.css';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const AddDebt = lazy(() => import('./pages/AddDebt'));
+const AddFixedExpense = lazy(() => import('./pages/AddFixedExpense'));
+const AddAsset = lazy(() => import('./pages/AddAsset'));
+const AddIncome = lazy(() => import('./pages/AddIncome'));
 const EditDebt = lazy(() => import('./pages/EditDebt'));
 const DeleteDebt = lazy(() => import('./pages/DeleteDebt'));
 const DeleteAsset = lazy(() => import('./pages/DeleteAsset'));
@@ -43,6 +47,38 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-debt"
+        element={
+          <ProtectedRoute>
+            <AddDebt />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-fixed-expense"
+        element={
+          <ProtectedRoute>
+            <AddFixedExpense />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-asset"
+        element={
+          <ProtectedRoute>
+            <AddAsset />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-income"
+        element={
+          <ProtectedRoute>
+            <AddIncome />
           </ProtectedRoute>
         }
       />
