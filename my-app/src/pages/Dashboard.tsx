@@ -35,6 +35,7 @@ import {
   FaPiggyBank,
   FaBriefcase,
   FaBuilding,
+  FaSearch,
   FaDollarSign,
   FaWallet,
   FaTag,
@@ -1713,6 +1714,15 @@ const Dashboard: React.FC = () => {
               title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
             >
               <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-profile"
+              onClick={() => navigate('/prospects')}
+              title="Prospectos"
+            >
+              <Icon component={FaSearch} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}

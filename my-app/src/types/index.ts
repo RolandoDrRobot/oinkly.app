@@ -112,6 +112,23 @@ export interface Income {
   updatedAt: string;
 }
 
+export interface Prospect {
+  id: string;
+  name: string;
+  propertyValueUSD: number;
+  loanAmountUSD: number;
+  interestRate: number;       // % anual
+  loanTermYears: number;
+  renovationCostUSD: number;
+  monthlyExpensesUSD: number; // impuestos, seguro, mantenimiento, HOA
+  monthlyRentUSD: number;
+  vacancyRatePct: number;      // % vacancia (default 5)
+  appreciationRatePct: number; // % anual
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface NotificationMeta {
   reminderType: 'payment_reminder' | 'overdue_commitment' | 'call_reminder' | 'fixed_expense_overdue';
   debtId?: string;

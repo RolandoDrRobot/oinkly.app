@@ -1,4 +1,4 @@
-import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription } from '../types';
+import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription, Prospect } from '../types';
 import type { HydratePayload } from '../lib/supabaseData';
 import * as supabaseData from '../lib/supabaseData';
 
@@ -14,6 +14,7 @@ const FIXED_EXPENSES_ORDER_KEY = 'fixedExpensesOrder';
 const ASSETS_ORDER_KEY = 'assetsOrder';
 const INCOMES_ORDER_KEY = 'incomesOrder';
 const NOTIFICATIONS_KEY = 'notifications';
+const PROSPECTS_KEY = 'prospects';
 const OPENAI_API_KEY = 'openaiApiKey';
 
 export const storage = {
@@ -380,5 +381,28 @@ export const storage = {
   getUnreadNotificationsCount: (): number => {
     const notifications = storage.getNotifications();
     return notifications.filter(n => !n.read).length;
+  },
+
+  // Prospects
+  getProspects: (): Prospect[] => {
+    const raw = localStorage.getItem(PROSPECTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  },
+  saveProspect: (prospect: Prospect) => {
+    const prospects = storage.getProspects();
+    const idx = prospects.findIndex(p => p.id === prospect.id);
+    if (idx >= 0) {
+      prospects[idx] = { ...prospect, updatedAt: new Date().toISOString() };
+    } else {
+      prospects.push({ ...prospect, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    localStorage.setItem(PROSPECTS_KEY, JSON.stringify(prospects));
+  },
+  getProspect: (id: string): Prospect | null => {
+    return storage.getProspects().find(p => p.id === id) || null;
+  },
+  deleteProspect: (id: string) => {
+    const filtered = storage.getProspects().filter(p => p.id !== id);
+    localStorage.setItem(PROSPECTS_KEY, JSON.stringify(filtered));
   },
 };
