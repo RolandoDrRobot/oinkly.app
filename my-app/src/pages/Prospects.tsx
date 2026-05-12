@@ -33,7 +33,6 @@ const remainingBalance = (principal: number, annualRate: number, years: number, 
   if (principal <= 0) return 0;
   if (annualRate === 0) return Math.max(0, principal - (principal / (years * 12)) * monthsPaid);
   const r = annualRate / 100 / 12;
-  const n = years * 12;
   const payment = pmt(principal, annualRate, years);
   return principal * Math.pow(1 + r, monthsPaid) - payment * (Math.pow(1 + r, monthsPaid) - 1) / r;
 };
