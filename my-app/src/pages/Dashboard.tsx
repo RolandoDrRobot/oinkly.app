@@ -38,16 +38,13 @@ import {
   FaDollarSign,
   FaWallet,
   FaTag,
-  FaBell,
   FaBolt
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
 import { storage } from '../utils/storage';
-import { notify, ensureReminders, ensureFixedExpenseReminders } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
-import NotificationsSidebar from '../components/NotificationsSidebar';
 import './Dashboard.css';
 
 // Type assertion helper for icons
@@ -75,8 +72,6 @@ const Dashboard: React.FC = () => {
     return saved === 'true';
   });
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [savingsLocal, setSavingsLocal] = useState<number>(() => {
     const raw = localStorage.getItem('cashflow_savings_local');
     return raw ? parseFloat(raw) : 0;
@@ -100,22 +95,9 @@ const Dashboard: React.FC = () => {
     loadFixedExpenses();
     loadAssets();
     loadIncomes();
-    updateUnreadNotificationsCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    // Update unread count every 5 seconds
-    const interval = setInterval(() => {
-      updateUnreadNotificationsCount();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const updateUnreadNotificationsCount = () => {
-    const count = storage.getUnreadNotificationsCount();
-    setUnreadNotificationsCount(count);
-  };
 
   const loadFixedExpenses = () => {
     const allExpenses = storage.getFixedExpenses();
@@ -137,8 +119,6 @@ const Dashboard: React.FC = () => {
     }
     
     setFixedExpenses(orderedExpenses);
-    ensureFixedExpenseReminders(orderedExpenses);
-    updateUnreadNotificationsCount();
   };
 
   const loadAssets = () => {
@@ -255,8 +235,6 @@ const Dashboard: React.FC = () => {
       return 0;
     });
 
-    ensureReminders(orderedDebts);
-    updateUnreadNotificationsCount();
 
     setDebts(orderedDebts);
   };
@@ -381,7 +359,6 @@ const Dashboard: React.FC = () => {
     
     // Notify if overview-affecting fields changed (these affect totals automatically)
     if (numericFields.includes(field) && oldValue !== newValue) {
-      notify.overviewUpdated();
     }
     
     loadDebts();
@@ -422,7 +399,6 @@ const Dashboard: React.FC = () => {
     };
     
     storage.updateFixedExpense(updated);
-    notify.overviewUpdated();
     loadFixedExpenses();
     setEditingFixedExpense(null);
     setEditValue('');
@@ -453,7 +429,6 @@ const Dashboard: React.FC = () => {
     };
     
     storage.updateAsset(updated);
-    notify.overviewUpdated();
     loadAssets();
     setEditingAsset(null);
     setEditValue('');
@@ -484,7 +459,6 @@ const Dashboard: React.FC = () => {
     };
     
     storage.updateIncome(updated);
-    notify.overviewUpdated();
     loadIncomes();
     setEditingIncome(null);
     setEditValue('');
@@ -1715,13 +1689,6 @@ const Dashboard: React.FC = () => {
       transition={{ duration: 0.3 }}
       className="dashboard"
     >
-      <NotificationsSidebar
-        isOpen={isNotificationsOpen}
-        onClose={() => {
-          setIsNotificationsOpen(false);
-          updateUnreadNotificationsCount();
-        }}
-      />
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -1755,21 +1722,6 @@ const Dashboard: React.FC = () => {
               title={t('profile.title')}
             >
               <Icon component={FaUser} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-profile btn-notifications"
-              onClick={() => {
-                setIsNotificationsOpen(true);
-                updateUnreadNotificationsCount();
-              }}
-              title={t('notifications.title')}
-            >
-              <Icon component={FaBell} />
-              {unreadNotificationsCount > 0 && (
-                <span className="header-notification-badge">{unreadNotificationsCount}</span>
-              )}
             </motion.button>
           </div>
         </div>
