@@ -132,6 +132,132 @@
   margin-bottom: 20px;
 }
 
+/* Rat Race escape bar */
+.rat-race-bar-card {
+  background: var(--dark-section);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.rat-race-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rat-race-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.rat-race-bar-pct {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rat-race-bar-track {
+  height: 8px;
+  background: var(--bg-tertiary, rgba(255,255,255,0.08));
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 7px;
+}
+
+.rat-race-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--primary), #22c55e);
+  transition: width 0.6s ease;
+}
+
+.rat-race-bar-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+/* Cashflow bar */
+.cf-bar-card {
+  background: var(--dark-section);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.cf-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cf-bar-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.cf-bar-amount {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.cf-bar-track {
+  height: 10px;
+  background: var(--bg-tertiary, rgba(255,255,255,0.08));
+  border-radius: 99px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 7px;
+}
+
+.cf-bar-expenses {
+  height: 100%;
+  background: #ef4444;
+  border-radius: 99px 0 0 99px;
+  transition: width 0.5s ease;
+}
+
+.cf-bar-cashflow {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.5s ease;
+}
+
+.cf-bar-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.cf-bar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cf-bar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cf-bar-dot--expenses { background: #ef4444; }
+
 /* Botón AI flotante: abajo a la derecha, grande e invitador */
 .dashboard-bottom-nav {
   position: fixed;

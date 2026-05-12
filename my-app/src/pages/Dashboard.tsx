@@ -1746,6 +1746,35 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="dashboard-summary"
           >
+            {/* Rat Race escape bar */}
+            {(() => {
+              const cf = calculateCashflow();
+              const pct = cf.totalExpensesUSD > 0
+                ? Math.min((cf.passiveIncomeUSD / cf.totalExpensesUSD) * 100, 100)
+                : 0;
+              const free = pct >= 100;
+              return (
+                <div className="rat-race-bar-card">
+                  <div className="rat-race-bar-header">
+                    <span className="rat-race-bar-label">
+                      {free ? '🎉 ¡Libre de la carrera de la rata!' : 'Escapar de la carrera de la rata'}
+                    </span>
+                    <span className="rat-race-bar-pct" style={{ color: free ? 'var(--primary)' : 'var(--text-muted)' }}>
+                      {pct.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="rat-race-bar-track">
+                    <div className="rat-race-bar-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="rat-race-bar-legend">
+                    <span>Ingresos pasivos: <strong>{formatCurrency(cf.passiveIncomeUSD, 'USD')}</strong></span>
+                    <span>Gastos: <strong>{formatCurrency(cf.totalExpensesUSD, 'USD')}</strong></span>
+                  </div>
+                </div>
+              );
+            })()}
+
+
             <motion.div
               layout
               className={`summary-card overall-summary ${isOverallSummaryExpanded ? 'expanded' : 'collapsed'}`}
