@@ -39,7 +39,6 @@ import {
   FaWallet,
   FaTag,
   FaBell,
-  FaQuestionCircle,
   FaBolt
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
@@ -48,7 +47,6 @@ import { storage } from '../utils/storage';
 import { notify, ensureReminders, ensureFixedExpenseReminders } from '../utils/notifications';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
-import Tour from '../components/Tour';
 import NotificationsSidebar from '../components/NotificationsSidebar';
 import './Dashboard.css';
 
@@ -76,7 +74,6 @@ const Dashboard: React.FC = () => {
     const saved = localStorage.getItem('hideAmounts');
     return saved === 'true';
   });
-  const [tourRun, setTourRun] = useState(false);
   const [isOverallSummaryExpanded, setIsOverallSummaryExpanded] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
@@ -1718,7 +1715,6 @@ const Dashboard: React.FC = () => {
       transition={{ duration: 0.3 }}
       className="dashboard"
     >
-      <Tour run={tourRun} onComplete={() => setTourRun(false)} />
       <NotificationsSidebar
         isOpen={isNotificationsOpen}
         onClose={() => {
@@ -1750,15 +1746,6 @@ const Dashboard: React.FC = () => {
               title={hideAmounts ? t('dashboard.showAmounts') : t('dashboard.hideAmounts')}
             >
               <Icon component={hideAmounts ? FaEyeSlash : FaEye} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-profile"
-              onClick={() => setTourRun(true)}
-              title={t('tour.startTour')}
-            >
-              <Icon component={FaQuestionCircle} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
