@@ -620,6 +620,26 @@
   opacity: 0.5;
 }
 
+.expense-card-paid {
+  border: 1.5px solid var(--primary);
+  position: relative;
+}
+
+.expense-paid-check {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
 .expense-actions-col {
   display: flex;
   flex-direction: column;

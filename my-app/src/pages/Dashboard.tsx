@@ -405,6 +405,21 @@ const Dashboard: React.FC = () => {
     setEditValue('');
   };
 
+  const toggleExpensePaid = (expenseId: string, e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button') || target.closest('input')) return;
+    const expense = fixedExpenses.find(ex => ex.id === expenseId);
+    if (!expense) return;
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const updated = {
+      ...expense,
+      paidForMonth: expense.paidForMonth === currentMonth ? undefined : currentMonth,
+      updatedAt: new Date().toISOString(),
+    };
+    storage.updateFixedExpense(updated);
+    loadFixedExpenses();
+  };
+
   // Asset editing functions
   const startEditingAsset = (assetId: string, field: string, currentValue: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -1167,8 +1182,17 @@ const Dashboard: React.FC = () => {
               <div className="items-list">
                 {fixedExpenses.map((expense, index) => (
                   <SortableItemCard key={expense.id} id={expense.id} index={index}>
-                    {({ dragAttributes, dragListeners, isDragging }) => (
-                      <div className="expense-card-compact" data-dragging={isDragging}>
+                    {({ dragAttributes, dragListeners, isDragging }) => {
+                      const currentMonth = new Date().toISOString().slice(0, 7);
+                      const isPaid = expense.paidForMonth === currentMonth;
+                      return (
+                      <div
+                        className={`expense-card-compact${isPaid ? ' expense-card-paid' : ''}`}
+                        data-dragging={isDragging}
+                        onClick={(e) => toggleExpensePaid(expense.id, e)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {isPaid && <div className="expense-paid-check"><Icon component={FaCheck} size={10} /></div>}
                         {/* Left: name + date */}
                         <div className="expense-info">
                           <div className="expense-name-row">
@@ -1295,7 +1319,8 @@ const Dashboard: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    )}
+                      );
+                    }}
                   </SortableItemCard>
                 ))}
               </div>
