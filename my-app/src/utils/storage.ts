@@ -1,4 +1,4 @@
-import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription, Prospect } from '../types';
+import { Debt, User, FixedExpense, Asset, Income, Notification, Subscription, Prospect, Note } from '../types';
 import type { HydratePayload } from '../lib/supabaseData';
 import * as supabaseData from '../lib/supabaseData';
 
@@ -15,6 +15,7 @@ const ASSETS_ORDER_KEY = 'assetsOrder';
 const INCOMES_ORDER_KEY = 'incomesOrder';
 const NOTIFICATIONS_KEY = 'notifications';
 const PROSPECTS_KEY = 'prospects';
+const NOTES_KEY = 'notes';
 const OPENAI_API_KEY = 'openaiApiKey';
 
 export const storage = {
@@ -404,5 +405,25 @@ export const storage = {
   deleteProspect: (id: string) => {
     const filtered = storage.getProspects().filter(p => p.id !== id);
     localStorage.setItem(PROSPECTS_KEY, JSON.stringify(filtered));
+  },
+
+  // Notes
+  getNotes: (): Note[] => {
+    const raw = localStorage.getItem(NOTES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  },
+  saveNote: (note: Note) => {
+    const notes = storage.getNotes();
+    const idx = notes.findIndex(n => n.id === note.id);
+    if (idx >= 0) {
+      notes[idx] = { ...note, updatedAt: new Date().toISOString() };
+    } else {
+      notes.push({ ...note, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    }
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+  },
+  deleteNote: (id: string) => {
+    const filtered = storage.getNotes().filter(n => n.id !== id);
+    localStorage.setItem(NOTES_KEY, JSON.stringify(filtered));
   },
 };

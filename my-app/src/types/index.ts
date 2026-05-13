@@ -130,6 +130,17 @@ export interface Prospect {
   updatedAt: string;
 }
 
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  relatedType?: 'debt' | 'asset' | 'income' | 'fixedExpense';
+  relatedId?: string;
+  relatedName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface NotificationMeta {
   reminderType: 'payment_reminder' | 'overdue_commitment' | 'call_reminder' | 'fixed_expense_overdue';
   debtId?: string;
