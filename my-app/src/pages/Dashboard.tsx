@@ -943,15 +943,53 @@ const Dashboard: React.FC = () => {
                                       </div>
                                       <div className="payment-item">
                                         <span className="payment-label">{t('dashboard.total')} ({storage.getLocalCurrency()})</span>
-                                        <span className="payment-value">
-                                          {hideAmounts ? '••••' : formatCurrency(debt.totalLocal, debt.localCurrency)}
-                                        </span>
+                                        {editingField?.debtId === debt.id && editingField?.field === 'totalLocal' ? (
+                                          <input
+                                            type="number" inputMode="decimal" step="0.01"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onBlur={() => saveEdit(debt.id, 'totalLocal')}
+                                            onKeyDown={(e) => {
+                                              if (e.key === 'Enter') saveEdit(debt.id, 'totalLocal');
+                                              if (e.key === 'Escape') cancelEdit();
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="inline-edit-input"
+                                            autoFocus
+                                          />
+                                        ) : (
+                                          <span className="payment-value editable-field" onClick={(e) => {
+                                            e.stopPropagation();
+                                            startEditing(debt.id, 'totalLocal', debt.totalLocal, e);
+                                          }}>
+                                            {hideAmounts ? '••••' : formatCurrency(debt.totalLocal, debt.localCurrency)}
+                                          </span>
+                                        )}
                                       </div>
                                       <div className="payment-item">
                                         <span className="payment-label">{t('dashboard.total')} (USD)</span>
-                                        <span className="payment-value">
-                                          {hideAmounts ? '••••' : formatCurrency(debt.totalDollars, 'USD')}
-                                        </span>
+                                        {editingField?.debtId === debt.id && editingField?.field === 'totalDollars' ? (
+                                          <input
+                                            type="number" inputMode="decimal" step="0.01"
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            onBlur={() => saveEdit(debt.id, 'totalDollars')}
+                                            onKeyDown={(e) => {
+                                              if (e.key === 'Enter') saveEdit(debt.id, 'totalDollars');
+                                              if (e.key === 'Escape') cancelEdit();
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="inline-edit-input"
+                                            autoFocus
+                                          />
+                                        ) : (
+                                          <span className="payment-value editable-field" onClick={(e) => {
+                                            e.stopPropagation();
+                                            startEditing(debt.id, 'totalDollars', debt.totalDollars, e);
+                                          }}>
+                                            {hideAmounts ? '••••' : formatCurrency(debt.totalDollars, 'USD')}
+                                          </span>
+                                        )}
                                       </div>
                                       <div className="payment-item">
                                         <span className="payment-label">{t('dashboard.paymentDate')}</span>
