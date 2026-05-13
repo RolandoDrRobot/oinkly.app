@@ -48,6 +48,7 @@ export interface Debt {
   commitments?: PaymentCommitment[];
   callHistory?: CallRecord[];
   closedAt?: string; // ISO date when debt was paid off (total reached 0)
+  paidForMonth?: string; // YYYY-MM del mes en que se marcó el pago realizado
 }
 
 export interface User {

@@ -405,6 +405,20 @@ const Dashboard: React.FC = () => {
     setEditValue('');
   };
 
+  const toggleDebtPaid = (debtId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const debt = debts.find(d => d.id === debtId);
+    if (!debt) return;
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const updated = {
+      ...debt,
+      paidForMonth: debt.paidForMonth === currentMonth ? undefined : currentMonth,
+      updatedAt: new Date().toISOString(),
+    };
+    storage.saveDebt(updated);
+    loadDebts();
+  };
+
   const toggleExpensePaid = (expenseId: string, e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button') || target.closest('input')) return;
@@ -759,17 +773,24 @@ const Dashboard: React.FC = () => {
                     const isExpanded = expandedDebts.has(debt.id);
                     return (
                       <SortableDebtCard key={debt.id} debt={debt} index={index}>
-                        {({ dragAttributes, dragListeners, isDragging }) => (
+                        {({ dragAttributes, dragListeners, isDragging }) => {
+                          const debtCurrentMonth = new Date().toISOString().slice(0, 7);
+                          const isDebtPaid = debt.paidForMonth === debtCurrentMonth;
+                          return (
                           <div
-                            className="debt-card"
-                            onClick={() => {
-                              if (!isExpanded) {
-                                toggleExpand(debt.id);
-                              }
-                            }}
+                            className={`debt-card${isDebtPaid ? ' expense-card-paid' : ''}`}
+                            onClick={() => { if (!isExpanded) toggleExpand(debt.id); }}
                           >
                             <div className="debt-header">
                               <div className="debt-header-actions-top">
+                                <motion.button
+                                  className={`debt-paid-toggle${isDebtPaid ? ' debt-paid-toggle--active' : ''}`}
+                                  onClick={(e) => toggleDebtPaid(debt.id, e)}
+                                  whileTap={{ scale: 0.9 }}
+                                  title="Marcar pago del mes"
+                                >
+                                  <Icon component={FaCheck} size={10} />
+                                </motion.button>
                                 {isExpanded && (
                                   <motion.button
                                     initial={{ opacity: 0, scale: 0.8 }}
@@ -1096,7 +1117,8 @@ const Dashboard: React.FC = () => {
                               )}
                             </AnimatePresence>
                           </div>
-                        )}
+                          );
+                        }}
                       </SortableDebtCard>
                     );
                   })}

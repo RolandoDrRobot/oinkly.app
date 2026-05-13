@@ -625,6 +625,29 @@
   position: relative;
 }
 
+.debt-paid-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-tertiary, rgba(255,255,255,0.15));
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.debt-paid-toggle--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  opacity: 1;
+}
+
 .expense-paid-check {
   position: absolute;
   top: -8px;
@@ -1029,6 +1052,11 @@
   cursor: pointer;
   user-select: none;
   position: relative;
+}
+
+.debt-card.expense-card-paid {
+  border-color: var(--primary);
+  border-width: 1.5px;
 }
 
 .debt-card[data-dragging="true"] {
