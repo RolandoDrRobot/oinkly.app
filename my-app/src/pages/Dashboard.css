@@ -593,6 +593,20 @@
   margin-right: 6px;
 }
 
+.summary-amount-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.summary-pending {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  opacity: 0.85;
+}
+
 .summary-amount {
   font-size: 22px;
   font-weight: 700;

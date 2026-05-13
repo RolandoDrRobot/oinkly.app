@@ -738,16 +738,30 @@ const Dashboard: React.FC = () => {
                       <Icon component={FaMoneyBill} className="summary-icon" />
                       <span className="summary-label">{t('dashboard.monthlyPayment')}</span>
                     </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{totals.mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(totals.monthlyLocal, totals.mostCommonCurrency)}</span>
-                      </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(totals.monthlyDollars, 'USD')}</span>
-                      </div>
-                    </div>
+                    {(() => {
+                      const currentMonth = new Date().toISOString().slice(0, 7);
+                      const unpaid = debts.filter(d => !d.closedAt && d.paidForMonth !== currentMonth);
+                      const unpaidLocal = unpaid.reduce((a, d) => a + (d.localFee || 0), 0);
+                      const unpaidUSD = unpaid.reduce((a, d) => a + (d.dollarFee || 0), 0);
+                      return (
+                        <div className="summary-values">
+                          <div className="summary-value">
+                            <span className="summary-currency">{totals.mostCommonCurrency}</span>
+                            <div className="summary-amount-col">
+                              <span className="summary-amount">{formatCurrency(totals.monthlyLocal, totals.mostCommonCurrency)}</span>
+                              {unpaidLocal > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidLocal, totals.mostCommonCurrency)}</span>}
+                            </div>
+                          </div>
+                          <div className="summary-value">
+                            <span className="summary-currency">USD</span>
+                            <div className="summary-amount-col">
+                              <span className="summary-amount">{formatCurrency(totals.monthlyDollars, 'USD')}</span>
+                              {unpaidUSD > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidUSD, 'USD')}</span>}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </motion.div>
@@ -1178,16 +1192,30 @@ const Dashboard: React.FC = () => {
                       <Icon component={FaBolt} className="summary-icon" />
                       <span className="summary-label">{t('dashboard.totalFixedExpenses')}</span>
                     </div>
-                    <div className="summary-values">
-                      <div className="summary-value">
-                        <span className="summary-currency">{fixedExpensesTotals.mostCommonCurrency}</span>
-                        <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalLocal, fixedExpensesTotals.mostCommonCurrency)}</span>
-                      </div>
-                      <div className="summary-value">
-                        <span className="summary-currency">USD</span>
-                        <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalDollars, 'USD')}</span>
-                      </div>
-                    </div>
+                    {(() => {
+                      const currentMonth = new Date().toISOString().slice(0, 7);
+                      const unpaid = fixedExpenses.filter(e => e.paidForMonth !== currentMonth);
+                      const unpaidLocal = unpaid.reduce((a, e) => a + (e.amountLocal || 0), 0);
+                      const unpaidUSD = unpaid.reduce((a, e) => a + (e.amountDollars || 0), 0);
+                      return (
+                        <div className="summary-values">
+                          <div className="summary-value">
+                            <span className="summary-currency">{fixedExpensesTotals.mostCommonCurrency}</span>
+                            <div className="summary-amount-col">
+                              <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalLocal, fixedExpensesTotals.mostCommonCurrency)}</span>
+                              {unpaidLocal > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidLocal, fixedExpensesTotals.mostCommonCurrency)}</span>}
+                            </div>
+                          </div>
+                          <div className="summary-value">
+                            <span className="summary-currency">USD</span>
+                            <div className="summary-amount-col">
+                              <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalDollars, 'USD')}</span>
+                              {unpaidUSD > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidUSD, 'USD')}</span>}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </motion.div>
