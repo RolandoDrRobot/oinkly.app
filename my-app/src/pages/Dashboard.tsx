@@ -544,7 +544,10 @@ const Dashboard: React.FC = () => {
     const fixedExpensesTotals = calculateFixedExpensesTotals();
     const assetsTotals = calculateAssetsTotals();
     const incomesTotals = calculateIncomesTotals();
-    
+
+    const savingsLocal = parseFloat(localStorage.getItem('cashflow_savings_local') || '0') || 0;
+    const savingsUSD = parseFloat(localStorage.getItem('cashflow_savings_usd') || '0') || 0;
+
     return {
       debts: {
         totalLocal: totals.totalLocal,
@@ -564,9 +567,13 @@ const Dashboard: React.FC = () => {
         totalLocal: incomesTotals.totalLocal,
         totalDollars: incomesTotals.totalDollars,
       },
+      savings: {
+        totalLocal: savingsLocal,
+        totalDollars: savingsUSD,
+      },
       netWorth: {
-        totalLocal: assetsTotals.totalLocal - totals.totalLocal,
-        totalDollars: assetsTotals.totalDollars - totals.totalDollars,
+        totalLocal: assetsTotals.totalLocal + savingsLocal - totals.totalLocal,
+        totalDollars: assetsTotals.totalDollars + savingsUSD - totals.totalDollars,
       },
       mostCommonCurrency: localCurrency,
     };
@@ -1883,11 +1890,36 @@ const Dashboard: React.FC = () => {
                           <div className="summary-divider"></div>
                         </>
                       )}
+                      {(calculateOverallTotals().savings.totalLocal > 0 || calculateOverallTotals().savings.totalDollars > 0) && (
+                        <>
+                          <div className="summary-section">
+                            <div className="summary-card-header">
+                              <Icon component={FaPiggyBank} className="summary-icon" />
+                              <span className="summary-label">Ahorros</span>
+                            </div>
+                            <div className="summary-values">
+                              {calculateOverallTotals().savings.totalLocal > 0 && (
+                                <div className="summary-value">
+                                  <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
+                                  <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
+                                </div>
+                              )}
+                              {calculateOverallTotals().savings.totalDollars > 0 && (
+                                <div className="summary-value">
+                                  <span className="summary-currency">USD</span>
+                                  <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalDollars, 'USD')}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="summary-divider"></div>
+                        </>
+                      )}
                       <div className="summary-section">
                         <div className="summary-card-header">
                           <Icon component={FaChartLine} className="summary-icon" />
                           <span className="summary-label">{t('dashboard.netWorth')}</span>
-                          <span className="networth-formula-badge">Activos − Deudas</span>
+                          <span className="networth-formula-badge">Activos + Ahorros − Deudas</span>
                         </div>
                         <div className="summary-values">
                           <div className="summary-value">
