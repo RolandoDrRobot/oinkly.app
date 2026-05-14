@@ -121,7 +121,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(64px + env(safe-area-inset-bottom));
+  height: calc(58px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: var(--dark-section);
   border-top: 1px solid var(--bg-tertiary, rgba(255,255,255,0.08));
@@ -140,8 +140,8 @@
 }
 
 .bottom-tab-btn {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 50px;
   border-radius: 14px;
   border: none;
   background-color: transparent;
@@ -162,14 +162,14 @@
 }
 
 .bottom-tab-icon {
-  font-size: 22px;
+  font-size: 30px;
   color: var(--text-primary);
 }
 
 .bottom-tab-logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
   object-fit: contain;
 }
 
@@ -319,7 +319,7 @@
 /* Botón AI flotante: abajo a la derecha, grande e invitador */
 .dashboard-bottom-nav {
   position: fixed;
-  bottom: calc(64px + env(safe-area-inset-bottom) + 14px);
+  bottom: calc(58px + env(safe-area-inset-bottom) + 14px);
   right: max(20px, env(safe-area-inset-right));
   left: auto;
   z-index: 100;
