@@ -39,7 +39,9 @@ import {
   FaDollarSign,
   FaWallet,
   FaTag,
-  FaBolt
+  FaBolt,
+  FaExclamationTriangle,
+  FaCheckCircle
 } from 'react-icons/fa';
 // import { useAuth } from '../context/AuthContext'; // Reserved for future use
 import { Debt, FixedExpense, Asset, Income } from '../types';
@@ -47,6 +49,7 @@ import { storage } from '../utils/storage';
 import SortableDebtCard from '../components/SortableDebtCard';
 import SortableItemCard from '../components/SortableItemCard';
 import './Dashboard.css';
+import './Plan.css';
 
 // Type assertion helper for icons
 const Icon = ({ component: Component, ...props }: { component: any; [key: string]: any }) => {
@@ -1817,7 +1820,7 @@ const Dashboard: React.FC = () => {
         className="dashboard-header"
       >
         <div className="header-content">
-          <div className="header-title-wrapper" style={{ cursor: 'pointer' }} onClick={() => navigate('/plan')}>
+          <div className="header-title-wrapper">
             <img
               src={`${process.env.PUBLIC_URL}/logo.png`}
               alt={t('dashboard.logoAlt')}
@@ -2231,6 +2234,155 @@ const Dashboard: React.FC = () => {
             })()}
           </motion.div>
         )}
+
+        {/* Plan section — only on home tab */}
+        {activeTab === 'home' && (() => {
+          const cf = calculateCashflow();
+          const rate = exchangeRate || 500;
+          const toUSD = (local: number) => local / rate;
+          const totalSavingsUSD = savingsUSD + toUSD(savingsLocal);
+          const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+
+          const debtsSorted = debts
+            .filter(d => !d.closedAt)
+            .map(d => {
+              const totalUSD = (d.totalDollars || 0) + toUSD(d.totalLocal || 0);
+              const feeUSD = (d.dollarFee || 0) + toUSD(d.localFee || 0);
+              const efficiency = totalUSD > 0 ? feeUSD / totalUSD : 0;
+              return { id: d.id, name: d.name, totalUSD, feeUSD, efficiency };
+            })
+            .filter(d => d.feeUSD > 0 && d.totalUSD > 0)
+            .sort((a, b) => b.efficiency - a.efficiency);
+
+          const dti = cf.incomeUSD > 0 ? (cf.debtPaymentsUSD / cf.incomeUSD) * 100 : 0;
+          const emergencyMonths = cf.totalExpensesUSD > 0 ? totalSavingsUSD / cf.totalExpensesUSD : Infinity;
+          const freedomPct = cf.totalExpensesUSD > 0 ? Math.min((cf.passiveIncomeUSD / cf.totalExpensesUSD) * 100, 100) : 0;
+          const freedomGap = cf.totalExpensesUSD - cf.passiveIncomeUSD;
+
+          return (
+            <div className="plan-content" style={{ padding: '0 0 8px' }}>
+
+              {/* Q1: Deuda vs cashflow */}
+              {debtsSorted.length > 0 && (
+                <div className="plan-card">
+                  <div className="plan-card-header">
+                    <Icon component={FaBolt} className="plan-icon" />
+                    <div>
+                      <h2 className="plan-question">¿Qué deuda libera más cashflow?</h2>
+                      <p className="plan-subtitle">Ordenadas por eficiencia: cashflow mensual liberado por cada $ pagado.</p>
+                    </div>
+                  </div>
+                  <div className="plan-cf-current">
+                    <span className="plan-cf-current-label">Cashflow actual</span>
+                    <span className={`plan-cf-current-value ${cf.cashflowUSD >= 0 ? 'plan-green' : 'plan-red'}`}>
+                      {fmt(cf.cashflowUSD)}<span className="plan-cf-per-month">/mes</span>
+                    </span>
+                  </div>
+                  <div className="plan-debt-list">
+                    {debtsSorted.map((d, i) => {
+                      const freed = debtsSorted.slice(0, i + 1).reduce((a, x) => a + x.feeUSD, 0);
+                      const cfAfter = cf.cashflowUSD + freed;
+                      return (
+                        <div key={d.id} className="plan-debt-row">
+                          <div className="plan-debt-rank">{i + 1}</div>
+                          <div className="plan-debt-info">
+                            <span className="plan-debt-name">{d.name}</span>
+                            <span className="plan-debt-total">Pagar: {fmt(d.totalUSD)}</span>
+                          </div>
+                          <div className="plan-debt-impact">
+                            <span className="plan-debt-freed">+{fmt(d.feeUSD)}/mes</span>
+                            <span className="plan-debt-efficiency">{(d.efficiency * 100).toFixed(1)}% eficiencia</span>
+                            <span className={`plan-debt-cf-after ${cfAfter >= 0 ? 'plan-green' : 'plan-red'}`}>→ {fmt(cfAfter)}/mes</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="plan-debt-all-free">
+                    <span>Si pagas todas las deudas</span>
+                    <span className={`plan-debt-all-free-value ${(cf.cashflowUSD + cf.debtPaymentsUSD) >= 0 ? 'plan-green' : 'plan-red'}`}>
+                      {fmt(cf.cashflowUSD + cf.debtPaymentsUSD)}/mes
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Q2: DTI */}
+              <div className="plan-card">
+                <div className="plan-card-header">
+                  <Icon component={FaExclamationTriangle} className="plan-icon" />
+                  <div>
+                    <h2 className="plan-question">¿Qué % de tus ingresos va a deudas? (DTI)</h2>
+                    <p className="plan-subtitle">Sano: &lt;36%. Crítico: &gt;50%.</p>
+                  </div>
+                </div>
+                <div className="plan-stat-row">
+                  <div className="plan-stat"><span className="plan-stat-label">Pagos deuda/mes</span><span className="plan-stat-value">{fmt(cf.debtPaymentsUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">Ingresos/mes</span><span className="plan-stat-value">{fmt(cf.incomeUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">DTI</span><span className={`plan-stat-value ${dti <= 36 ? 'plan-green' : dti <= 50 ? 'plan-orange' : 'plan-red'}`}>{dti.toFixed(1)}%</span></div>
+                </div>
+                <div className="plan-dti-bar-wrap">
+                  <div className="plan-dti-bar">
+                    <div className={`plan-dti-fill ${dti <= 36 ? 'plan-dti-green' : dti <= 50 ? 'plan-dti-orange' : 'plan-dti-red'}`} style={{ width: `${Math.min(dti, 100)}%` }} />
+                    <div className="plan-dti-marker" style={{ left: '36%' }} />
+                    <div className="plan-dti-marker" style={{ left: '50%' }} />
+                  </div>
+                  <div className="plan-progress-labels"><span>0%</span><span>36%</span><span>50%</span><span>100%</span></div>
+                </div>
+                <p className="plan-tip">{dti <= 36 ? '✅ DTI en zona sana.' : dti <= 50 ? '⚠️ DTI elevado.' : '🚨 DTI crítico.'}</p>
+              </div>
+
+              {/* Q3: Fondo emergencia */}
+              <div className="plan-card">
+                <div className="plan-card-header">
+                  <Icon component={FaPiggyBank} className="plan-icon" />
+                  <div>
+                    <h2 className="plan-question">¿Cuántos meses de gastos cubren tus ahorros?</h2>
+                    <p className="plan-subtitle">Regla: 3–6 meses como fondo de emergencia.</p>
+                  </div>
+                </div>
+                <div className="plan-stat-row">
+                  <div className="plan-stat"><span className="plan-stat-label">Ahorros</span><span className="plan-stat-value">{fmt(totalSavingsUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">Gastos/mes</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">Cobertura</span><span className={`plan-stat-value ${emergencyMonths >= 3 ? 'plan-green' : 'plan-red'}`}>{emergencyMonths === Infinity ? '∞' : emergencyMonths.toFixed(1)} meses</span></div>
+                </div>
+                <div className="plan-progress-wrap">
+                  <div className="plan-progress-bar">
+                    <div className="plan-progress-fill" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} />
+                    <div className="plan-progress-marker" style={{ left: '50%' }} />
+                  </div>
+                  <div className="plan-progress-labels"><span>0</span><span>3 meses</span><span>6 meses</span></div>
+                </div>
+                {emergencyMonths < 3 && cf.totalExpensesUSD > 0 && (
+                  <p className="plan-tip">Necesitás ahorrar {fmt(3 * cf.totalExpensesUSD - totalSavingsUSD)} más para 3 meses.</p>
+                )}
+              </div>
+
+              {/* Q4: Libertad financiera */}
+              <div className="plan-card">
+                <div className="plan-card-header">
+                  <Icon component={FaCheckCircle} className="plan-icon" />
+                  <div>
+                    <h2 className="plan-question">¿Qué tan cerca estás de la libertad financiera?</h2>
+                    <p className="plan-subtitle">Libertad = ingresos pasivos ≥ gastos totales.</p>
+                  </div>
+                </div>
+                <div className="plan-stat-row">
+                  <div className="plan-stat"><span className="plan-stat-label">Pasivos/mes</span><span className="plan-stat-value plan-green">{fmt(cf.passiveIncomeUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">Gastos/mes</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">Gap</span><span className={`plan-stat-value ${freedomGap <= 0 ? 'plan-green' : 'plan-red'}`}>{freedomGap <= 0 ? '🎉 Libre' : `-${fmt(freedomGap)}`}</span></div>
+                </div>
+                <div className="plan-progress-wrap">
+                  <div className="plan-progress-bar">
+                    <div className="plan-progress-fill plan-progress-fill--freedom" style={{ width: `${freedomPct}%` }} />
+                  </div>
+                  <div className="plan-progress-labels"><span>0%</span><span style={{ color: 'var(--primary)', fontWeight: 700 }}>{freedomPct.toFixed(1)}%</span><span>100%</span></div>
+                </div>
+              </div>
+
+            </div>
+          );
+        })()}
 
         {/* Section content */}
         <AnimatePresence mode="wait">
