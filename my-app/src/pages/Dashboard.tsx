@@ -54,7 +54,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
   return Component ? <Component {...props} /> : null;
 };
 
-type ActiveTab = 'debt' | 'fixedExpenses' | 'assets' | 'incomes';
+type ActiveTab = 'home' | 'debt' | 'fixedExpenses' | 'assets' | 'incomes';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('debt');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [expandedDebts, setExpandedDebts] = useState<Set<string>>(new Set());
   const [editingField, setEditingField] = useState<{ debtId: string; field: string } | null>(null);
   const [editingFixedExpense, setEditingFixedExpense] = useState<{ expenseId: string; field: string } | null>(null);
@@ -1868,8 +1868,8 @@ const Dashboard: React.FC = () => {
       </motion.header>
 
       <div className="dashboard-content">
-        {/* Overall Summary - Shows when there are any items */}
-        {(debts.length > 0 || fixedExpenses.length > 0 || assets.length > 0 || incomes.length > 0) && (
+        {/* Overall Summary - only on home tab */}
+        {activeTab === 'home' && (debts.length > 0 || fixedExpenses.length > 0 || assets.length > 0 || incomes.length > 0) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -2242,96 +2242,28 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Menu de 4 botones */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="dashboard-menu"
-        >
-          <button
-            className={`menu-button menu-button--debt ${activeTab === 'debt' ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/debt.png)` }}
-            onClick={() => setActiveTab('debt')}
-            title={t('dashboard.debt')}
-            aria-label={t('dashboard.debt')}
-          />
-          <button
-            className={`menu-button menu-button--gastos ${activeTab === 'fixedExpenses' ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/gasts_fijos.png)` }}
-            onClick={() => setActiveTab('fixedExpenses')}
-            title={t('dashboard.fixedExpenses')}
-            aria-label={t('dashboard.fixedExpenses')}
-          />
-          <button
-            className={`menu-button menu-button--activos ${activeTab === 'assets' ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/activos.png)` }}
-            onClick={() => setActiveTab('assets')}
-            title={t('dashboard.assets')}
-            aria-label={t('dashboard.assets')}
-          />
-          <button
-            className={`menu-button menu-button--ingresos ${activeTab === 'incomes' ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ingresos.png)` }}
-            onClick={() => setActiveTab('incomes')}
-            title={t('dashboard.incomes')}
-            aria-label={t('dashboard.incomes')}
-          />
-        </motion.div>
-
-        {/* Contenedor de pantallas */}
-        <div className="dashboard-screens-container">
-          <AnimatePresence mode="wait">
-            {activeTab === 'debt' && (
-              <motion.div
-                key="debt"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                style={{ width: '100%' }}
-              >
-                {renderDebtsScreen()}
-              </motion.div>
-            )}
-            {activeTab === 'fixedExpenses' && (
-              <motion.div
-                key="fixedExpenses"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderFixedExpensesScreen()}
-              </motion.div>
-            )}
-            {activeTab === 'assets' && (
-              <motion.div
-                key="assets"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderAssetsScreen()}
-              </motion.div>
-            )}
-            {activeTab === 'incomes' && (
-              <motion.div
-                key="incomes"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderIncomesScreen()}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Section content */}
+        <AnimatePresence mode="wait">
+          {activeTab !== 'home' && (
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="dashboard-screens-container"
+            >
+              {activeTab === 'debt' && renderDebtsScreen()}
+              {activeTab === 'fixedExpenses' && renderFixedExpensesScreen()}
+              {activeTab === 'assets' && renderAssetsScreen()}
+              {activeTab === 'incomes' && renderIncomesScreen()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Nav fija al fondo: botón para agregar según el tab activo */}
+      {/* FAB — solo en tabs de sección */}
+      {activeTab !== 'home' && (
       <nav className="dashboard-bottom-nav" aria-label={t('common.add')}>
         <div className="ai-agent-entry-wrap">
           <motion.button
@@ -2341,7 +2273,7 @@ const Dashboard: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="ai-agent-entry-button"
             onClick={() => {
-              const routes: Record<ActiveTab, string> = {
+              const routes: Record<string, string> = {
                 debt: '/add-debt',
                 fixedExpenses: '/add-fixed-expense',
                 assets: '/add-asset',
@@ -2354,6 +2286,45 @@ const Dashboard: React.FC = () => {
             <span style={{ fontSize: 28, lineHeight: 1, color: '#fff', fontWeight: 300 }}>+</span>
           </motion.button>
         </div>
+      </nav>
+      )}
+
+      {/* Bottom tab bar */}
+      <nav className="bottom-tab-nav">
+        <button
+          className={`bottom-tab-btn${activeTab === 'debt' ? ' bottom-tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('debt')}
+          title={t('dashboard.debt')}
+        >
+          <Icon component={FaFileInvoiceDollar} className="bottom-tab-icon" />
+        </button>
+        <button
+          className={`bottom-tab-btn${activeTab === 'fixedExpenses' ? ' bottom-tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('fixedExpenses')}
+          title={t('dashboard.fixedExpenses')}
+        >
+          <Icon component={FaBolt} className="bottom-tab-icon" />
+        </button>
+        <button
+          className={`bottom-tab-btn${activeTab === 'home' ? ' bottom-tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('home')}
+        >
+          <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Home" className="bottom-tab-logo" />
+        </button>
+        <button
+          className={`bottom-tab-btn${activeTab === 'assets' ? ' bottom-tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('assets')}
+          title={t('dashboard.assets')}
+        >
+          <Icon component={FaWallet} className="bottom-tab-icon" />
+        </button>
+        <button
+          className={`bottom-tab-btn${activeTab === 'incomes' ? ' bottom-tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('incomes')}
+          title={t('dashboard.incomes')}
+        >
+          <Icon component={FaMoneyBillWave} className="bottom-tab-icon" />
+        </button>
       </nav>
     </motion.div>
   );
