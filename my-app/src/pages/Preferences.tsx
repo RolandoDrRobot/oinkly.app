@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaArrowLeft, FaCheck, FaDollarSign, FaGlobe, FaMicrophone } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaDollarSign, FaGlobe } from 'react-icons/fa';
 import { storage } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import { setUserPreferences } from '../lib/supabaseData';
-import { isAIVoiceEnabled } from '../api/aiVoiceApi';
 import './Preferences.css';
 
 // Type assertion helper for icons
@@ -38,10 +37,7 @@ const Preferences: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [localCurrency, setLocalCurrencyState] = useState<string>(storage.getLocalCurrency());
   const [language, setLanguageState] = useState<string>(storage.getLanguage());
-  const [openAIApiKeyInput, setOpenAIApiKeyInput] = useState<string>('');
-  const [openAIKeySavedFeedback, setOpenAIKeySavedFeedback] = useState<string | null>(null);
   const isFirstTime = !localStorage.getItem('hasSeenInitialSetup');
-  const hasOpenAIKey = isAIVoiceEnabled();
 
   useEffect(() => {
     setLocalCurrencyState(storage.getLocalCurrency());
@@ -57,13 +53,6 @@ const Preferences: React.FC = () => {
     storage.setLanguage(lang);
     i18n.changeLanguage(lang);
     setLanguageState(lang);
-  };
-
-  const handleSaveOpenAIApiKey = () => {
-    storage.setOpenAIApiKey(openAIApiKeyInput);
-    setOpenAIApiKeyInput('');
-    setOpenAIKeySavedFeedback(openAIApiKeyInput.trim() ? t('preferences.openAIApiKeySaved') : t('preferences.openAIApiKeyRemoved'));
-    setTimeout(() => setOpenAIKeySavedFeedback(null), 2500);
   };
 
   const handleHeaderAction = () => {
@@ -188,41 +177,6 @@ const Preferences: React.FC = () => {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="preferences-section"
-        >
-          <h2 className="section-title">
-            <Icon component={FaMicrophone} className="section-icon" />
-            {t('preferences.voiceAiSection')}
-          </h2>
-          <p className="preferences-voice-ai-desc">{t('preferences.voiceAiDescription')}</p>
-          <div className="preferences-voice-ai-row">
-            <input
-              type="password"
-              className="preferences-openai-input"
-              placeholder={hasOpenAIKey ? '••••••••' : t('preferences.openAIApiKeyPlaceholder')}
-              value={openAIApiKeyInput}
-              onChange={(e) => setOpenAIApiKeyInput(e.target.value)}
-              aria-label={t('preferences.openAIApiKey')}
-            />
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="preferences-openai-save"
-              onClick={handleSaveOpenAIApiKey}
-            >
-              {t('common.save')}
-            </motion.button>
-          </div>
-          {openAIKeySavedFeedback && (
-            <span className="preferences-openai-feedback">{openAIKeySavedFeedback}</span>
-          )}
-          <p className="preferences-get-key">{t('preferences.getKeyAt')}</p>
-        </motion.div>
         <p className="preferences-security-note" role="note">
           {t('preferences.dataStoredOnDevice')}
         </p>

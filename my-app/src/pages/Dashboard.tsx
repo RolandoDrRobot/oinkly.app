@@ -2429,17 +2429,15 @@ const Dashboard: React.FC = () => {
         <button
           className={`bottom-tab-btn${activeTab === 'debt' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('debt')}
+          style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/debt.png)` }}
           title={t('dashboard.debt')}
-        >
-          <Icon component={FaFileInvoiceDollar} className="bottom-tab-icon" />
-        </button>
+        />
         <button
           className={`bottom-tab-btn${activeTab === 'fixedExpenses' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('fixedExpenses')}
+          style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/gasts_fijos.png)` }}
           title={t('dashboard.fixedExpenses')}
-        >
-          <Icon component={FaBolt} className="bottom-tab-icon" />
-        </button>
+        />
         <button
           className={`bottom-tab-btn bottom-tab-btn--home${activeTab === 'home' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('home')}
@@ -2449,17 +2447,15 @@ const Dashboard: React.FC = () => {
         <button
           className={`bottom-tab-btn${activeTab === 'assets' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('assets')}
+          style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/activos.png)` }}
           title={t('dashboard.assets')}
-        >
-          <Icon component={FaHome} className="bottom-tab-icon" />
-        </button>
+        />
         <button
           className={`bottom-tab-btn${activeTab === 'incomes' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('incomes')}
+          style={{ backgroundImage: `url(${process.env.PUBLIC_URL || ''}/img/ingresos.png)` }}
           title={t('dashboard.incomes')}
-        >
-          <Icon component={FaMoneyBillWave} className="bottom-tab-icon" />
-        </button>
+        />
       </nav>
     </motion.div>
   );

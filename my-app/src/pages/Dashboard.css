@@ -142,10 +142,10 @@
 .bottom-tab-btn {
   width: 56px;
   height: 50px;
-  border-radius: 14px;
+  border-radius: 15px;
   border: none;
   background-color: transparent;
-  background-size: 80%;
+  background-size: 90%;
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
@@ -153,7 +153,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 .bottom-tab-btn--active {
