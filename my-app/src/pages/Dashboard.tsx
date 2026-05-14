@@ -35,7 +35,6 @@ import {
   FaPiggyBank,
   FaBriefcase,
   FaBuilding,
-  FaSearch,
   FaStickyNote,
   FaDollarSign,
   FaWallet,
@@ -1848,15 +1847,6 @@ const Dashboard: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-profile"
-              onClick={() => navigate('/prospects')}
-              title="Prospectos"
-            >
-              <Icon component={FaSearch} />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               className="btn-profile btn-nav-profile"
               onClick={() => navigate('/profile')}
               title={t('profile.title')}
@@ -2306,7 +2296,7 @@ const Dashboard: React.FC = () => {
           <Icon component={FaBolt} className="bottom-tab-icon" />
         </button>
         <button
-          className={`bottom-tab-btn${activeTab === 'home' ? ' bottom-tab-btn--active' : ''}`}
+          className={`bottom-tab-btn bottom-tab-btn--home${activeTab === 'home' ? ' bottom-tab-btn--active' : ''}`}
           onClick={() => setActiveTab('home')}
         >
           <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Home" className="bottom-tab-logo" />
@@ -2316,7 +2306,7 @@ const Dashboard: React.FC = () => {
           onClick={() => setActiveTab('assets')}
           title={t('dashboard.assets')}
         >
-          <Icon component={FaWallet} className="bottom-tab-icon" />
+          <Icon component={FaHome} className="bottom-tab-icon" />
         </button>
         <button
           className={`bottom-tab-btn${activeTab === 'incomes' ? ' bottom-tab-btn--active' : ''}`}
