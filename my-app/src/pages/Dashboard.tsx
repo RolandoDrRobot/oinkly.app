@@ -752,14 +752,14 @@ const Dashboard: React.FC = () => {
                             <span className="summary-currency">{totals.mostCommonCurrency}</span>
                             <div className="summary-amount-col">
                               <span className="summary-amount">{formatCurrency(totals.monthlyLocal, totals.mostCommonCurrency)}</span>
-                              {unpaidLocal > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidLocal, totals.mostCommonCurrency)}</span>}
+                              {unpaidLocal > 0 && <span className="summary-pending">{t('cashflow.pendingAmount', { amount: formatCurrency(unpaidLocal, totals.mostCommonCurrency) })}</span>}
                             </div>
                           </div>
                           <div className="summary-value">
                             <span className="summary-currency">USD</span>
                             <div className="summary-amount-col">
                               <span className="summary-amount">{formatCurrency(totals.monthlyDollars, 'USD')}</span>
-                              {unpaidUSD > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidUSD, 'USD')}</span>}
+                              {unpaidUSD > 0 && <span className="summary-pending">{t('cashflow.pendingAmount', { amount: formatCurrency(unpaidUSD, 'USD') })}</span>}
                             </div>
                           </div>
                         </div>
@@ -1067,7 +1067,7 @@ const Dashboard: React.FC = () => {
                                             e.stopPropagation();
                                             startEditing(debt.id, 'paymentDay', debt.paymentDay ?? '', e);
                                           }}>
-                                            {debt.paymentDay ? `Día ${debt.paymentDay}` : t('dashboard.noPaymentDate')}
+                                            {debt.paymentDay ? t('cashflow.dayOf', { day: debt.paymentDay }) : t('dashboard.noPaymentDate')}
                                           </span>
                                         )}
                                       </div>
@@ -1095,7 +1095,7 @@ const Dashboard: React.FC = () => {
                                               e.stopPropagation();
                                               startEditing(debt.id, 'cutDay', debt.cutDay ?? '', e);
                                             }}>
-                                              {debt.cutDay ? `Día ${debt.cutDay}` : t('dashboard.noCutDate')}
+                                              {debt.cutDay ? t('cashflow.dayOf', { day: debt.cutDay }) : t('dashboard.noCutDate')}
                                             </span>
                                           )}
                                         </div>
@@ -1206,14 +1206,14 @@ const Dashboard: React.FC = () => {
                             <span className="summary-currency">{fixedExpensesTotals.mostCommonCurrency}</span>
                             <div className="summary-amount-col">
                               <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalLocal, fixedExpensesTotals.mostCommonCurrency)}</span>
-                              {unpaidLocal > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidLocal, fixedExpensesTotals.mostCommonCurrency)}</span>}
+                              {unpaidLocal > 0 && <span className="summary-pending">{t('cashflow.pendingAmount', { amount: formatCurrency(unpaidLocal, fixedExpensesTotals.mostCommonCurrency) })}</span>}
                             </div>
                           </div>
                           <div className="summary-value">
                             <span className="summary-currency">USD</span>
                             <div className="summary-amount-col">
                               <span className="summary-amount">{formatCurrency(fixedExpensesTotals.totalDollars, 'USD')}</span>
-                              {unpaidUSD > 0 && <span className="summary-pending">Falta: {formatCurrency(unpaidUSD, 'USD')}</span>}
+                              {unpaidUSD > 0 && <span className="summary-pending">{t('cashflow.pendingAmount', { amount: formatCurrency(unpaidUSD, 'USD') })}</span>}
                             </div>
                           </div>
                         </div>
@@ -1295,7 +1295,7 @@ const Dashboard: React.FC = () => {
                               startEditingFixedExpense(expense.id, 'paymentDay', expense.paymentDay ?? '', e);
                             }}>
                               <Icon component={FaCalendarAlt} size={10} style={{ marginRight: 3 }} />
-                              {expense.paymentDay ? `Día ${expense.paymentDay}` : '—'}
+                              {expense.paymentDay ? t('cashflow.dayOf', { day: expense.paymentDay }) : '—'}
                             </span>
                           )}
                         </div>
@@ -1494,7 +1494,7 @@ const Dashboard: React.FC = () => {
                           {((asset.monthlyIncomeLocal || 0) > 0 || (asset.monthlyIncomeUSD || 0) > 0) && (
                             <div className="asset-passive-income">
                               <Icon component={FaPiggyBank} size={11} style={{ marginRight: 5, color: 'var(--primary)' }} />
-                              <span className="asset-passive-income-label">Ingreso mensual:</span>
+                              <span className="asset-passive-income-label">{t('cashflow.monthlyIncomeLabel')}</span>
                               {(asset.monthlyIncomeLocal || 0) > 0 && (
                                 <span className="asset-passive-income-amount">{formatCurrency(asset.monthlyIncomeLocal!, asset.localCurrency)}</span>
                               )}
@@ -1713,7 +1713,7 @@ const Dashboard: React.FC = () => {
                               startEditingIncome(income.id, 'paymentDay', income.paymentDay ?? '', e);
                             }}>
                               <Icon component={FaCalendarAlt} size={10} style={{ marginRight: 3 }} />
-                              {income.paymentDay ? `Día ${income.paymentDay}` : '—'}
+                              {income.paymentDay ? t('cashflow.dayOf', { day: income.paymentDay }) : '—'}
                             </span>
                           )}
                           <span className="expense-date" style={{ opacity: 0.6 }}>
@@ -1880,7 +1880,7 @@ const Dashboard: React.FC = () => {
                 <div className="rat-race-bar-card">
                   <div className="rat-race-bar-header">
                     <span className="rat-race-bar-label">
-                      {free ? '🎉 ¡Libre de la carrera de la rata!' : 'Escapar de la carrera de la rata'}
+                      {free ? t('ratRace.free') : t('ratRace.escape')}
                     </span>
                     <span className="rat-race-bar-pct" style={{ color: free ? 'var(--primary)' : 'var(--text-muted)' }}>
                       {pct.toFixed(1)}%
@@ -1890,8 +1890,8 @@ const Dashboard: React.FC = () => {
                     <div className="rat-race-bar-fill" style={{ width: `${pct}%` }} />
                   </div>
                   <div className="rat-race-bar-legend">
-                    <span>Ingresos pasivos: <strong>{formatCurrency(cf.passiveIncomeUSD, 'USD')}</strong></span>
-                    <span>Gastos: <strong>{formatCurrency(cf.totalExpensesUSD, 'USD')}</strong></span>
+                    <span>{t('ratRace.passiveIncome', { amount: formatCurrency(cf.passiveIncomeUSD, 'USD') })}</span>
+                    <span>{t('ratRace.expenses', { amount: formatCurrency(cf.totalExpensesUSD, 'USD') })}</span>
                   </div>
                 </div>
               );
@@ -2009,7 +2009,7 @@ const Dashboard: React.FC = () => {
                       <div className="summary-section">
                         <div className="summary-card-header">
                           <Icon component={FaPiggyBank} className="summary-icon" />
-                          <span className="summary-label">Ahorros</span>
+                          <span className="summary-label">{t('cashflow.savings')}</span>
                         </div>
                         <div className="summary-values">
                           <div className="summary-value">
@@ -2027,7 +2027,7 @@ const Dashboard: React.FC = () => {
                         <div className="summary-card-header">
                           <Icon component={FaChartLine} className="summary-icon" />
                           <span className="summary-label">{t('dashboard.netWorth')}</span>
-                          <span className="networth-formula-badge">Activos + Ahorros − Deudas</span>
+                          <span className="networth-formula-badge">{t('cashflow.savings')} + Assets − Debts</span>
                         </div>
                         <div className="summary-values">
                           <div className="summary-value">
@@ -2058,12 +2058,12 @@ const Dashboard: React.FC = () => {
                 >
                   <div className="cashflow-header">
                     <Icon component={FaWallet} className="summary-icon" />
-                    <span className="summary-label">Cashflow mensual</span>
+                    <span className="summary-label">{t('cashflow.monthlyTitle')}</span>
                   </div>
 
                   {/* Tipo de cambio */}
                   <div className="cashflow-rate-row">
-                    <span className="cashflow-rate-label">Tipo de cambio</span>
+                    <span className="cashflow-rate-label">{t('cashflow.exchangeRate')}</span>
                     <div className="cashflow-rate-value-wrap">
                       <span className="cashflow-rate-tag">{cf.currency} / USD</span>
                       {editingRate ? (
@@ -2101,7 +2101,7 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaMoneyBillWave} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
-                      Ingresos activos
+                      {t('cashflow.activeIncome')}
                     </span>
                     <span className="cashflow-row-amount cashflow-positive">
                       +{formatCurrency(cf.activeIncomeUSD, 'USD')}
@@ -2111,7 +2111,7 @@ const Dashboard: React.FC = () => {
                     <div className="cashflow-row">
                       <span className="cashflow-row-label">
                         <Icon component={FaPiggyBank} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
-                        Ingresos pasivos
+                        {t('cashflow.passiveIncome')}
                       </span>
                       <span className="cashflow-row-amount cashflow-positive">
                         +{formatCurrency(cf.passiveIncomeUSD, 'USD')}
@@ -2121,7 +2121,7 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaFileInvoiceDollar} size={13} style={{ marginRight: 6, color: 'var(--error, #ef4444)' }} />
-                      Gastos fijos
+                      {t('cashflow.fixedExpenses')}
                     </span>
                     <span className="cashflow-row-amount cashflow-negative">
                       -{formatCurrency(cf.fixedExpensesUSD, 'USD')}
@@ -2130,7 +2130,7 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaCreditCard} size={13} style={{ marginRight: 6, color: 'var(--error, #ef4444)' }} />
-                      Pagos deudas
+                      {t('cashflow.debtPayments')}
                     </span>
                     <span className="cashflow-row-amount cashflow-negative">
                       -{formatCurrency(cf.debtPaymentsUSD, 'USD')}
@@ -2142,7 +2142,7 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row cashflow-row--total">
                     <span className="cashflow-row-label">
                       <Icon component={FaChartLine} size={13} style={{ marginRight: 6 }} />
-                      Cashflow USD
+                      {t('cashflow.cashflowUSD')}
                     </span>
                     <span className={`cashflow-row-amount cashflow-total ${cf.cashflowUSD >= 0 ? 'cashflow-positive' : 'cashflow-negative'}`}>
                       {cf.cashflowUSD >= 0 ? '+' : ''}{formatCurrency(cf.cashflowUSD, 'USD')}
@@ -2154,7 +2154,7 @@ const Dashboard: React.FC = () => {
                   <div className="cashflow-row">
                     <span className="cashflow-row-label">
                       <Icon component={FaPiggyBank} size={13} style={{ marginRight: 6, color: 'var(--primary)' }} />
-                      Ahorros
+                      {t('cashflow.savings')}
                     </span>
                     <div className="cashflow-savings-cols">
                       {/* Local currency */}
@@ -2261,14 +2261,14 @@ const Dashboard: React.FC = () => {
                   <div className="plan-card-header">
                     <Icon component={FaBolt} className="plan-icon" />
                     <div>
-                      <h2 className="plan-question">¿Qué deuda libera más cashflow?</h2>
-                      <p className="plan-subtitle">Ordenadas por eficiencia: cashflow mensual liberado por cada $ pagado.</p>
+                      <h2 className="plan-question">{t('plan.debtCashflowTitle')}</h2>
+                      <p className="plan-subtitle">{t('plan.debtCashflowSubtitle')}</p>
                     </div>
                   </div>
                   <div className="plan-cf-current">
-                    <span className="plan-cf-current-label">Cashflow actual</span>
+                    <span className="plan-cf-current-label">{t('plan.currentCashflow')}</span>
                     <span className={`plan-cf-current-value ${cf.cashflowUSD >= 0 ? 'plan-green' : 'plan-red'}`}>
-                      {fmt(cf.cashflowUSD)}<span className="plan-cf-per-month">/mes</span>
+                      {fmt(cf.cashflowUSD)}<span className="plan-cf-per-month">{t('plan.perMonth')}</span>
                     </span>
                   </div>
                   <div className="plan-debt-list">
@@ -2280,21 +2280,21 @@ const Dashboard: React.FC = () => {
                           <div className="plan-debt-rank">{i + 1}</div>
                           <div className="plan-debt-info">
                             <span className="plan-debt-name">{d.name}</span>
-                            <span className="plan-debt-total">Pagar: {fmt(d.totalUSD)}</span>
+                            <span className="plan-debt-total">{t('plan.payToPayOff', { amount: fmt(d.totalUSD) })}</span>
                           </div>
                           <div className="plan-debt-impact">
-                            <span className="plan-debt-freed">+{fmt(d.feeUSD)}/mes</span>
-                            <span className="plan-debt-efficiency">{(d.efficiency * 100).toFixed(1)}% eficiencia</span>
-                            <span className={`plan-debt-cf-after ${cfAfter >= 0 ? 'plan-green' : 'plan-red'}`}>→ {fmt(cfAfter)}/mes</span>
+                            <span className="plan-debt-freed">+{fmt(d.feeUSD)}{t('plan.perMonth')}</span>
+                            <span className="plan-debt-efficiency">{t('plan.efficiencyPct', { pct: (d.efficiency * 100).toFixed(1) })}</span>
+                            <span className={`plan-debt-cf-after ${cfAfter >= 0 ? 'plan-green' : 'plan-red'}`}>→ {fmt(cfAfter)}{t('plan.perMonth')}</span>
                           </div>
                         </div>
                       );
                     })}
                   </div>
                   <div className="plan-debt-all-free">
-                    <span>Si pagas todas las deudas</span>
+                    <span>{t('plan.ifPayAllDebts')}</span>
                     <span className={`plan-debt-all-free-value ${(cf.cashflowUSD + cf.debtPaymentsUSD) >= 0 ? 'plan-green' : 'plan-red'}`}>
-                      {fmt(cf.cashflowUSD + cf.debtPaymentsUSD)}/mes
+                      {fmt(cf.cashflowUSD + cf.debtPaymentsUSD)}{t('plan.perMonth')}
                     </span>
                   </div>
                 </div>
@@ -2305,13 +2305,13 @@ const Dashboard: React.FC = () => {
                 <div className="plan-card-header">
                   <Icon component={FaExclamationTriangle} className="plan-icon" />
                   <div>
-                    <h2 className="plan-question">¿Qué % de tus ingresos va a deudas? (DTI)</h2>
-                    <p className="plan-subtitle">Sano: &lt;36%. Crítico: &gt;50%.</p>
+                    <h2 className="plan-question">{t('plan.dtiTitle')}</h2>
+                    <p className="plan-subtitle">{t('plan.dtiSubtitle')}</p>
                   </div>
                 </div>
                 <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">Pagos deuda/mes</span><span className="plan-stat-value">{fmt(cf.debtPaymentsUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">Ingresos/mes</span><span className="plan-stat-value">{fmt(cf.incomeUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.debtPaymentsMonth')}</span><span className="plan-stat-value">{fmt(cf.debtPaymentsUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.incomeMonth')}</span><span className="plan-stat-value">{fmt(cf.incomeUSD)}</span></div>
                   <div className="plan-stat"><span className="plan-stat-label">DTI</span><span className={`plan-stat-value ${dti <= 36 ? 'plan-green' : dti <= 50 ? 'plan-orange' : 'plan-red'}`}>{dti.toFixed(1)}%</span></div>
                 </div>
                 <div className="plan-dti-bar-wrap">
@@ -2322,7 +2322,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div className="plan-progress-labels"><span>0%</span><span>36%</span><span>50%</span><span>100%</span></div>
                 </div>
-                <p className="plan-tip">{dti <= 36 ? '✅ DTI en zona sana.' : dti <= 50 ? '⚠️ DTI elevado.' : '🚨 DTI crítico.'}</p>
+                <p className="plan-tip">{dti <= 36 ? t('plan.dtiHealthy') : dti <= 50 ? t('plan.dtiElevated') : t('plan.dtiCritical')}</p>
               </div>
 
               {/* Q3: Fondo emergencia */}
@@ -2330,24 +2330,24 @@ const Dashboard: React.FC = () => {
                 <div className="plan-card-header">
                   <Icon component={FaPiggyBank} className="plan-icon" />
                   <div>
-                    <h2 className="plan-question">¿Cuántos meses de gastos cubren tus ahorros?</h2>
-                    <p className="plan-subtitle">Regla: 3–6 meses como fondo de emergencia.</p>
+                    <h2 className="plan-question">{t('plan.emergencyTitle')}</h2>
+                    <p className="plan-subtitle">{t('plan.emergencySubtitle')}</p>
                   </div>
                 </div>
                 <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">Ahorros</span><span className="plan-stat-value">{fmt(totalSavingsUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">Gastos/mes</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">Cobertura</span><span className={`plan-stat-value ${emergencyMonths >= 3 ? 'plan-green' : 'plan-red'}`}>{emergencyMonths === Infinity ? '∞' : emergencyMonths.toFixed(1)} meses</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalSavings')}</span><span className="plan-stat-value">{fmt(totalSavingsUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.expensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.coverage')}</span><span className={`plan-stat-value ${emergencyMonths >= 3 ? 'plan-green' : 'plan-red'}`}>{emergencyMonths === Infinity ? t('plan.emergencyInfinite') : t('plan.emergencyMonths', { n: emergencyMonths.toFixed(1) })}</span></div>
                 </div>
                 <div className="plan-progress-wrap">
                   <div className="plan-progress-bar">
                     <div className="plan-progress-fill" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} />
                     <div className="plan-progress-marker" style={{ left: '50%' }} />
                   </div>
-                  <div className="plan-progress-labels"><span>0</span><span>3 meses</span><span>6 meses</span></div>
+                  <div className="plan-progress-labels"><span>0</span><span>3</span><span>6</span></div>
                 </div>
                 {emergencyMonths < 3 && cf.totalExpensesUSD > 0 && (
-                  <p className="plan-tip">Necesitás ahorrar {fmt(3 * cf.totalExpensesUSD - totalSavingsUSD)} más para 3 meses.</p>
+                  <p className="plan-tip">{t('plan.emergencyTip', { amount: fmt(3 * cf.totalExpensesUSD - totalSavingsUSD) })}</p>
                 )}
               </div>
 
@@ -2356,14 +2356,14 @@ const Dashboard: React.FC = () => {
                 <div className="plan-card-header">
                   <Icon component={FaCheckCircle} className="plan-icon" />
                   <div>
-                    <h2 className="plan-question">¿Qué tan cerca estás de la libertad financiera?</h2>
-                    <p className="plan-subtitle">Libertad = ingresos pasivos ≥ gastos totales.</p>
+                    <h2 className="plan-question">{t('plan.freedomTitle')}</h2>
+                    <p className="plan-subtitle">{t('plan.freedomSubtitle')}</p>
                   </div>
                 </div>
                 <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">Pasivos/mes</span><span className="plan-stat-value plan-green">{fmt(cf.passiveIncomeUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">Gastos/mes</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">Gap</span><span className={`plan-stat-value ${freedomGap <= 0 ? 'plan-green' : 'plan-red'}`}>{freedomGap <= 0 ? '🎉 Libre' : `-${fmt(freedomGap)}`}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.passiveMonth')}</span><span className="plan-stat-value plan-green">{fmt(cf.passiveIncomeUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalExpensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.gap')}</span><span className={`plan-stat-value ${freedomGap <= 0 ? 'plan-green' : 'plan-red'}`}>{freedomGap <= 0 ? t('plan.freeLabel') : `-${fmt(freedomGap)}`}</span></div>
                 </div>
                 <div className="plan-progress-wrap">
                   <div className="plan-progress-bar">

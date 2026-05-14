@@ -14,12 +14,12 @@ import './Notes.css';
 const Icon = ({ component: C, ...p }: { component: any; [k: string]: any }) =>
   C ? <C {...p} /> : null;
 
-const TYPE_LABELS: Record<string, string> = {
-  debt: 'Deuda',
-  asset: 'Activo',
-  income: 'Ingreso',
-  fixedExpense: 'Gasto fijo',
-};
+const useTypeLabels = (t: (k: string) => string): Record<string, string> => ({
+  debt: t('notes.typeDebt'),
+  asset: t('notes.typeAsset'),
+  income: t('notes.typeIncome'),
+  fixedExpense: t('notes.typeFixedExpense'),
+});
 
 const TYPE_ICONS: Record<string, any> = {
   debt: FaFileInvoiceDollar,
@@ -40,6 +40,8 @@ const useRelatedItems = () => {
 
 // ── Note Card ──────────────────────────────────────────────────────────────
 const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate: (note: Note) => void }> = ({ note, onDelete, onUpdate }) => {
+  const { t } = useTranslation();
+  const TYPE_LABELS = useTypeLabels(t as any);
   const [expanded, setExpanded] = useState(false);
   const [content, setContent] = useState(note.content);
   const [title, setTitle] = useState(note.title);
@@ -50,7 +52,7 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
     onUpdate(updated);
   };
 
-  const dateStr = new Date(note.updatedAt).toLocaleDateString('es', { day: '2-digit', month: 'short', year: '2-digit' });
+  const dateStr = new Date(note.updatedAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: '2-digit' });
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="note-card">
@@ -59,7 +61,7 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
         <div className="note-card-left">
           <Icon component={FaStickyNote} className="note-icon" />
           <div className="note-card-info">
-            <span className="note-title">{note.title || 'Sin título'}</span>
+            <span className="note-title">{note.title || t('notes.untitled')}</span>
             <div className="note-meta">
               {note.relatedType && (
                 <span className="note-related-chip">
@@ -89,7 +91,7 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
               <input
                 className="note-edit-title"
                 value={title}
-                placeholder="Título de la nota"
+                placeholder={t('notes.editTitlePlaceholder')}
                 onChange={e => setTitle(e.target.value)}
                 onBlur={saveChanges}
               />
@@ -106,7 +108,7 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
               <textarea
                 className="note-edit-content"
                 value={content}
-                placeholder="Escribe tu nota aquí..."
+                placeholder={t('notes.contentPlaceholder')}
                 onChange={e => setContent(e.target.value)}
                 onBlur={saveChanges}
                 rows={5}
@@ -114,10 +116,10 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
 
               <div className="note-actions">
                 <span className="note-date-full">
-                  Actualizado: {new Date(note.updatedAt).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  {t('notes.updatedAt', { date: new Date(note.updatedAt).toLocaleString(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) })}
                 </span>
                 <button className="note-delete-btn" onClick={() => onDelete(note.id)}>
-                  <Icon component={FaTrash} size={12} style={{ marginRight: 5 }} /> Eliminar
+                  <Icon component={FaTrash} size={12} style={{ marginRight: 5 }} /> {t('notes.deleteBtn')}
                 </button>
               </div>
             </div>
@@ -130,6 +132,8 @@ const NoteCard: React.FC<{ note: Note; onDelete: (id: string) => void; onUpdate:
 
 // ── Add Note Sheet ─────────────────────────────────────────────────────────
 const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void }> = ({ onClose, onSave }) => {
+  const { t } = useTranslation();
+  const TYPE_LABELS = useTypeLabels(t as any);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [relatedType, setRelatedType] = useState<Note['relatedType']>(undefined);
@@ -143,7 +147,7 @@ const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void
     if (!title.trim() && !content.trim()) return;
     const note: Note = {
       id: Date.now().toString(),
-      title: title.trim() || 'Sin título',
+      title: title.trim() || t('notes.untitled'),
       content: content.trim(),
       relatedType: relatedType || undefined,
       relatedId: selectedItem?.id,
@@ -167,13 +171,13 @@ const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void
         onClick={e => e.stopPropagation()}
       >
         <div className="note-sheet-header">
-          <span className="note-sheet-title">Nueva nota</span>
+          <span className="note-sheet-title">{t('notes.newNote')}</span>
           <button className="note-sheet-close" onClick={onClose}><Icon component={FaTimes} size={16} /></button>
         </div>
 
         <input
           className="note-edit-title"
-          placeholder="Título"
+          placeholder={t('notes.titlePlaceholder')}
           value={title}
           onChange={e => setTitle(e.target.value)}
           autoFocus
@@ -181,7 +185,7 @@ const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void
 
         <textarea
           className="note-edit-content"
-          placeholder="Escribe tu nota..."
+          placeholder={t('notes.contentPlaceholder')}
           value={content}
           onChange={e => setContent(e.target.value)}
           rows={6}
@@ -189,7 +193,7 @@ const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void
 
         {/* Relation */}
         <div className="note-relation-section">
-          <span className="note-relation-label">Relacionar con (opcional)</span>
+          <span className="note-relation-label">{t('notes.relateWith')}</span>
           <div className="note-relation-types">
             {(['debt', 'asset', 'income', 'fixedExpense'] as const).map(type => (
               <button
@@ -208,19 +212,19 @@ const AddNoteSheet: React.FC<{ onClose: () => void; onSave: (note: Note) => void
               value={relatedId}
               onChange={e => setRelatedId(e.target.value)}
             >
-              <option value="">Seleccionar...</option>
+              <option value="">{t('notes.selectItem')}</option>
               {relatedItems.map(item => (
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))}
             </select>
           )}
           {relatedType && relatedItems.length === 0 && (
-            <span className="note-relation-empty">No hay {TYPE_LABELS[relatedType].toLowerCase()}s registrados.</span>
+            <span className="note-relation-empty">{t('notes.noItemsForType', { type: TYPE_LABELS[relatedType].toLowerCase() })}</span>
           )}
         </div>
 
         <button className="note-save-btn" onClick={handleSave} disabled={!title.trim() && !content.trim()}>
-          Guardar nota
+          {t('notes.save')}
         </button>
       </motion.div>
     </motion.div>
@@ -255,7 +259,7 @@ const Notes: React.FC = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="notes-page">
       <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="page-header">
         <div className="header-content">
-          <h1>Notas</h1>
+          <h1>{t('notes.title')}</h1>
           <motion.button type="button" className="btn-back" onClick={() => navigate('/dashboard')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Icon component={FaArrowLeft} style={{ marginRight: 8 }} /> {t('common.back')}
           </motion.button>
@@ -266,8 +270,8 @@ const Notes: React.FC = () => {
         {notes.length === 0 ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="notes-empty">
             <Icon component={FaStickyNote} size={48} style={{ opacity: 0.25, marginBottom: 12 }} />
-            <p>No tenés notas aún.</p>
-            <p style={{ fontSize: 13, opacity: 0.5 }}>Tocá + para crear una.</p>
+            <p>{t('notes.empty')}</p>
+            <p style={{ fontSize: 13, opacity: 0.5 }}>{t('notes.emptyHint')}</p>
           </motion.div>
         ) : (
           <div className="notes-list">
