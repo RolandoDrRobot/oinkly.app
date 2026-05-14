@@ -2006,31 +2006,23 @@ const Dashboard: React.FC = () => {
                           <div className="summary-divider"></div>
                         </>
                       )}
-                      {(calculateOverallTotals().savings.totalLocal > 0 || calculateOverallTotals().savings.totalDollars > 0) && (
-                        <>
-                          <div className="summary-section">
-                            <div className="summary-card-header">
-                              <Icon component={FaPiggyBank} className="summary-icon" />
-                              <span className="summary-label">Ahorros</span>
-                            </div>
-                            <div className="summary-values">
-                              {calculateOverallTotals().savings.totalLocal > 0 && (
-                                <div className="summary-value">
-                                  <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
-                                  <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
-                                </div>
-                              )}
-                              {calculateOverallTotals().savings.totalDollars > 0 && (
-                                <div className="summary-value">
-                                  <span className="summary-currency">USD</span>
-                                  <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalDollars, 'USD')}</span>
-                                </div>
-                              )}
-                            </div>
+                      <div className="summary-section">
+                        <div className="summary-card-header">
+                          <Icon component={FaPiggyBank} className="summary-icon" />
+                          <span className="summary-label">Ahorros</span>
+                        </div>
+                        <div className="summary-values">
+                          <div className="summary-value">
+                            <span className="summary-currency">{calculateOverallTotals().mostCommonCurrency}</span>
+                            <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalLocal, calculateOverallTotals().mostCommonCurrency)}</span>
                           </div>
-                          <div className="summary-divider"></div>
-                        </>
-                      )}
+                          <div className="summary-value">
+                            <span className="summary-currency">USD</span>
+                            <span className="summary-amount">{formatCurrency(calculateOverallTotals().savings.totalDollars, 'USD')}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="summary-divider"></div>
                       <div className="summary-section">
                         <div className="summary-card-header">
                           <Icon component={FaChartLine} className="summary-icon" />
@@ -2252,7 +2244,8 @@ const Dashboard: React.FC = () => {
               return { id: d.id, name: d.name, totalUSD, feeUSD, efficiency };
             })
             .filter(d => d.feeUSD > 0 && d.totalUSD > 0)
-            .sort((a, b) => b.efficiency - a.efficiency);
+            .sort((a, b) => b.efficiency - a.efficiency)
+            .slice(0, 5);
 
           const dti = cf.incomeUSD > 0 ? (cf.debtPaymentsUSD / cf.incomeUSD) * 100 : 0;
           const emergencyMonths = cf.totalExpensesUSD > 0 ? totalSavingsUSD / cf.totalExpensesUSD : Infinity;
