@@ -21,7 +21,7 @@ const Icon = ({ component: Component, ...props }: { component: any; [key: string
 const Profile: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { isPremium } = useSubscription();
+  useSubscription();
   const navigate = useNavigate();
   const displayUser =
     user ||
