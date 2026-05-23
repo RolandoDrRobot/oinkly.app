@@ -104,6 +104,9 @@ const Preferences: React.FC = () => {
               )}
             </motion.button>
           </div>
+          {isFirstTime && (
+            <p className="preferences-onboarding-subtitle">{t('preferences.onboardingSubtitle')}</p>
+          )}
         </motion.header>
 
       <div className="preferences-content">

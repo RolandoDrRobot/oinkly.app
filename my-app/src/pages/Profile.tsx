@@ -88,7 +88,7 @@ const Profile: React.FC = () => {
           initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.05 }}
-          className={`profile-card ${isPremium ? 'profile-card-premium' : ''}`}
+          className="profile-card"
         >
           <div className="profile-avatar-wrap">
             {displayUser?.avatarUrl ? (

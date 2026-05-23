@@ -701,13 +701,23 @@ const Dashboard: React.FC = () => {
                 transition={{ delay: 0.4, duration: 0.3 }}
               />
             </div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
               {t('dashboard.noDebts')}
             </motion.p>
+            <motion.p className="empty-subtitle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+              {t('dashboard.noDebtsSubtitle')}
+            </motion.p>
+            <motion.button
+              className="btn-add-first-debt"
+              onClick={() => navigate('/add-debt')}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t('dashboard.addFirstDebt')}
+            </motion.button>
           </motion.div>
         ) : (
           <>
@@ -1172,13 +1182,23 @@ const Dashboard: React.FC = () => {
                 transition={{ delay: 0.4, duration: 0.3 }}
               />
             </div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
               {t('dashboard.noFixedExpenses')}
             </motion.p>
+            <motion.p className="empty-subtitle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+              {t('dashboard.noFixedExpensesSubtitle')}
+            </motion.p>
+            <motion.button
+              className="btn-add-first-debt"
+              onClick={() => navigate('/add-fixed-expense')}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t('dashboard.addFirstFixedExpense')}
+            </motion.button>
           </motion.div>
         ) : (
           <>
@@ -1409,13 +1429,23 @@ const Dashboard: React.FC = () => {
                 transition={{ delay: 0.4, duration: 0.3 }}
               />
             </div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
               {t('dashboard.noAssets')}
             </motion.p>
+            <motion.p className="empty-subtitle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+              {t('dashboard.noAssetsSubtitle')}
+            </motion.p>
+            <motion.button
+              className="btn-add-first-debt"
+              onClick={() => navigate('/add-asset')}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t('dashboard.addFirstAsset')}
+            </motion.button>
           </motion.div>
         ) : (
           <>
@@ -1613,13 +1643,23 @@ const Dashboard: React.FC = () => {
                 transition={{ delay: 0.4, duration: 0.3 }}
               />
             </div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
               {t('dashboard.noIncomes')}
             </motion.p>
+            <motion.p className="empty-subtitle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+              {t('dashboard.noIncomesSubtitle')}
+            </motion.p>
+            <motion.button
+              className="btn-add-first-debt"
+              onClick={() => navigate('/add-income')}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t('dashboard.addFirstIncome')}
+            </motion.button>
           </motion.div>
         ) : (
           <>
@@ -2227,8 +2267,45 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Plan section — only on home tab */}
-        {activeTab === 'home' && (() => {
+        {/* Home empty state */}
+        {activeTab === 'home' && debts.length === 0 && fixedExpenses.length === 0 && assets.length === 0 && incomes.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="empty-state home-empty-state"
+          >
+            <div className="empty-state-image-wrapper">
+              <motion.img
+                src={`${process.env.PUBLIC_URL}/trophy.png`}
+                alt={t('dashboard.emptyStateAlt')}
+                className="empty-state-image"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+              />
+            </div>
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+              {t('dashboard.homeEmptyTitle')}
+            </motion.p>
+            <motion.p className="empty-subtitle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+              {t('dashboard.homeEmptySubtitle')}
+            </motion.p>
+            <motion.div
+              className="home-empty-actions"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.button className="btn-add-first-debt" onClick={() => setActiveTab('debt')} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
+                {t('dashboard.addFirstDebt')}
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Plan section — only on home tab when there is data */}
+        {activeTab === 'home' && (debts.length > 0 || fixedExpenses.length > 0 || assets.length > 0 || incomes.length > 0) && (() => {
           const cf = calculateCashflow();
           const rate = exchangeRate || 500;
           const toUSD = (local: number) => local / rate;
@@ -2300,78 +2377,84 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
 
-              {/* Q2: DTI */}
-              <div className="plan-card">
-                <div className="plan-card-header">
-                  <Icon component={FaExclamationTriangle} className="plan-icon" />
-                  <div>
-                    <h2 className="plan-question">{t('plan.dtiTitle')}</h2>
-                    <p className="plan-subtitle">{t('plan.dtiSubtitle')}</p>
+              {/* Q2: DTI — only when there's income or debt payment data */}
+              {(cf.incomeUSD > 0 || cf.debtPaymentsUSD > 0) && (
+                <div className="plan-card">
+                  <div className="plan-card-header">
+                    <Icon component={FaExclamationTriangle} className="plan-icon" />
+                    <div>
+                      <h2 className="plan-question">{t('plan.dtiTitle')}</h2>
+                      <p className="plan-subtitle">{t('plan.dtiSubtitle')}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.debtPaymentsMonth')}</span><span className="plan-stat-value">{fmt(cf.debtPaymentsUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.incomeMonth')}</span><span className="plan-stat-value">{fmt(cf.incomeUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">DTI</span><span className={`plan-stat-value ${dti <= 36 ? 'plan-green' : dti <= 50 ? 'plan-orange' : 'plan-red'}`}>{dti.toFixed(1)}%</span></div>
-                </div>
-                <div className="plan-dti-bar-wrap">
-                  <div className="plan-dti-bar">
-                    <div className={`plan-dti-fill ${dti <= 36 ? 'plan-dti-green' : dti <= 50 ? 'plan-dti-orange' : 'plan-dti-red'}`} style={{ width: `${Math.min(dti, 100)}%` }} />
-                    <div className="plan-dti-marker" style={{ left: '36%' }} />
-                    <div className="plan-dti-marker" style={{ left: '50%' }} />
+                  <div className="plan-stat-row">
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.debtPaymentsMonth')}</span><span className="plan-stat-value">{fmt(cf.debtPaymentsUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.incomeMonth')}</span><span className="plan-stat-value">{fmt(cf.incomeUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">DTI</span><span className={`plan-stat-value ${dti <= 36 ? 'plan-green' : dti <= 50 ? 'plan-orange' : 'plan-red'}`}>{dti.toFixed(1)}%</span></div>
                   </div>
-                  <div className="plan-progress-labels"><span>0%</span><span>36%</span><span>50%</span><span>100%</span></div>
+                  <div className="plan-dti-bar-wrap">
+                    <div className="plan-dti-bar">
+                      <div className={`plan-dti-fill ${dti <= 36 ? 'plan-dti-green' : dti <= 50 ? 'plan-dti-orange' : 'plan-dti-red'}`} style={{ width: `${Math.min(dti, 100)}%` }} />
+                      <div className="plan-dti-marker" style={{ left: '36%' }} />
+                      <div className="plan-dti-marker" style={{ left: '50%' }} />
+                    </div>
+                    <div className="plan-progress-labels"><span>0%</span><span>36%</span><span>50%</span><span>100%</span></div>
+                  </div>
+                  <p className="plan-tip">{dti <= 36 ? t('plan.dtiHealthy') : dti <= 50 ? t('plan.dtiElevated') : t('plan.dtiCritical')}</p>
                 </div>
-                <p className="plan-tip">{dti <= 36 ? t('plan.dtiHealthy') : dti <= 50 ? t('plan.dtiElevated') : t('plan.dtiCritical')}</p>
-              </div>
+              )}
 
-              {/* Q3: Fondo emergencia */}
-              <div className="plan-card">
-                <div className="plan-card-header">
-                  <Icon component={FaPiggyBank} className="plan-icon" />
-                  <div>
-                    <h2 className="plan-question">{t('plan.emergencyTitle')}</h2>
-                    <p className="plan-subtitle">{t('plan.emergencySubtitle')}</p>
+              {/* Q3: Fondo emergencia — only when there are expenses to cover */}
+              {cf.totalExpensesUSD > 0 && (
+                <div className="plan-card">
+                  <div className="plan-card-header">
+                    <Icon component={FaPiggyBank} className="plan-icon" />
+                    <div>
+                      <h2 className="plan-question">{t('plan.emergencyTitle')}</h2>
+                      <p className="plan-subtitle">{t('plan.emergencySubtitle')}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalSavings')}</span><span className="plan-stat-value">{fmt(totalSavingsUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.expensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.coverage')}</span><span className={`plan-stat-value ${emergencyMonths >= 3 ? 'plan-green' : 'plan-red'}`}>{emergencyMonths === Infinity ? t('plan.emergencyInfinite') : t('plan.emergencyMonths', { n: emergencyMonths.toFixed(1) })}</span></div>
-                </div>
-                <div className="plan-progress-wrap">
-                  <div className="plan-progress-bar">
-                    <div className="plan-progress-fill" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} />
-                    <div className="plan-progress-marker" style={{ left: '50%' }} />
+                  <div className="plan-stat-row">
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalSavings')}</span><span className="plan-stat-value">{fmt(totalSavingsUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.expensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.coverage')}</span><span className={`plan-stat-value ${emergencyMonths >= 3 ? 'plan-green' : 'plan-red'}`}>{emergencyMonths === Infinity ? t('plan.emergencyInfinite') : t('plan.emergencyMonths', { n: emergencyMonths.toFixed(1) })}</span></div>
                   </div>
-                  <div className="plan-progress-labels"><span>0</span><span>3</span><span>6</span></div>
+                  <div className="plan-progress-wrap">
+                    <div className="plan-progress-bar">
+                      <div className="plan-progress-fill" style={{ width: `${Math.min((emergencyMonths / 6) * 100, 100)}%` }} />
+                      <div className="plan-progress-marker" style={{ left: '50%' }} />
+                    </div>
+                    <div className="plan-progress-labels"><span>0</span><span>3</span><span>6</span></div>
+                  </div>
+                  {emergencyMonths < 3 && (
+                    <p className="plan-tip">{t('plan.emergencyTip', { amount: fmt(3 * cf.totalExpensesUSD - totalSavingsUSD) })}</p>
+                  )}
                 </div>
-                {emergencyMonths < 3 && cf.totalExpensesUSD > 0 && (
-                  <p className="plan-tip">{t('plan.emergencyTip', { amount: fmt(3 * cf.totalExpensesUSD - totalSavingsUSD) })}</p>
-                )}
-              </div>
+              )}
 
-              {/* Q4: Libertad financiera */}
-              <div className="plan-card">
-                <div className="plan-card-header">
-                  <Icon component={FaCheckCircle} className="plan-icon" />
-                  <div>
-                    <h2 className="plan-question">{t('plan.freedomTitle')}</h2>
-                    <p className="plan-subtitle">{t('plan.freedomSubtitle')}</p>
+              {/* Q4: Libertad financiera — only when there are expenses */}
+              {cf.totalExpensesUSD > 0 && (
+                <div className="plan-card">
+                  <div className="plan-card-header">
+                    <Icon component={FaCheckCircle} className="plan-icon" />
+                    <div>
+                      <h2 className="plan-question">{t('plan.freedomTitle')}</h2>
+                      <p className="plan-subtitle">{t('plan.freedomSubtitle')}</p>
+                    </div>
+                  </div>
+                  <div className="plan-stat-row">
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.passiveMonth')}</span><span className="plan-stat-value plan-green">{fmt(cf.passiveIncomeUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalExpensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
+                    <div className="plan-stat"><span className="plan-stat-label">{t('plan.gap')}</span><span className={`plan-stat-value ${freedomGap <= 0 ? 'plan-green' : 'plan-red'}`}>{freedomGap <= 0 ? t('plan.freeLabel') : `-${fmt(freedomGap)}`}</span></div>
+                  </div>
+                  <div className="plan-progress-wrap">
+                    <div className="plan-progress-bar">
+                      <div className="plan-progress-fill plan-progress-fill--freedom" style={{ width: `${freedomPct}%` }} />
+                    </div>
+                    <div className="plan-progress-labels"><span>0%</span><span style={{ color: 'var(--primary)', fontWeight: 700 }}>{freedomPct.toFixed(1)}%</span><span>100%</span></div>
                   </div>
                 </div>
-                <div className="plan-stat-row">
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.passiveMonth')}</span><span className="plan-stat-value plan-green">{fmt(cf.passiveIncomeUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.totalExpensesMonth')}</span><span className="plan-stat-value">{fmt(cf.totalExpensesUSD)}</span></div>
-                  <div className="plan-stat"><span className="plan-stat-label">{t('plan.gap')}</span><span className={`plan-stat-value ${freedomGap <= 0 ? 'plan-green' : 'plan-red'}`}>{freedomGap <= 0 ? t('plan.freeLabel') : `-${fmt(freedomGap)}`}</span></div>
-                </div>
-                <div className="plan-progress-wrap">
-                  <div className="plan-progress-bar">
-                    <div className="plan-progress-fill plan-progress-fill--freedom" style={{ width: `${freedomPct}%` }} />
-                  </div>
-                  <div className="plan-progress-labels"><span>0%</span><span style={{ color: 'var(--primary)', fontWeight: 700 }}>{freedomPct.toFixed(1)}%</span><span>100%</span></div>
-                </div>
-              </div>
+              )}
 
             </div>
           );

@@ -36,12 +36,17 @@ const InstallApp = lazy(() => import('./pages/InstallApp'));
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const hasSeenSetup = !!localStorage.getItem('hasSeenInitialSetup');
 
   return (
     <Routes>
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />}
+        element={
+          isAuthenticated
+            ? <Navigate to={hasSeenSetup ? '/dashboard' : '/preferences'} replace />
+            : <Landing />
+        }
       />
       <Route
         path="/dashboard"
