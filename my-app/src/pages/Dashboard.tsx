@@ -2277,7 +2277,7 @@ const Dashboard: React.FC = () => {
           >
             <div className="empty-state-image-wrapper">
               <motion.img
-                src={`${process.env.PUBLIC_URL}/trophy.png`}
+                src={`${process.env.PUBLIC_URL}/logo.png`}
                 alt={t('dashboard.emptyStateAlt')}
                 className="empty-state-image"
                 initial={{ scale: 0.8, opacity: 0 }}
