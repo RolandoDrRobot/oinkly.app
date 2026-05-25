@@ -52,6 +52,8 @@
     "noIncomes": "Aún no hay ingresos registrados",
     "noIncomesSubtitle": "Agrega tus fuentes de ingreso para tener una visión financiera completa",
     "addFirstIncome": "Agregar Tu Primer Ingreso",
+    "pendingThisMonth": "Por pagar",
+    "allPaid": "¡Todo pagado!",
     "homeEmptyTitle": "¡Bienvenido a Oinkly!",
     "homeEmptySubtitle": "Empieza agregando tus deudas, gastos fijos, activos e ingresos para ver tu panorama financiero completo.",
     "totalDebt": "Deuda Total",

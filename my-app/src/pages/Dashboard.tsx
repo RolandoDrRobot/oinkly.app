@@ -2264,6 +2264,45 @@ const Dashboard: React.FC = () => {
                 </motion.div>
               );
             })()}
+
+            {/* Pending widget */}
+            {(() => {
+              const currentMonth = new Date().toISOString().slice(0, 7);
+              const localCurrency = storage.getLocalCurrency();
+              const unpaidDebts = debts.filter(d => !d.closedAt && d.paidForMonth !== currentMonth);
+              const unpaidExpenses = fixedExpenses.filter(e => e.paidForMonth !== currentMonth);
+              const totalLocal = unpaidDebts.reduce((a, d) => a + (d.localFee || 0), 0)
+                               + unpaidExpenses.reduce((a, e) => a + (e.amountLocal || 0), 0);
+              const totalUSD   = unpaidDebts.reduce((a, d) => a + (d.dollarFee || 0), 0)
+                               + unpaidExpenses.reduce((a, e) => a + (e.amountDollars || 0), 0);
+              const allPaid = unpaidDebts.length === 0 && unpaidExpenses.length === 0;
+              const count = unpaidDebts.length + unpaidExpenses.length;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.28 }}
+                  className="pending-widget"
+                >
+                  <div className="pending-widget-header">
+                    <Icon component={FaCalendarAlt} size={13} style={{ color: 'var(--text-muted)' }} />
+                    <span className="pending-widget-label">{t('dashboard.pendingThisMonth')}</span>
+                    {!allPaid && <span className="pending-widget-count">{count}</span>}
+                  </div>
+                  {allPaid ? (
+                    <div className="pending-widget-paid">
+                      <Icon component={FaCheckCircle} size={18} style={{ color: 'var(--primary)' }} />
+                      <span>{t('dashboard.allPaid')}</span>
+                    </div>
+                  ) : (
+                    <div className="pending-widget-amounts">
+                      <span className="pending-widget-main">{formatCurrency(totalLocal, localCurrency)}</span>
+                      <span className="pending-widget-usd">{formatCurrency(totalUSD, 'USD')}</span>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
           </motion.div>
         )}
 

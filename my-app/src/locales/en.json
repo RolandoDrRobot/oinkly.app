@@ -52,6 +52,8 @@
     "noIncomes": "No income recorded yet",
     "noIncomesSubtitle": "Add your income sources to get a complete financial picture",
     "addFirstIncome": "Add Your First Income",
+    "pendingThisMonth": "To pay",
+    "allPaid": "All paid!",
     "homeEmptyTitle": "Welcome to Oinkly!",
     "homeEmptySubtitle": "Start by adding your debts, fixed expenses, assets, and income to see your full financial picture.",
     "totalDebt": "Total Debt",
