@@ -2265,6 +2265,54 @@ const Dashboard: React.FC = () => {
               );
             })()}
 
+            {/* Cashflow summary table */}
+            {(() => {
+              const cf = calculateCashflow();
+              const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+              if (cf.incomeUSD === 0 && cf.totalExpensesUSD === 0) return null;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.27 }}
+                  className="summary-card"
+                  style={{ marginTop: 10 }}
+                >
+                  <div className="cashflow-header" style={{ marginBottom: 10 }}>
+                    <Icon component={FaChartLine} className="summary-icon" />
+                    <span className="summary-label">{t('cashflow.monthlyTitle')}</span>
+                  </div>
+                  <div className="plan-table">
+                    <div className="plan-cf-summary-row">
+                      <span className="plan-cf-summary-label">{t('cashflow.activeIncome')}</span>
+                      <span className="plan-green">+{fmt(cf.activeIncomeUSD)}</span>
+                    </div>
+                    {cf.passiveIncomeUSD > 0 && (
+                      <div className="plan-cf-summary-row">
+                        <span className="plan-cf-summary-label">{t('cashflow.passiveIncome')}</span>
+                        <span className="plan-green">+{fmt(cf.passiveIncomeUSD)}</span>
+                      </div>
+                    )}
+                    <div className="plan-cf-summary-row">
+                      <span className="plan-cf-summary-label">{t('cashflow.fixedExpenses')}</span>
+                      <span className="plan-red">-{fmt(cf.fixedExpensesUSD)}</span>
+                    </div>
+                    <div className="plan-cf-summary-row">
+                      <span className="plan-cf-summary-label">{t('cashflow.debtPayments')}</span>
+                      <span className="plan-red">-{fmt(cf.debtPaymentsUSD)}</span>
+                    </div>
+                    <div className="plan-cf-summary-divider" />
+                    <div className="plan-cf-summary-row plan-cf-summary-total">
+                      <span className="plan-cf-summary-label">{t('cashflow.cashflowUSD')}</span>
+                      <span className={cf.cashflowUSD >= 0 ? 'plan-green' : 'plan-red'}>
+                        {cf.cashflowUSD >= 0 ? '+' : ''}{fmt(cf.cashflowUSD)}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
+
             {/* Pending widget */}
             {(() => {
               const currentMonth = new Date().toISOString().slice(0, 7);
